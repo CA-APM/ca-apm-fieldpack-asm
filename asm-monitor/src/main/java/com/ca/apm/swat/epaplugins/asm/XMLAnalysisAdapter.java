@@ -1,4 +1,4 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.wily.field.apmcloudminder.reporting.MetricWriter;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 
 public class XMLAnalysisAdapter {
 

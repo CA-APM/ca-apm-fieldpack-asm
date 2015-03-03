@@ -1,12 +1,12 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.PrintStream;
 import java.util.HashMap;
 
-import com.wily.field.apmcloudminder.reporting.DummyMetricWriter;
-import com.wily.field.apmcloudminder.reporting.MetricWriter;
-import com.wily.field.apmcloudminder.reporting.MetricWriterISC;
-import com.wily.fieldext.epaplugins.utils.PropertiesUtils;
+import com.ca.apm.swat.epaplugins.asm.reporting.DummyMetricWriter;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriterISC;
+import com.ca.apm.swat.epaplugins.utils.PropertiesUtils;
 import com.wily.introscope.epagent.PropertiesReader;
 
 

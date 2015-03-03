@@ -1,5 +1,6 @@
 package com.wily.introscope.epagent;
 
+import com.wily.introscope.epagent.EPAgent;
 import com.wily.util.feedback.IModuleFeedbackChannel;
 import com.wily.util.feedback.SystemOutFeedbackChannel;
 

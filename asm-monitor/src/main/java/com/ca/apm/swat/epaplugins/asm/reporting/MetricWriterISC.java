@@ -1,4 +1,4 @@
-package com.wily.field.apmcloudminder.reporting;
+package com.ca.apm.swat.epaplugins.asm.reporting;
 
 import java.io.PrintStream;
 import java.util.Date;
@@ -14,17 +14,17 @@ import com.wily.introscope.epagent.api.LongCounterDataRecorder;
 import com.wily.introscope.epagent.api.TimestampDataRecorder;
 
 /**
- * Implementation for writing the Introscope data in REST format to the EPA
+ * Implementation for writing the Introscope data in XML format to the EPA
  * 
  * @author Andreas Reiss - CA Wily Professional Service
  *
  */
-public class RestMetricWriter implements MetricWriter {
+public class MetricWriterISC implements MetricWriter {
 
   private final PrintStream printStream;
   private IAgent agent;
 
-  public RestMetricWriter(PrintStream printStream) {
+  public MetricWriterISC(PrintStream printStream) {
     this.printStream = printStream;
     if (agent == null) {
       try {

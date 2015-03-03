@@ -1,4 +1,4 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,11 +10,12 @@ import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.wily.fieldext.epaplugins.utils.EPAConstants;
-import com.wily.fieldext.epaplugins.utils.JSONHelper;
-import com.wily.fieldext.epaplugins.utils.PropertiesUtils;
-import com.wily.fieldext.epaplugins.utils.StringFilter;
-import com.wily.fieldext.epaplugins.utils.TextNormalizer;
+
+import com.ca.apm.swat.epaplugins.utils.EPAConstants;
+import com.ca.apm.swat.epaplugins.utils.JSONHelper;
+import com.ca.apm.swat.epaplugins.utils.PropertiesUtils;
+import com.ca.apm.swat.epaplugins.utils.StringFilter;
+import com.ca.apm.swat.epaplugins.utils.TextNormalizer;
 
 public class CloudMonitorRequestHelper {
 

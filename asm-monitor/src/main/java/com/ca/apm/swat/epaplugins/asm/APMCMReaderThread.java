@@ -1,10 +1,10 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.Date;
 import java.util.HashMap;
 
-import com.wily.fieldext.epaplugins.utils.JSONHelper;
-import com.wily.fieldext.epaplugins.utils.PropertiesUtils;
+import com.ca.apm.swat.epaplugins.utils.JSONHelper;
+import com.ca.apm.swat.epaplugins.utils.PropertiesUtils;
 
 public class APMCMReaderThread extends Thread {
   String thisFolder;

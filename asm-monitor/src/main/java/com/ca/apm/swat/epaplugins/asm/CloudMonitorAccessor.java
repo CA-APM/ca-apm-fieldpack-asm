@@ -1,4 +1,4 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -7,10 +7,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONObject;
-import com.wily.fieldext.epaplugins.utils.CryptoUtils;
-import com.wily.fieldext.epaplugins.utils.EPAConstants;
-import com.wily.fieldext.epaplugins.utils.PropertiesUtils;
-import com.wily.fieldext.epaplugins.utils.RESTClient;
+
+import com.ca.apm.swat.epaplugins.utils.CryptoUtils;
+import com.ca.apm.swat.epaplugins.utils.EPAConstants;
+import com.ca.apm.swat.epaplugins.utils.PropertiesUtils;
+import com.ca.apm.swat.epaplugins.utils.RESTClient;
 
 public class CloudMonitorAccessor {
 

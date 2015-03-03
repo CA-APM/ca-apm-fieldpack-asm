@@ -1,4 +1,4 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,8 +7,9 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-import com.wily.field.apmcloudminder.reporting.DummyMetricWriter;
-import com.wily.field.apmcloudminder.reporting.MetricWriter;
+import com.ca.apm.swat.epaplugins.asm.CloudMonitorMetricReporter;
+import com.ca.apm.swat.epaplugins.asm.reporting.DummyMetricWriter;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 
 
 public class APMCMAgentTest {

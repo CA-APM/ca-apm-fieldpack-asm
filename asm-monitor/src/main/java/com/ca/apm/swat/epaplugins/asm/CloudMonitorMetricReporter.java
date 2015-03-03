@@ -1,4 +1,4 @@
-package com.wily.fieldext.epaplugins.apmcloudmonitor;
+package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,8 +18,8 @@ import org.xml.sax.SAXException;
 //import sun.misc.BASE64Decoder;
 import org.apache.commons.codec.binary.Base64;
 
-import com.wily.field.apmcloudminder.reporting.MetricWriter;
-import com.wily.fieldext.epaplugins.utils.EPAConstants;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
+import com.ca.apm.swat.epaplugins.utils.EPAConstants;
 
 public class CloudMonitorMetricReporter {
 
