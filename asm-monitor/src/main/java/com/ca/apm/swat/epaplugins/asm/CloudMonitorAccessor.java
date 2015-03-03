@@ -92,9 +92,9 @@ public class CloudMonitorAccessor {
     if (errorCode == 1000) {
       System.err.print("Login Failed.\nTry logging manually at " + this.apmcmProperties.getProperty("apmcm.URL") + "/"
         + "acct_token" + "\nwith the login credentials in your config file.\n"
-        + "NOTE: If this is your first time using the APM Cloud Monitor Agent,\n" + "set your API password at : "
-        + "http://www.watchmouse.com/en/change_passwd.php" + "\n"
-        + "Use the password provided to you by Watchmouse when you signed up.");
+        + "NOTE: If this is your first time using the " + EPAConstants.apmcmProductName + ",\n" + "set your API password at : "
+        + EPAConstants.apmcmPasswordPage + "\n"
+        + "Use the password provided to you by " + EPAConstants.apmcmProductName + " when you signed up.");
     }
 
     System.exit(1000);

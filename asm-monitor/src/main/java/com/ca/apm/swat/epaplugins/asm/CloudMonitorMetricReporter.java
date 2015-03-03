@@ -52,7 +52,7 @@ public class CloudMonitorMetricReporter {
         thisMetricType = "IntCounter";
       }
 
-      metricWriter.writeMetric(thisMetricType, "APM Cloud Monitor" + "|" + metricPairs.getKey(), metricPairs.getValue());
+      metricWriter.writeMetric(thisMetricType, EPAConstants.apmcmMetricTree + "|" + metricPairs.getKey(), metricPairs.getValue());
     }
   }
 
