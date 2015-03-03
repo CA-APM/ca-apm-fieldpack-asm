@@ -48,6 +48,7 @@ public class EPAConstants
 	public static final String kAPMCMErrors = "errors";
 	public static final String kAPMCMInfo = "info";
 	public static final String kAPMCMName = "name";
+	public static final Object kAPMCMDescr = "descr";
 	public static final String kAPMCMLoc = "loc";
 	public static final String kAPMCMMonitors = "monitors";
 	public static final String kAPMCMStats = "stats";

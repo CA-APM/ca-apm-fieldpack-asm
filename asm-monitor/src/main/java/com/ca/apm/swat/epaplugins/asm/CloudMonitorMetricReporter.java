@@ -125,7 +125,7 @@ public class CloudMonitorMetricReporter {
           }
         }
       } else {
-        if ((thisKey.equals(EPAConstants.kAPMCMColor)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
+        if ((thisKey.equals(EPAConstants.kAPMCMCode)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
           || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, "").length() == 0))
           continue;
         String thisValue = thisJO.getString(thisKey);

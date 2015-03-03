@@ -26,7 +26,4 @@ public class ASMProperties {
 	public static final String PASS_ENCRYPTED			= "apmcm.pass.encrypted";
 	public static final String PASS						= "apmcm.pass";
 	public static final String FOLDERS					= "apmcm.folders";
-	public static final String METRICS7					= "apmcm";
-	public static final String METRICS8					= "apmcm";
-	public static final String METRICS9					= "apmcm";
 }
