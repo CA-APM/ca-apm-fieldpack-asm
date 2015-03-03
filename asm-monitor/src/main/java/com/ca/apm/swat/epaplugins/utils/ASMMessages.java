@@ -18,10 +18,6 @@ public class ASMMessages {
 	public static final String loginInfo						= "loginInfo";
 	public static final String noError							= "noError";
 	public static final String noInfo							= "noInfo";
-	public static final String connectionRetry5					= "connectionRetry";
-	public static final String connectionRetry6					= "connectionRetry";
-	public static final String connectionRetry7					= "connectionRetry";
-	public static final String connectionRetry8					= "connectionRetry";
 	public static final String parentThread						= "parentThread";
 	public static final String agentInitialization 				= "agentInitialization";
 

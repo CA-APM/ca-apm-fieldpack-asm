@@ -58,7 +58,6 @@ public class EPAConstants
 	public static final String kAPMCMOutput = "output";
 	public static final String kAPMCMHarOrLog = "{\"har\": {\"log\"";
 	public static final String kAPMCMUndefined = "Undefined";
-
 	public static final String apmcmMetricTree = "APM Cloud Monitor";
 	public static final String apmcmMonitorMetricPrefix = "Monitors|";
 	public static final String apmcmRootFolder = "root_folder";
@@ -135,7 +134,7 @@ public class EPAConstants
 		apmcmColors.put("orange", "2");
 		apmcmColors.put("red", "3");
 
-		kNoStringArrayProperties = new String[0];
+		NoStringArrayProperties = new String[0];
 
 		//TODO: GG reset to true
 		apmcmQuiet = Boolean.valueOf(false);

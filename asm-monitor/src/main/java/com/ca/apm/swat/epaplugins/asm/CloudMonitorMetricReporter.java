@@ -51,7 +51,11 @@ public class CloudMonitorMetricReporter {
         thisMetricType = EPAConstants.kIntCounter;
       }
 
+<<<<<<< HEAD
       metricWriter.writeMetric(thisMetricType, EPAConstants.apmcmMetricTree + EPAConstants.kMetricPathSeparator + metricPairs.getKey(), metricPairs.getValue());
+=======
+      metricWriter.writeMetric(thisMetricType, EPAConstants.apmcmMetricTree + "|" + metricPairs.getKey(), metricPairs.getValue());
+>>>>>>> branch 'master' of https://github-isl-01.ca.com/APMSWAT/fieldpack.asmmonitor.git
     }
   }
 

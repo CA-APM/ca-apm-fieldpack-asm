@@ -96,7 +96,7 @@ public class CloudMonitorAccessor {
     		  EPAConstants.kAPMCMLoginCmd,
     		  EPAConstants.apmcmProductName,
     		  EPAConstants.apmcmPasswordPage}));
-    }
+   }
 
     System.exit(1000);
 
