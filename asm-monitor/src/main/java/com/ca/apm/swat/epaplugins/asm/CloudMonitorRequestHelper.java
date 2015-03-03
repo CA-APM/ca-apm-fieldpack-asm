@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.utils.ASMProperties;
 import com.ca.apm.swat.epaplugins.utils.EPAConstants;
 import com.ca.apm.swat.epaplugins.utils.JSONHelper;
 import com.ca.apm.swat.epaplugins.utils.PropertiesUtils;
@@ -34,11 +35,11 @@ public class CloudMonitorRequestHelper {
 
   public String[] getFolders() throws Exception {
     String[] apmcmFolders;
-    if ((apmcmProperties.getProperty("apmcm.folders", "").length() == 0)
-      || (apmcmProperties.getProperty("apmcm.folders", "").contains("all_folders")))
-      apmcmFolders = getFolders("all_folders", cloudMonitorAccessor, apmcmProperties);
+    if ((apmcmProperties.getProperty(ASMProperties.FOLDERS, "").length() == 0)
+      || (apmcmProperties.getProperty(ASMProperties.FOLDERS, "").contains(EPAConstants.apmcmAllFolders)))
+      apmcmFolders = getFolders(EPAConstants.apmcmAllFolders, cloudMonitorAccessor, apmcmProperties);
     else {
-      apmcmFolders = getFolders(apmcmProperties.getProperty("apmcm.folders"), cloudMonitorAccessor, apmcmProperties);
+      apmcmFolders = getFolders(apmcmProperties.getProperty(ASMProperties.FOLDERS), cloudMonitorAccessor, apmcmProperties);
     }
 
     return apmcmFolders;

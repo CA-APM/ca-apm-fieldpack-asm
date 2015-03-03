@@ -8,15 +8,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.Inflater;
 
+//import sun.misc.BASE64Decoder;
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-//import sun.misc.BASE64Decoder;
-import org.apache.commons.codec.binary.Base64;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.utils.EPAConstants;
@@ -47,30 +46,30 @@ public class CloudMonitorMetricReporter {
         continue;
       String thisMetricType = returnMetricType((String) metricPairs.getValue());
 
-      if (thisMetricType.equals("Float")) {
+      if (thisMetricType.equals(EPAConstants.kFloat)) {
         metricPairs.setValue(((String) metricPairs.getValue()).split("\\.")[0]);
-        thisMetricType = "IntCounter";
+        thisMetricType = EPAConstants.kIntCounter;
       }
 
-      metricWriter.writeMetric(thisMetricType, "APM Cloud Monitor" + "|" + metricPairs.getKey(), metricPairs.getValue());
+      metricWriter.writeMetric(thisMetricType, EPAConstants.apmcmMetricTree + EPAConstants.kMetricPathSeparator + metricPairs.getKey(), metricPairs.getValue());
     }
   }
 
   private String returnMetricType(String thisMetric) {
-    String metricType = "StringEvent";
+    String metricType = EPAConstants.kStringEvent;
     try {
       new Integer(thisMetric);
-      metricType = "IntCounter";
+      metricType = EPAConstants.kIntCounter;
     } catch (NumberFormatException e) {
       try {
         new Long(thisMetric);
-        metricType = "LongCounter";
+        metricType = EPAConstants.kLongCounter;
       } catch (NumberFormatException ee) {
         try {
           new Float(thisMetric);
-          metricType = "Float";
+          metricType = EPAConstants.kFloat;
         } catch (NumberFormatException eee) {
-          metricType = "StringEvent";
+          metricType = EPAConstants.kStringEvent;
         }
       }
     }
@@ -83,7 +82,7 @@ public class CloudMonitorMetricReporter {
       while (metricIt.hasNext()) {
         Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
 
-        if (!returnMetricType((String) metricPairs.getValue()).equals("StringEvent"))
+        if (!returnMetricType((String) metricPairs.getValue()).equals(EPAConstants.kStringEvent))
           metric_map.put((String) metricPairs.getKey(), "0");
         else {
           metric_map.put((String) metricPairs.getKey(), "");
@@ -99,13 +98,13 @@ public class CloudMonitorMetricReporter {
 
     JSONObject thisJO = new JSONObject(jsonString);
 
-    if (thisJO.optString("name", null) != null) {
-      metricTree = metricTree + "|" + thisJO.getString("name");
+    if (thisJO.optString(EPAConstants.kAPMCMName, null) != null) {
+      metricTree = metricTree + EPAConstants.kMetricPathSeparator + thisJO.getString(EPAConstants.kAPMCMName);
     }
 
     if (apmcmDisplayMonitor) {
-      if (thisJO.optString("loc", null) != null) {
-        metricTree = metricTree + "|" + (String) this.cpMap.get(thisJO.getString("loc"));
+      if (thisJO.optString(EPAConstants.kAPMCMLoc, null) != null) {
+        metricTree = metricTree + EPAConstants.kMetricPathSeparator + (String) this.cpMap.get(thisJO.getString(EPAConstants.kAPMCMLoc));
       }
     }
 
@@ -119,25 +118,25 @@ public class CloudMonitorMetricReporter {
       } else if (thisJO.optJSONArray(thisKey) != null) {
         JSONArray innerJA = thisJO.optJSONArray(thisKey);
         for (int i = 0; i < innerJA.length(); i++) {
-          if ((thisKey.equals("result")) || (thisKey.equals("monitors")) || (thisKey.equals("stats")))
+          if ((thisKey.equals(EPAConstants.kAPMCMResult)) || (thisKey.equals(EPAConstants.kAPMCMMonitors)) || (thisKey.equals(EPAConstants.kAPMCMStats)))
             metric_map.putAll(generateMetrics(innerJA.getJSONObject(i).toString(), metricTree));
           else {
-            metric_map.putAll(generateMetrics(innerJA.getJSONObject(i).toString(), metricTree + "|" + thisKey));
+            metric_map.putAll(generateMetrics(innerJA.getJSONObject(i).toString(), metricTree + EPAConstants.kMetricPathSeparator + thisKey));
           }
         }
       } else {
-        if ((thisKey.equals("code")) || (thisKey.equals("elapsed")) || (thisKey.equals("info"))
-          || (thisKey.equals("version")) || (thisJO.optString(thisKey, "").length() == 0))
+        if ((thisKey.equals(EPAConstants.kAPMCMColor)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
+          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, "").length() == 0))
           continue;
         String thisValue = thisJO.getString(thisKey);
 
-        if (thisKey.equals("descr")) {
-          String rawErrorMetric = metricTree + ":" + (String) EPAConstants.apmcmMetrics.get("errors");
+        if (thisKey.equals(EPAConstants.kAPMCMDescr)) {
+          String rawErrorMetric = metricTree + EPAConstants.kMetricNameSeparator + (String) EPAConstants.apmcmMetrics.get(EPAConstants.kAPMCMErrors);
           metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), "1");
         }
 
-        if (thisKey.equals("color")) {
-          String rawErrorMetric = metricTree + ":" + (String) EPAConstants.apmcmMetrics.get("colors");
+        if (thisKey.equals(EPAConstants.kAPMCMColor)) {
+          String rawErrorMetric = metricTree + EPAConstants.kMetricNameSeparator + (String) EPAConstants.apmcmMetrics.get(EPAConstants.kAPMCMColors);
           if (EPAConstants.apmcmColors.containsKey(thisValue))
             metric_map.put(
               CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
@@ -152,13 +151,13 @@ public class CloudMonitorMetricReporter {
           thisKey = ((String) EPAConstants.apmcmMetrics.get(thisKey)).toString();
         }
 
-        if (thisKey.equalsIgnoreCase("output")) {
+        if (thisKey.equalsIgnoreCase(EPAConstants.kAPMCMOutput)) {
 
           //Handled different
           continue;
         }
 
-        String rawMetric = metricTree + ":" + thisKey;
+        String rawMetric = metricTree + EPAConstants.kMetricNameSeparator + thisKey;
         metric_map.put(CloudMonitorRequestHelper.fixMetric(rawMetric), CloudMonitorRequestHelper.fixMetric(thisValue));
       }
     }
@@ -199,9 +198,9 @@ public class CloudMonitorMetricReporter {
 
     JSONObject thisJO = new JSONObject(jsonString);
 
-    String name = "Undefined";
-    if (thisJO.optString("name", null) != null) {
-      name = thisJO.getString("name");
+    String name = EPAConstants.kAPMCMUndefined;
+    if (thisJO.optString(EPAConstants.kAPMCMName, null) != null) {
+      name = thisJO.getString(EPAConstants.kAPMCMName);
     }
     Iterator thisJOKeys = thisJO.keys();
     while (thisJOKeys.hasNext()) {
@@ -216,24 +215,24 @@ public class CloudMonitorMetricReporter {
           analyzeContentResults(innerJA.getJSONObject(i).toString(), folder, metric_map);
         }
       } else {
-        if ((thisKey.equals("code")) || (thisKey.equals("elapsed")) || (thisKey.equals("info"))
-          || (thisKey.equals("version")) || (thisJO.optString(thisKey, "").length() == 0))
+        if ((thisKey.equals(EPAConstants.kAPMCMColor)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
+          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, "").length() == 0))
           continue;
         String thisValue = thisJO.getString(thisKey);
 
         // TODO: separate into different components - chain of responsibility discover, decode, handle
-        if (thisKey.equalsIgnoreCase("output")) {
+        if (thisKey.equalsIgnoreCase(EPAConstants.kAPMCMOutput)) {
           try {
             String originalString = thisValue;
             byte[] decoded = Base64.decodeBase64(originalString);
             if (decoded != null) {
               byte[] bytesDecompressed = decompress(decoded);
               if (bytesDecompressed != null) {
-                String returnValue = new String(bytesDecompressed, 0, bytesDecompressed.length, "UTF-8");
-                if (returnValue.startsWith("<?xml")) {
+                String returnValue = new String(bytesDecompressed, 0, bytesDecompressed.length, EPAConstants.UTF8);
+                if (returnValue.startsWith(EPAConstants.kXMLPrefix)) {
                   analysisAdapter.analyzeXML(returnValue, folder, name, metric_map);
                 } else {
-                  if (returnValue.startsWith("{\"har\": {\"log\"")) {
+                  if (returnValue.startsWith(EPAConstants.kAPMCMHarOrLog)) {
                     //Do nothing - already have seen it. and we don't need this log
                   }
                 }

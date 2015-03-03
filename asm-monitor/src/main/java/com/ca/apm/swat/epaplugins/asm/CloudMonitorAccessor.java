@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.utils.ASMMessages;
+import com.ca.apm.swat.epaplugins.utils.ASMProperties;
 import com.ca.apm.swat.epaplugins.utils.CryptoUtils;
 import com.ca.apm.swat.epaplugins.utils.EPAConstants;
 import com.ca.apm.swat.epaplugins.utils.PropertiesUtils;
@@ -18,25 +20,27 @@ public class CloudMonitorAccessor {
   private boolean apmcmLocalTest;
   private PropertiesUtils apmcmProperties;
   private RESTClient apmcmClient;
-  public static final CryptoUtils apmcmCrypto = new CryptoUtils("1D0NTF33LT4RDY");
+  public static final CryptoUtils apmcmCrypto = new CryptoUtils(EPAConstants.kMsgDigest);
   private String apmcmLocalTestPath = "";
 
+  public static final String FAILED = "Failed";
+  
   public CloudMonitorAccessor(PropertiesUtils apmcmProperties) {
     this.apmcmProperties = apmcmProperties;
 
-    String proxyHost = this.apmcmProperties.getProperty("apmcm.proxy.host", "");
-    String proxyPort = this.apmcmProperties.getProperty("apmcm.proxy.port", "");
-    String proxyUser = this.apmcmProperties.getProperty("apmcm.proxy.user", "");
+    String proxyHost = this.apmcmProperties.getProperty(ASMProperties.PROXY_HOST, "");
+    String proxyPort = this.apmcmProperties.getProperty(ASMProperties.PROXY_PORT, "");
+    String proxyUser = this.apmcmProperties.getProperty(ASMProperties.PROXY_USER, "");
     String proxyPass;
-    if (this.apmcmProperties.getProperty("apmcm.proxy.pass.encrypted", "false").equals("true"))
-      proxyPass = CloudMonitorAccessor.apmcmCrypto.decrypt(this.apmcmProperties.getProperty("apmcm.proxy.pass", ""));
+    if (this.apmcmProperties.getProperty(ASMProperties.PROXY_PASS_ENCRYPTED, ASMProperties.FALSE).equals(ASMProperties.TRUE))
+      proxyPass = CloudMonitorAccessor.apmcmCrypto.decrypt(this.apmcmProperties.getProperty(ASMProperties.PROXY_PASS, ""));
     else {
-      proxyPass = this.apmcmProperties.getProperty("apmcm.proxy.pass", "");
+      proxyPass = this.apmcmProperties.getProperty(ASMProperties.PROXY_PASS, "");
     }
 
-    this.apmcmLocalTest = Boolean.parseBoolean(this.apmcmProperties.getProperty("apmcm.localtest", "false"));
+    this.apmcmLocalTest = Boolean.parseBoolean(this.apmcmProperties.getProperty(ASMProperties.LOCAL_TEST, ASMProperties.FALSE));
     if (this.apmcmLocalTest) {
-      this.apmcmLocalTestPath = this.apmcmProperties.getProperty("apmcm.localtestpath");
+      this.apmcmLocalTestPath = this.apmcmProperties.getProperty(ASMProperties.LOCAL_TEST);
     }
     this.apmcmClient = new RESTClient(proxyHost, proxyPort, proxyUser, proxyPass);
   }
@@ -44,9 +48,8 @@ public class CloudMonitorAccessor {
   public String executeAPI(String callType, String callParams) throws Exception {
     String apiResponse = "";
     if (!apmcmLocalTest) {
-      URL apiURL = new URL(this.apmcmProperties.getProperty("apmcm.URL") + "/" + callType);
-      apiResponse = this.apmcmClient.request(EPAConstants.apmcmQuiet.booleanValue(), "POST", apiURL, callParams);
-    } else if (!callType.equals("acct_logout")) {
+      URL apiURL = new URL(this.apmcmProperties.getProperty(ASMProperties.URL) + "/" + callType);
+      apiResponse = this.apmcmClient.request(EPAConstants.apmcmQuiet.booleanValue(), EPAConstants.apmcmMethod, apiURL, callParams);
       String inputLine = null;
       String inputFileName = this.apmcmLocalTestPath + "\\" + callType + ".txt";
       BufferedReader inputFile = new BufferedReader(new FileReader(inputFileName));
@@ -61,50 +64,48 @@ public class CloudMonitorAccessor {
   }
 
   public String login() throws Exception {
-    String apmcmUser = this.apmcmProperties.getProperty("apmcm.user");
+    String apmcmUser = this.apmcmProperties.getProperty(ASMProperties.USER);
     String apmcmPass = null;
-    if (this.apmcmProperties.getProperty("apmcm.pass.encrypted").equals("true"))
-      apmcmPass = CloudMonitorAccessor.apmcmCrypto.decrypt(this.apmcmProperties.getProperty("apmcm.pass"));
+    if (this.apmcmProperties.getProperty(ASMProperties.PASS_ENCRYPTED).equals(ASMProperties.TRUE))
+      apmcmPass = CloudMonitorAccessor.apmcmCrypto.decrypt(this.apmcmProperties.getProperty(ASMProperties.PASS));
     else {
-      apmcmPass = this.apmcmProperties.getProperty("apmcm.pass");
+      apmcmPass = this.apmcmProperties.getProperty(ASMProperties.PASS);
     }
 
-    String loginStr = "user=" + apmcmUser + "&password=" + apmcmPass + "&callback=" + "doCallback";
-    String loginRequest = executeAPI("acct_token", loginStr);
+    String loginStr = "user=" + apmcmUser + "&password=" + apmcmPass + "&callback=" + EPAConstants.apmcmCallback;
+    String loginRequest = executeAPI(EPAConstants.kAPMCMLoginCmd, loginStr);
     JSONObject entireJO = new JSONObject(unpadJSON(loginRequest));
 
-    if (entireJO.getInt("code") == 0) {
-      JSONObject resultJO = entireJO.optJSONObject("result");
+    if (entireJO.getInt(EPAConstants.kAPMCMCode) == 0) {
+      JSONObject resultJO = entireJO.optJSONObject(EPAConstants.kAPMCMResult);
       if (resultJO != null) {
-        return resultJO.optString("nkey", null);
+        return resultJO.optString(EPAConstants.kAPMCMNKey, null);
       }
-      return "Failed";
+      return FAILED;
     }
 
-    String errorStr = entireJO.optString("error", "No error given.");
-    int errorCode = entireJO.optInt("code", -1);
-    String errorInfo = entireJO.optString("info", "No information given.");
+    String errorStr = entireJO.optString(EPAConstants.kAPMCMError, ASMMessages.getMessage(ASMMessages.noError));
+    int errorCode = entireJO.optInt(EPAConstants.kAPMCMCode, -1);
+    String errorInfo = entireJO.optString(EPAConstants.kAPMCMInfo, ASMMessages.getMessage(ASMMessages.noInfo));
 
-    System.err.println("Error: " + errorStr);
-    System.err.println("Error Code: " + errorCode);
-    System.err.println("Error Info: " + errorInfo);
+    System.err.println(ASMMessages.getMessage(ASMMessages.loginError, new Object[]{errorStr, errorCode, errorInfo}));
 
     if (errorCode == 1000) {
-      System.err.print("Login Failed.\nTry logging manually at " + this.apmcmProperties.getProperty("apmcm.URL") + "/"
-        + "acct_token" + "\nwith the login credentials in your config file.\n"
-        + "NOTE: If this is your first time using the APM Cloud Monitor Agent,\n" + "set your API password at : "
-        + "http://www.watchmouse.com/en/change_passwd.php" + "\n"
-        + "Use the password provided to you by Watchmouse when you signed up.");
+      System.err.print(ASMMessages.getMessage(ASMMessages.loginInfo,
+    		  new Object[]{this.apmcmProperties.getProperty(ASMProperties.URL),
+    		  EPAConstants.kAPMCMLoginCmd,
+    		  EPAConstants.apmcmProductName,
+    		  EPAConstants.apmcmPasswordPage}));
     }
 
     System.exit(1000);
 
-    return "Failed";
+    return FAILED;
   }
 
 
   private String unpadJSON(String jsonWithPadding) throws Exception {
-    String patternToMatch = "doCallback\\((.*)\\)([\n]*)";
+    String patternToMatch = EPAConstants.kJsonRegex;
 
     Pattern unpad = Pattern.compile(patternToMatch);
     Matcher matched = unpad.matcher(jsonWithPadding);
