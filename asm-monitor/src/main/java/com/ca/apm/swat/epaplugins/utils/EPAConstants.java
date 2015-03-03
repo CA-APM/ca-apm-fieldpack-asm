@@ -59,7 +59,6 @@ public class EPAConstants
 	public static final String kAPMCMOutput = "output";
 	public static final String kAPMCMHarOrLog = "{\"har\": {\"log\"";
 	public static final String kAPMCMUndefined = "Undefined";
-
 	public static final String apmcmMetricTree = "APM Cloud Monitor";
 	public static final String apmcmMonitorMetricPrefix = "Monitors|";
 	public static final String apmcmRootFolder = "root_folder";
