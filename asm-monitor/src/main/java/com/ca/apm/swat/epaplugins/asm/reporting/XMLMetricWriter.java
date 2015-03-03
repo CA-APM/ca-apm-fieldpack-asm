@@ -3,6 +3,7 @@ package com.ca.apm.swat.epaplugins.asm.reporting;
 import java.io.PrintStream;
 import java.util.Date;
 
+import com.ca.apm.swat.epaplugins.utils.EPAConstants;
 import com.wily.introscope.agent.AgentNotAvailableException;
 import com.wily.introscope.agent.AgentShim;
 import com.wily.introscope.agent.IAgent;
@@ -14,17 +15,17 @@ import com.wily.introscope.epagent.api.LongCounterDataRecorder;
 import com.wily.introscope.epagent.api.TimestampDataRecorder;
 
 /**
- * Implementation for writing the Introscope data in REST format to the EPA
+ * Implementation for writing the Introscope data in XML format to the EPA
  * 
  * @author Andreas Reiss - CA Wily Professional Service
  *
  */
-public class RestMetricWriter implements MetricWriter {
+public class XMLMetricWriter implements MetricWriter {
 
   private final PrintStream printStream;
   private IAgent agent;
 
-  public RestMetricWriter(PrintStream printStream) {
+  public XMLMetricWriter(PrintStream printStream) {
     this.printStream = printStream;
     if (agent == null) {
       try {
@@ -54,7 +55,7 @@ public class RestMetricWriter implements MetricWriter {
   }
 
   public void writeErrorMessage(String message) {
-    writeMetric("StringEvent", "CEM Integration:Error Message", message);
+    writeMetric("StringEvent", EPAConstants.apmcmProductNameShort + " Integration:Error Message", message);
   }
 
   public void writeMetric(String type, String name, float metric) {
@@ -63,7 +64,7 @@ public class RestMetricWriter implements MetricWriter {
   }
 
   public void writeErrorDetectorEntry(String text, String resource) {
-    printStream.println("<event  resource=\"CEM Integration\"> <param name=\"Trace Type\" value=\"ErrorSnapshot\"/> <calledComponent  resource=\""
+    printStream.println("<event  resource=\"" + EPAConstants.apmcmProductNameShort + " Integration\"> <param name=\"Trace Type\" value=\"ErrorSnapshot\"/> <calledComponent  resource=\""
       + resource + "\"><param name=\"Error Message\" value=\"" + text + "\"/>  </calledComponent> </event>");
   }
 
