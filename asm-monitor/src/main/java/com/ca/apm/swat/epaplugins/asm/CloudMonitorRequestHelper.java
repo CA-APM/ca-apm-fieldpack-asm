@@ -35,8 +35,8 @@ public class CloudMonitorRequestHelper {
 
   public String[] getFolders() throws Exception {
     String[] apmcmFolders;
-    if ((apmcmProperties.getProperty(ASMProperties.FOLDERS, "").length() == 0)
-      || (apmcmProperties.getProperty(ASMProperties.FOLDERS, "").contains(EPAConstants.apmcmAllFolders)))
+    if ((apmcmProperties.getProperty(ASMProperties.FOLDERS, EPAConstants.EMPTY_STRING).length() == 0)
+      || (apmcmProperties.getProperty(ASMProperties.FOLDERS, EPAConstants.EMPTY_STRING).contains(EPAConstants.apmcmAllFolders)))
       apmcmFolders = getFolders(EPAConstants.apmcmAllFolders, cloudMonitorAccessor, apmcmProperties);
     else {
       apmcmFolders = getFolders(apmcmProperties.getProperty(ASMProperties.FOLDERS), cloudMonitorAccessor, apmcmProperties);
@@ -48,33 +48,36 @@ public class CloudMonitorRequestHelper {
   private String[] getFolders(String folderList, CloudMonitorAccessor cloudMonitorAccessor,
     PropertiesUtils apmcmProperties) throws Exception {
     List<String> folderQueryOutput = new ArrayList<String>();
-    String folderStr = "nkey=" + this.nkey + "&callback=" + "doCallback";
-    String folderRequest = cloudMonitorAccessor.executeAPI("fldr_get", folderStr);
+    String folderRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMFoldersCmd, getCommandString());
 
-    JSONArray folderJA = extractJSONArray(folderRequest, "folders");
+    JSONArray folderJA = extractJSONArray(folderRequest, EPAConstants.kAPMCMFolders);
 
-    folderQueryOutput.add("root_folder");
+    folderQueryOutput.add(EPAConstants.apmcmRootFolder);
     for (int i = 0; i < folderJA.length(); i++) {
       JSONObject folderJO = folderJA.getJSONObject(i);
 
-      if ((!folderJO.optString("active", "").equals("y"))
-        && (apmcmProperties.getProperty("apmcm.skip_inactive.folders", "").equals("true")))
+      if ((!folderJO.optString(EPAConstants.kAPMCMActive, EPAConstants.EMPTY_STRING).equals(EPAConstants.YES))
+        && (apmcmProperties.getProperty(ASMProperties.SKIP_INACTIVE_FOLDERS, EPAConstants.EMPTY_STRING).equals(ASMProperties.TRUE)))
         continue;
-      folderQueryOutput.add(folderJO.get("name").toString());
+      folderQueryOutput.add(folderJO.get(EPAConstants.kAPMCMName).toString());
     }
 
-    if (!folderList.equals("all_folders")) {
+    if (!folderList.equals(EPAConstants.apmcmAllFolders)) {
       return compareList(folderQueryOutput, folderList);
     }
     return (String[]) folderQueryOutput.toArray(EPAConstants.kNoStringArrayProperties);
   }
 
-  private JSONArray extractJSONArray(String metricInput, String arrayName) throws Exception {
+  private String getCommandString() {
+	return EPAConstants.kAPMCMNKeyParam + this.nkey + EPAConstants.kAPMCMCallbackParam + EPAConstants.apmcmCallback;
+}
+
+private JSONArray extractJSONArray(String metricInput, String arrayName) throws Exception {
     JSONObject entireJO = new JSONObject(JSONHelper.unpadJSON(metricInput));
     JSONArray thisJA = new JSONArray();
 
-    if (entireJO.optJSONObject("result") != null) {
-      JSONObject resultJO = entireJO.getJSONObject("result");
+    if (entireJO.optJSONObject(EPAConstants.kAPMCMResult) != null) {
+      JSONObject resultJO = entireJO.getJSONObject(EPAConstants.kAPMCMResult);
 
       if (resultJO.optJSONArray(arrayName) != null) {
         thisJA = resultJO.optJSONArray(arrayName);
@@ -92,23 +95,22 @@ public class CloudMonitorRequestHelper {
 
   public HashMap<String, String> getCredits() throws Exception {
     HashMap<String, String> metric_map = new HashMap<String, String>();
-    String creditsRequest = "";
-    String creditsStr = "nkey=" + this.nkey + "&callback=" + "doCallback";
-    creditsRequest = cloudMonitorAccessor.executeAPI("acct_credits", creditsStr);
+    String creditsRequest = EPAConstants.EMPTY_STRING;
+    creditsRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMCreditsCmd, getCommandString());
 
-    JSONArray creditJA = extractJSONArray(creditsRequest, "credits");
+    JSONArray creditJA = extractJSONArray(creditsRequest, EPAConstants.kAPMCMCredits);
 
     for (int i = 0; i < creditJA.length(); i++) {
       JSONObject thisCreditJO = creditJA.getJSONObject(i);
 
-      String thisKey = thisCreditJO.optString("type", "no type");
-      String thisValue = thisCreditJO.optString("available", "0");
+      String thisKey = thisCreditJO.optString(EPAConstants.kAPMCMType, EPAConstants.NO_TYPE);
+      String thisValue = thisCreditJO.optString("available", EPAConstants.ZERO);
 
       if (EPAConstants.apmcmMetrics.containsKey(thisKey)) {
         thisKey = ((String) EPAConstants.apmcmMetrics.get(thisKey)).toString();
       }
 
-      String rawMetric = "Credits:" + thisKey;
+      String rawMetric = EPAConstants.kCreditsCategory + ":" + thisKey;
       metric_map.put(fixMetric(rawMetric), fixMetric(thisValue));
     }
 
@@ -125,8 +127,8 @@ public class CloudMonitorRequestHelper {
     }
 
     String metricKeyNormalized = thisNormalizer.filter(rawMetric);
-    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-    String fixedMetric = pattern.matcher(metricKeyNormalized).replaceAll("");
+    Pattern pattern = Pattern.compile(EPAConstants.kJsonPattern);
+    String fixedMetric = pattern.matcher(metricKeyNormalized).replaceAll(EPAConstants.EMPTY_STRING);
 
     return fixedMetric.replace("\\", "-").replace("/", "-").replace(",", "_").replace(";", "-").replace("&", "and");
   }
@@ -134,21 +136,20 @@ public class CloudMonitorRequestHelper {
   public HashMap<String, String> getCheckpoints() throws Exception {
     HashMap<String, String> returnCp = new HashMap<String, String>();
 
-    String cpStr = "nkey=" + this.nkey + "&callback=" + "doCallback";
-    String cpRequest = cloudMonitorAccessor.executeAPI("cp_list", cpStr);
+    String cpRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMCheckptsCmd, getCommandString());
 
-    JSONArray cpJA = extractJSONArray(cpRequest, "checkpoints");
+    JSONArray cpJA = extractJSONArray(cpRequest, EPAConstants.kAPMCMCheckpoints);
 
     for (int i = 0; i < cpJA.length(); i++) {
       JSONObject cpJO = cpJA.getJSONObject(i);
-      if (cpJO.get("areas").toString().contains(","))
+      if (cpJO.get(EPAConstants.kAPMCMAreas).toString().contains(","))
         returnCp.put(
-          cpJO.get("loc").toString(),
-          cpJO.get("areas").toString().split(",")[1] + "|" + cpJO.get("country_name") + "|" + cpJO.get("city"));
+          cpJO.get(EPAConstants.kAPMCMLoc).toString(),
+          cpJO.get(EPAConstants.kAPMCMAreas).toString().split(",")[1] + "|" + cpJO.get(EPAConstants.kAPMCMCountry) + "|" + cpJO.get(EPAConstants.kAPMCMCity));
       else {
         returnCp.put(
-          cpJO.get("loc").toString(),
-          cpJO.get("areas") + "|" + cpJO.get("country_name") + "|" + cpJO.get("city"));
+          cpJO.get(EPAConstants.kAPMCMLoc).toString(),
+          cpJO.get(EPAConstants.kAPMCMAreas) + "|" + cpJO.get(EPAConstants.kAPMCMCountry) + "|" + cpJO.get(EPAConstants.kAPMCMCity));
       }
     }
 
@@ -157,30 +158,29 @@ public class CloudMonitorRequestHelper {
 
   private String[] getRules(String folder, String rulesList) throws Exception {
     List<String> ruleQueryOutput = new ArrayList<String>();
-    String folderStr = "";
-    if (!folder.equals("root_folder"))
-      folderStr = "&folder=" + folder;
+    String folderStr = EPAConstants.EMPTY_STRING;
+    if (!folder.equals(EPAConstants.apmcmRootFolder))
+      folderStr = EPAConstants.kAPMCMFolderParam + folder;
     else {
-      folder = "";
+      folder = EPAConstants.EMPTY_STRING;
     }
 
-    String ruleStr = "nkey=" + this.nkey + folderStr + "&callback=" + "doCallback";
-    String ruleRequest = cloudMonitorAccessor.executeAPI("rule_get", ruleStr);
+    String ruleRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMRuleCmd, getCommandString() + folderStr);
 
-    JSONArray ruleJA = extractJSONArray(ruleRequest, "rules");
+    JSONArray ruleJA = extractJSONArray(ruleRequest, EPAConstants.kAPMCMRules);
 
     for (int i = 0; i < ruleJA.length(); i++) {
       JSONObject thisRuleJO = ruleJA.getJSONObject(i);
-      if (!thisRuleJO.optString("folder", "").equals(folder)) {
+      if (!thisRuleJO.optString(EPAConstants.kAPMCMFolder, EPAConstants.EMPTY_STRING).equals(folder)) {
         continue;
       }
-      if ((!thisRuleJO.optString("active", "n").equals("y"))
-        && (this.apmcmProperties.getProperty("apmcm.skip_inactive.rules", "false").equals("true")))
+      if ((!thisRuleJO.optString(EPAConstants.kAPMCMActive, EPAConstants.NO).equals(EPAConstants.YES))
+        && (this.apmcmProperties.getProperty(ASMProperties.SKIP_INACTIVE_FOLDERS, ASMProperties.FALSE).equals(ASMProperties.TRUE)))
         continue;
-      ruleQueryOutput.add(thisRuleJO.getString("name"));
+      ruleQueryOutput.add(thisRuleJO.getString(EPAConstants.kAPMCMName));
     }
 
-    if (!rulesList.equals("all_rules")) {
+    if (!rulesList.equals(EPAConstants.apmcmAllRules)) {
       return compareList(ruleQueryOutput, rulesList);
     }
     return (String[]) ruleQueryOutput.toArray(EPAConstants.kNoStringArrayProperties);
@@ -191,12 +191,12 @@ public class CloudMonitorRequestHelper {
 
 
     for (int i = 0; i < apmcmFolders.length; i++) {
-      String thisFolderProp = apmcmProperties.getProperty("apmcm.folder." + apmcmFolders[i], "");
+      String thisFolderProp = apmcmProperties.getProperty(ASMProperties.FOLDER_PREFIX + apmcmFolders[i], EPAConstants.EMPTY_STRING);
       String[] rules;
-      if ((thisFolderProp.length() == 0) || (thisFolderProp.equals("all_rules"))) {
-        String[] allRules = getRules(apmcmFolders[i], "all_rules");
+      if ((thisFolderProp.length() == 0) || (thisFolderProp.equals(EPAConstants.apmcmAllRules))) {
+        String[] allRules = getRules(apmcmFolders[i], EPAConstants.apmcmAllRules);
         rules = new String[allRules.length + 1];
-        rules[0] = "all_rules";
+        rules[0] = EPAConstants.apmcmAllRules;
         for (int j = 0; j < allRules.length; j++)
           rules[(j + 1)] = allRules[j];
       } else {
@@ -210,73 +210,72 @@ public class CloudMonitorRequestHelper {
   }
 
   public String getStats(String folder, String rule, String apmcmUser) throws Exception {
-    String statsRequest = "";
-    String folderStr = "";
-    String ruleStr = "";
+    String statsRequest = EPAConstants.EMPTY_STRING;
+    String folderStr = EPAConstants.EMPTY_STRING;
+    String ruleStr = EPAConstants.EMPTY_STRING;
 
-    if ((folder.length() != 0) && (!folder.equals("root_folder")))
-      folderStr = "&folder=" + folder;
+    if ((folder.length() != 0) && (!folder.equals(EPAConstants.apmcmRootFolder)))
+      folderStr = EPAConstants.kAPMCMFolderParam + folder;
     else {
-      folder = "root_folder";
+      folder = EPAConstants.apmcmRootFolder;
     }
 
     if (rule.length() != 0) {
-      ruleStr = "&name=" + rule;
+      ruleStr = EPAConstants.kAPMCMNameParam + rule;
       folder = folder + "|" + rule;
     }
 
-    String statsStr = "nkey=" + this.nkey + "&acct=" + apmcmUser + folderStr + ruleStr + "&start_date="
-      + getTodaysDate() + "&callback=" + "doCallback";
-    statsRequest = cloudMonitorAccessor.executeAPI("rule_stats", statsStr);
+    String statsStr = EPAConstants.kAPMCMNKeyParam + this.nkey + EPAConstants.kAPMCMAccountParam + apmcmUser + folderStr + ruleStr + EPAConstants.kAPMCMStartDateParam
+      + getTodaysDate() + EPAConstants.kAPMCMCallbackParam + EPAConstants.apmcmCallback;
+    statsRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMStatsCmd, statsStr);
     return statsRequest;
   }
 
   public String getPSP(String folder, String rule, String apmcmUser) throws Exception {
-    String pspRequest = "";
-    String folderStr = "";
-    String ruleStr = "";
+    String pspRequest = EPAConstants.EMPTY_STRING;
+    String folderStr = EPAConstants.EMPTY_STRING;
+    String ruleStr = EPAConstants.EMPTY_STRING;
 
-    if ((folder.length() != 0) && (!folder.equals("root_folder")))
-      folderStr = "&folder=" + folder;
+    if ((folder.length() != 0) && (!folder.equals(EPAConstants.apmcmRootFolder)))
+      folderStr = EPAConstants.kAPMCMFolderParam + folder;
     else {
-      folder = "root_folder";
+      folder = EPAConstants.apmcmRootFolder;
     }
 
     if (rule.length() != 0) {
-      ruleStr = "&name=" + rule;
+      ruleStr = EPAConstants.kAPMCMNameParam + rule;
     }
 
-    String pspStr = "nkey=" + this.nkey + "&acct=" + apmcmUser + folderStr + ruleStr + "&callback=" + "doCallback";
-    pspRequest = cloudMonitorAccessor.executeAPI("rule_psp", pspStr);
+    pspRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMPSPCmd, getCommandString() + folderStr + ruleStr);
     return pspRequest;
   }
 
   public String getLogs(String folder, String rule, int numRules) throws Exception {
-    String logRequest = "";
-    String folderStr = "";
-    String ruleStr = "";
-    int numLogs = Integer.parseInt(this.apmcmProperties.getProperty("apmcm.numlogs")) * numRules;
-    if ((folder.length() != 0) && (!folder.equals("root_folder")))
-      folderStr = "&folder=" + folder;
+    String logRequest = EPAConstants.EMPTY_STRING;
+    String folderStr = EPAConstants.EMPTY_STRING;
+    String ruleStr = EPAConstants.EMPTY_STRING;
+    int numLogs = Integer.parseInt(this.apmcmProperties.getProperty(ASMProperties.NUM_LOGS)) * numRules;
+    if ((folder.length() != 0) && (!folder.equals(EPAConstants.apmcmRootFolder)))
+      folderStr = EPAConstants.kAPMCMFolderParam + folder;
     else {
-      folder = "root_folder";
+      folder = EPAConstants.apmcmRootFolder;
     }
 
     if (rule.length() != 0) {
-      ruleStr = "&name=" + rule;
+      ruleStr = EPAConstants.kAPMCMNameParam + rule;
     }
-    String logStr = "nkey=" + this.nkey + folderStr + ruleStr + "&num=" + numLogs + "&reverse=y&callback="
-      + "doCallback" + "&full=y";
+    String logStr = EPAConstants.kAPMCMNKeyParam + this.nkey + folderStr + ruleStr + EPAConstants.kAPMCMNumParam + numLogs + 
+    		EPAConstants.kAPMCMReverseParam + EPAConstants.kAPMCMCallbackParam + EPAConstants.apmcmCallback + EPAConstants.kAPMCMFullParam;
     //    String logStr = "nkey=" + this.nkey + folderStr + ruleStr + "&num=" + numLogs + "&reverse=y&full=y";
 
     // logRequest = cloudMonitorAccessor.executeAPINew("rule_log", logStr);
-    logRequest = cloudMonitorAccessor.executeAPI("rule_log", logStr);
+    logRequest = cloudMonitorAccessor.executeAPI(EPAConstants.kAPMCMLogsCmd, logStr);
     return logRequest;
   }
 
   private String getTodaysDate() throws Exception {
     Calendar calendar = Calendar.getInstance();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat dateFormat = new SimpleDateFormat(EPAConstants.DATE_FORMAT);
     String todaysDate = null;
     todaysDate = dateFormat.format(calendar.getTime());
     return todaysDate;

@@ -24,6 +24,7 @@ public class CloudMonitorAccessor {
   private String apmcmLocalTestPath = "";
 
   public static final String FAILED = "Failed";
+  public static final String LOGGED_OUT = "Logged Out.";
   
   public CloudMonitorAccessor(PropertiesUtils apmcmProperties) {
     this.apmcmProperties = apmcmProperties;
@@ -57,7 +58,7 @@ public class CloudMonitorAccessor {
         apiResponse = apiResponse + inputLine;
       inputFile.close();
     } else {
-      return "Logged Out.";
+      return LOGGED_OUT;
     }
 
     return apiResponse.trim();

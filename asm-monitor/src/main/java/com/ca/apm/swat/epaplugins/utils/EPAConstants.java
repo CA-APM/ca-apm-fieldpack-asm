@@ -22,6 +22,7 @@ public class EPAConstants
 	public static final int kBufferWaitTime = 60000;
 	public static final String kJavaNetExceptionRegex = ".*(BindException|ConnectException|HttpRetryException|NoRouteToHostException|ProtocolException|SocketException|SocketTimeoutException|UnknownHostException).*";
 	public static final String kJsonRegex = "doCallback\\((.*)\\)([\n]*)";
+	public static final String kJsonPattern = "\\p{InCombiningDiacriticalMarks}+";
 	public static final String kXMLPrefix = "<?xml";
 	public static final String kCreditsCategory = "Credits";
 	public static final String kLogCategory = "Log";
@@ -40,21 +41,41 @@ public class EPAConstants
 	public static final String kAPMCMFoldersCmd = "fldr_get";
 	public static final String kAPMCMRuleCmd = "rule_get";
 	public static final String kAPMCMCreditsCmd = "acct_credits";
+
+	public static final String kAPMCMNKeyParam = "nkey=";
+	public static final String kAPMCMCallbackParam = "&callback=";
+	public static final String kAPMCMFolderParam = "&folder=";
+	public static final String kAPMCMNameParam = "&name=";
+	public static final String kAPMCMReverseParam = "&reverse=y";
+	public static final String kAPMCMNumParam = "&num=";
+	public static final String kAPMCMStartDateParam = "&start_date=";
+	public static final String kAPMCMAccountParam = "&acct=";
+	public static final String kAPMCMFullParam = "&full=y";
 	
+	public static final String kAPMCMActive = "active";
+	public static final String kAPMCMAreas = "areas";
+	public static final String kAPMCMCountry = "country_name";
+	public static final String kAPMCMCity = "city";
 	public static final String kAPMCMCode = "code";
+	public static final String kAPMCMCheckpoints = "checkpoints";
+	public static final String kAPMCMCredits = "credits";
 	public static final String kAPMCMResult = "result";
 	public static final String kAPMCMNKey = "nkey";
 	public static final String kAPMCMError = "error";
 	public static final String kAPMCMErrors = "errors";
+	public static final String kAPMCMFolder = "folder";
+	public static final String kAPMCMFolders = "folders";
+	public static final String kAPMCMRules = "rules";
 	public static final String kAPMCMInfo = "info";
 	public static final String kAPMCMName = "name";
-	public static final Object kAPMCMDescr = "descr";
+	public static final String kAPMCMDescr = "descr";
 	public static final String kAPMCMLoc = "loc";
 	public static final String kAPMCMMonitors = "monitors";
 	public static final String kAPMCMStats = "stats";
 	public static final String kAPMCMColor = "color";
-	public static final Object kAPMCMColors = "colors";
+	public static final String kAPMCMColors = "colors";
 	public static final String kAPMCMElapsed = "elapsed";
+	public static final String kAPMCMType = "type";
 	public static final String kAPMCMVersion = "version";
 	public static final String kAPMCMOutput = "output";
 	public static final String kAPMCMHarOrLog = "{\"har\": {\"log\"";
@@ -76,10 +97,17 @@ public class EPAConstants
 	public static final String UTF8 = "UTF-8";
 	public static final String apmcmProductName = "App Synthetic Monitor";
 	public static final String apmcmProductNameShort = "ASM";
-
+	public static final String EMPTY_STRING = "";
+	public static final String ZERO = "0";
+	public static final String ONE = "1";	
+	public static final String YES = "y";
+	public static final String NO = "n";
+	public static final String NO_TYPE ="no type";
+	public static final String DATE_FORMAT ="yyyy-MM-dd";
+	
 	static
 	{
-		apmcmMetrics.put("active", "Active");
+		apmcmMetrics.put(kAPMCMActive, "Active");
 		apmcmMetrics.put("alerts", "Alerts Per Interval");
 		apmcmMetrics.put("apdex", "Apdex Score");
 		apmcmMetrics.put("api", "API Credits Available");
@@ -90,9 +118,9 @@ public class EPAConstants
 		apmcmMetrics.put("check", "Check Credits Available");
 		apmcmMetrics.put("check_errors", "Check Errors");
 		apmcmMetrics.put("checks", "Checks");
-		apmcmMetrics.put("code", "Error Code");
-		apmcmMetrics.put("color", "Color");
-		apmcmMetrics.put("colors", "Performance Status");
+		apmcmMetrics.put(kAPMCMCode, "Error Code");
+		apmcmMetrics.put(kAPMCMColor, "Color");
+		apmcmMetrics.put(kAPMCMColors, "Performance Status");
 		apmcmMetrics.put("consecutive_errors", "Consecutive Errors");
 		apmcmMetrics.put("ctime", "Connect Time (ms)");
 		apmcmMetrics.put("descr", "Error Description");
@@ -123,7 +151,7 @@ public class EPAConstants
 		apmcmMetrics.put("timepoor", "Time Threshold Poor (ms)");
 		apmcmMetrics.put("timewarn", "Time Threshold Warning (ms)");
 		apmcmMetrics.put("ttime", "Total Time (ms)");
-		apmcmMetrics.put("type", "Type");
+		apmcmMetrics.put(EPAConstants.kAPMCMType, "Type");
 		apmcmMetrics.put("tz", "Agent Time Zone");
 		apmcmMetrics.put("uptime", "Uptime (%)");
 		apmcmMetrics.put("version", "API Version");

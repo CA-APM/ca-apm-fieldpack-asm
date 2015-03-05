@@ -27,6 +27,8 @@ public class CloudMonitorMetricReporter {
   private HashMap<String, String> cpMap;
   private XMLAnalysisAdapter analysisAdapter;
 
+  protected final static String SEPARATOR = "\\.";
+  
   public CloudMonitorMetricReporter(
     MetricWriter metricWriter,
     boolean apmcmDisplayMonitor,
@@ -47,7 +49,7 @@ public class CloudMonitorMetricReporter {
       String thisMetricType = returnMetricType((String) metricPairs.getValue());
 
       if (thisMetricType.equals(EPAConstants.kFloat)) {
-        metricPairs.setValue(((String) metricPairs.getValue()).split("\\.")[0]);
+        metricPairs.setValue(((String) metricPairs.getValue()).split(SEPARATOR)[0]);
         thisMetricType = EPAConstants.kIntCounter;
       }
 
@@ -83,9 +85,9 @@ public class CloudMonitorMetricReporter {
         Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
 
         if (!returnMetricType((String) metricPairs.getValue()).equals(EPAConstants.kStringEvent))
-          metric_map.put((String) metricPairs.getKey(), "0");
+          metric_map.put((String) metricPairs.getKey(), EPAConstants.ZERO);
         else {
-          metric_map.put((String) metricPairs.getKey(), "");
+          metric_map.put((String) metricPairs.getKey(), EPAConstants.EMPTY_STRING);
         }
       }
     }
@@ -126,13 +128,13 @@ public class CloudMonitorMetricReporter {
         }
       } else {
         if ((thisKey.equals(EPAConstants.kAPMCMCode)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
-          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, "").length() == 0))
+          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, EPAConstants.EMPTY_STRING).length() == 0))
           continue;
         String thisValue = thisJO.getString(thisKey);
 
         if (thisKey.equals(EPAConstants.kAPMCMDescr)) {
           String rawErrorMetric = metricTree + EPAConstants.kMetricNameSeparator + (String) EPAConstants.apmcmMetrics.get(EPAConstants.kAPMCMErrors);
-          metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), "1");
+          metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), EPAConstants.ONE);
         }
 
         if (thisKey.equals(EPAConstants.kAPMCMColor)) {
@@ -142,7 +144,7 @@ public class CloudMonitorMetricReporter {
               CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
               (String) EPAConstants.apmcmColors.get(thisValue));
           else {
-            metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), "0");
+            metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), EPAConstants.ZERO);
           }
 
         }
@@ -189,7 +191,7 @@ public class CloudMonitorMetricReporter {
 
   class NullResolver implements EntityResolver {
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-      return new InputSource(new StringReader(""));
+      return new InputSource(new StringReader(EPAConstants.EMPTY_STRING));
     }
   }
 
@@ -216,7 +218,7 @@ public class CloudMonitorMetricReporter {
         }
       } else {
         if ((thisKey.equals(EPAConstants.kAPMCMColor)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
-          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, "").length() == 0))
+          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, EPAConstants.EMPTY_STRING).length() == 0))
           continue;
         String thisValue = thisJO.getString(thisKey);
 
