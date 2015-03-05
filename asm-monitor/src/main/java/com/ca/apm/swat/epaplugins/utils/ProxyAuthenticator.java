@@ -18,8 +18,3 @@ class ProxyAuthenticator extends Authenticator
     return new PasswordAuthentication(this.user, this.password.toCharArray());
   }
 }
-
-/* Location:           \\vmware-host\Shared Folders\Documents\1APM-Wily\EPA\CloudMonitor\APMCMAgent\lib\APMCMPlugin.jar
- * Qualified Name:     com.wily.fieldext.epaplugins.utils.ProxyAuthenticator
- * JD-Core Version:    0.6.0
- */

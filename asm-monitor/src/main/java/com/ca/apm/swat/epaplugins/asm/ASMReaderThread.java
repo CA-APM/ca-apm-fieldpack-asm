@@ -96,22 +96,22 @@ private String thisFolder;
     }
 
     if (folder.equals(EPAConstants.apmcmRootFolder)) {
-      folder = "";
+      folder = EPAConstants.EMPTY_STRING;
     }
 
     if (apmcmProperties.getProperty(ASMProperties.METRICS_STATS_FOLDER, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
 
-      String statsRequest = requestHelper.getStats(folder, "", apmcmUser);
+      String statsRequest = requestHelper.getStats(folder, EPAConstants.EMPTY_STRING, apmcmUser);
       metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
     }
 
-    if ((thisFolderRules[0].equals(EPAConstants.apmcmAllRules)) && (!folder.equals(""))) {
+    if ((thisFolderRules[0].equals(EPAConstants.apmcmAllRules)) && (!folder.equals(EPAConstants.EMPTY_STRING))) {
       if (apmcmProperties.getProperty(ASMProperties.METRICS_PUBLIC, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
-        String pspRequest = requestHelper.getPSP(folder, "", apmcmUser);
+        String pspRequest = requestHelper.getPSP(folder, EPAConstants.EMPTY_STRING, apmcmUser);
         metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(pspRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
       }
       if (apmcmProperties.getProperty(ASMProperties.METRICS_LOGS, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
-        String logRequest = requestHelper.getLogs(folder, "", thisFolderRules.length - 1);
+        String logRequest = requestHelper.getLogs(folder, EPAConstants.EMPTY_STRING, thisFolderRules.length - 1);
         String unpadded = JSONHelper.unpadJSON(logRequest);
         if (unpadded != null) {
           HashMap<String, String> generatedMetrics = metricReporter.generateMetrics(unpadded, EPAConstants.apmcmMonitorMetricPrefix + folder);

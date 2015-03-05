@@ -16,8 +16,3 @@ public abstract interface StringFilter
 
   public abstract String filter(String paramString);
 }
-
-/* Location:           \\vmware-host\Shared Folders\Documents\1APM-Wily\EPA\CloudMonitor\APMCMAgent\lib\APMCMPlugin.jar
- * Qualified Name:     com.wily.fieldext.epaplugins.utils.StringFilter
- * JD-Core Version:    0.6.0
- */
