@@ -71,4 +71,8 @@ public class TextMetricWriter implements MetricWriter {
     System.out.println("Type:" + "IntCounter" + " Name:" + name + " MetricValue:" + metric);
   }
 
+  public void flushMetrics() {
+    System.out.flush();
+  }
+
 }

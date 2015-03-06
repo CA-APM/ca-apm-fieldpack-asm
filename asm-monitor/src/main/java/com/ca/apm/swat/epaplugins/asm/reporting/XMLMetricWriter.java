@@ -112,5 +112,9 @@ public class XMLMetricWriter implements MetricWriter {
     }
   }
 
+  public void flushMetrics() {
+    // do nothing
+  }
+
 
 }
