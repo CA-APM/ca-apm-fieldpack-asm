@@ -23,6 +23,7 @@ public class EPAConstants
 	public static final String kJavaNetExceptionRegex = ".*(BindException|ConnectException|HttpRetryException|NoRouteToHostException|ProtocolException|SocketException|SocketTimeoutException|UnknownHostException).*";
 	public static final String kJsonRegex = "doCallback\\((.*)\\)([\n]*)";
 	public static final String kJsonPattern = "\\p{InCombiningDiacriticalMarks}+";
+	public static final String kAlgorithm = "PBEWithMD5AndDES";
 	public static final String kXMLPrefix = "<?xml";
 	public static final String kCreditsCategory = "Credits";
 	public static final String kLogCategory = "Log";

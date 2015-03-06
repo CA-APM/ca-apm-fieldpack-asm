@@ -33,9 +33,9 @@ public class ASMMessages {
 	public static ResourceBundle getMessages() {
 		if (null == messages) {
 			if (null == locale) {
-				messages = ResourceBundle.getBundle("messages");
+				messages = ResourceBundle.getBundle("com.ca.apm.swat.epaplugins.utils.messages");
 			} else {
-				messages = ResourceBundle.getBundle("messages", locale);
+				messages = ResourceBundle.getBundle("com.ca.apm.swat.epaplugins.utils.messages", locale);
 			}
 		}
 

@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.utils;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.spec.AlgorithmParameterSpec;
 
@@ -12,8 +11,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 
 public class CryptoUtils
@@ -30,7 +28,7 @@ public class CryptoUtils
   {
     try {
       PBEKeySpec keySpec = new PBEKeySpec(passPhrase.toCharArray(), this.salt, this.iterationCount);
-      SecretKey key = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(keySpec);
+      SecretKey key = SecretKeyFactory.getInstance(EPAConstants.kAlgorithm).generateSecret(keySpec);
       this.ecipher = Cipher.getInstance(key.getAlgorithm());
       this.dcipher = Cipher.getInstance(key.getAlgorithm());
 
@@ -46,7 +44,7 @@ public class CryptoUtils
   public static void main(String[] args)
   {
     try {
-      CryptoUtils encrypter = new CryptoUtils("1D0NTF33LT4RDY");
+      CryptoUtils encrypter = new CryptoUtils(EPAConstants.kMsgDigest);
 
       String encrypted = encrypter.encrypt(args[0]);
       System.out.println("Put this in your APMCloudMonitor.properties file:");
@@ -66,7 +64,7 @@ public class CryptoUtils
 
       byte[] enc = this.ecipher.doFinal(utf8);
 
-      return new BASE64Encoder().encode(enc);
+      return new Base64().encodeToString(enc);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -76,7 +74,7 @@ public class CryptoUtils
   public String decrypt(String str)
   {
     try {
-      byte[] dec = new BASE64Decoder().decodeBuffer(str);
+      byte[] dec = new Base64().decode(str);
 
       byte[] utf8 = this.dcipher.doFinal(dec);
 
@@ -84,7 +82,6 @@ public class CryptoUtils
     } catch (BadPaddingException localBadPaddingException) {
     } catch (IllegalBlockSizeException localIllegalBlockSizeException) {
     } catch (UnsupportedEncodingException localUnsupportedEncodingException) {
-    } catch (IOException localIOException) {
     }
     return null;
   }
