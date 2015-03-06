@@ -6,6 +6,11 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ASMMonitor</name>
 	<description>Fieldpack to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
+	<properties>
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+		<!-- default is: yyyyMMdd-HHmm -->
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -29,4 +34,22 @@
 			<version>1.8</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<finalName>ca.apm.swat.asm-monitor</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+					<finalName>${project.artifactId}.${env.USER}.${build.timestamp}</finalName>
+					<descriptors>
+						<descriptor>src/assembly/distribution.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+		</plugins>
+		<defaultGoal>clean package assembly:single</defaultGoal>
+	</build>
 </project>
