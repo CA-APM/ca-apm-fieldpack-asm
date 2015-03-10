@@ -6,20 +6,20 @@ import java.util.ResourceBundle;
 
 public class ASMMessages {
 
-	public static final String initializationError	 			= "initializationError";
+	public static final String initializationError	= "initializationError";
 	public static final String runError	 						= "runError";
-	public static final String readingProperties 				= "readingProperties";
-	public static final String folderThreadTimeout 				= "folderThreadTimeout";
-	public static final String folderThreadError 				= "folderThreadError";
-	public static final String connectionError 					= "connectionError";
-	public static final String connectionRetry					= "connectionRetry";
-	public static final String connectionRetryError				= "connectionRetryError";
+	public static final String readingProperties 		= "readingProperties";
+	public static final String folderThreadTimeout	= "folderThreadTimeout";
+	public static final String folderThreadError 		= "folderThreadError";
+	public static final String connectionError 			= "connectionError";
+	public static final String connectionRetry			= "connectionRetry";
+	public static final String connectionRetryError	= "connectionRetryError";
 	public static final String loginError						= "loginError";
 	public static final String loginInfo						= "loginInfo";
 	public static final String noError							= "noError";
-	public static final String noInfo							= "noInfo";
-	public static final String parentThread						= "parentThread";
-	public static final String agentInitialization 				= "agentInitialization";
+	public static final String noInfo							  = "noInfo";
+	public static final String parentThread					= "parentThread";
+	public static final String agentInitialization 	= "agentInitialization";
 
 	
 	private static ResourceBundle messages = null;

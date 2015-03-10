@@ -1,5 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm.reporting;
 
+import java.io.IOException;
 import java.util.Date;
 
 
@@ -12,25 +13,36 @@ import java.util.Date;
  */
 public interface MetricWriter {
 
-  void writeMetric(String type, String name, int metric);
+  public static final String kPerIntervalCounter = "PerIntervalCounter";
+  public static final String kIntCounter = "IntCounter";
+  public static final String kIntAverage = "IntAverage";
+  public static final String kIntRate = "IntRate";
+  public static final String kLongCounter = "LongCounter";
+  public static final String kLongAverage = "LongAverage";
+  public static final String kStringEvent = "StringEvent";
+  public static final String kTimestamp = "Timestamp";
+  public static final String kFloat = "Float";
 
-  void writeMetric(String type, String name, String metric);
+  public void writeMetric(String type, String name, int metric);
 
-  void writeErrorMessage(String message);
+  public void writeMetric(String type, String name, String metric);
 
-  void writeMetric(String type, String name, float metric);
+  // TODO: really write generic error message?
+  public void writeErrorMessage(String message);
 
-  void writeErrorDetectorEntry(String text, String resource);
+  public void writeMetric(String type, String name, float metric);
 
-  void writeStringMetric(String name, String metric);
+  public void writeErrorDetectorEntry(String text, String resource);
+
+  public void writeStringMetric(String name, String metric);
   
   public void writeIntCounter(String name, int metric);
   
   public void writeTimestamp(String name, Date date);
 
-  void writeLongAverage(String name, long l);
+  public void writeLongAverage(String name, long l);
 
-  void writeIntCounterForceExist(String name, int i);
+  public void writeIntCounterForceExist(String name, int i);
   
-  void flushMetrics();
+  public void flushMetrics() throws IOException;
 }

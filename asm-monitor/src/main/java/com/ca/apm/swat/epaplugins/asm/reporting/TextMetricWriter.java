@@ -2,8 +2,6 @@ package com.ca.apm.swat.epaplugins.asm.reporting;
 
 import java.util.Date;
 
-import com.ca.apm.swat.epaplugins.utils.EPAConstants;
-
 /**
  * Dummy and Debug implementation for a defect writer.
  * Simply outputs the content to standard out.
@@ -41,7 +39,7 @@ public class TextMetricWriter implements MetricWriter {
 
   public void writeErrorDetectorEntry(String text, String resource) {
     fillTestValues();
-    System.out.println("Type:" + "ErrorDetector" + " Name:" + EPAConstants.apmcmProductNameShort + " Error" + " MetricValue:" + text);
+    System.out.println("Type:" + "ErrorDetector" + " Name:" + resource + " Error" + " MetricValue:" + text);
   }
 
   public void writeLongSteadyAverageMetric(String name, long metric) {

@@ -7,15 +7,6 @@ public class EPAConstants
 	public static final HashMap<String, String> apmcmMetrics = new HashMap<String, String>();
 	public static final HashMap<String, String> apmcmColors = new HashMap<String, String>();
 	
-	public static final String kPerIntervalCounter = "PerIntervalCounter";
-	public static final String kIntCounter = "IntCounter";
-	public static final String kIntAverage = "IntAverage";
-	public static final String kIntRate = "IntRate";
-	public static final String kLongCounter = "LongCounter";
-	public static final String kLongAverage = "LongAverage";
-	public static final String kStringEvent = "StringEvent";
-	public static final String kTimestamp = "Timestamp";
-	public static final String kFloat = "Float";
 	public static final String kDefaultDelimiter = ",";
 	public static final String[] kNoStringArrayProperties;
 	

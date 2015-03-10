@@ -1,18 +1,11 @@
 package com.ca.apm.swat.epaplugins.asm.reporting;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
-
-import com.ca.apm.swat.epaplugins.utils.EPAConstants;
-import com.wily.introscope.agent.AgentNotAvailableException;
-import com.wily.introscope.agent.AgentShim;
-import com.wily.introscope.agent.IAgent;
-import com.wily.introscope.agent.stat.ILongIntervalCounterDataAccumulator;
-import com.wily.introscope.epagent.PropertiesReader;
-import com.wily.introscope.epagent.api.DataRecorderFactory;
-import com.wily.introscope.epagent.api.LongAverageDataRecorder;
-import com.wily.introscope.epagent.api.LongCounterDataRecorder;
-import com.wily.introscope.epagent.api.TimestampDataRecorder;
 
 /**
  * Implementation for writing the Introscope data in REST format to the EPA
@@ -22,11 +15,19 @@ import com.wily.introscope.epagent.api.TimestampDataRecorder;
  */
 public class RestfulMetricWriter implements MetricWriter {
 
-  private StringBuffer buf = null;
+  private StringBuilder buf = null;
+  private URL url = null;
 
-  protected StringBuffer getBuffer() {
+  public final static String CONTENT_TYPE_HEADER = "content-type";
+  public final static String CONTENT_TYPE_JSON = "application/json";
+
+  public RestfulMetricWriter(URL url) {
+    this.url = url;
+  }
+  
+  protected StringBuilder getBuffer() {
     if (null == buf) {
-      buf = new StringBuffer("{\"metrics\" : [");
+      buf = new StringBuilder("{\"metrics\" : [");
     }
     return buf;
   }
@@ -41,7 +42,7 @@ public class RestfulMetricWriter implements MetricWriter {
   }
 
   public void writeErrorMessage(String message) {
-    writeMetric(EPAConstants.kStringEvent, EPAConstants.apmcmProductNameShort + " Integration:Error Message", message);
+    writeMetric(MetricWriter.kStringEvent, "Error Message", message);
   }
 
   public void writeMetric(String type, String name, float metric) {
@@ -49,40 +50,62 @@ public class RestfulMetricWriter implements MetricWriter {
   }
 
   public void writeErrorDetectorEntry(String text, String resource) {
-    // TODO printStream.println("<event  resource=\"" + EPAConstants.apmcmProductNameShort + " Integration\"> <param name=\"Trace Type\" value=\"ErrorSnapshot\"/> <calledComponent  resource=\""
+    // TODO printStream.println("<event  resource=\"" + MetricWriter.apmcmProductNameShort + " Integration\"> <param name=\"Trace Type\" value=\"ErrorSnapshot\"/> <calledComponent  resource=\""
     //    + resource + "\"><param name=\"Error Message\" value=\"" + text + "\"/>  </calledComponent> </event>");
   }
 
   public void writeStringMetric(String string, String string2) {
-    writeMetric(EPAConstants.kStringEvent, string, string2);
+    writeMetric(MetricWriter.kStringEvent, string, string2);
   }
 
   public void writeTimestamp(String string, Date date) {
-    writeMetric(EPAConstants.kTimestamp, string, date.getTime());
+    writeMetric(MetricWriter.kTimestamp, string, date.getTime());
   }
 
   public void writeLongAverage(String string, long l) {
-    writeMetric(EPAConstants.kLongAverage, string, Long.toString(l));
+    writeMetric(MetricWriter.kLongAverage, string, Long.toString(l));
   }
 
   public void writeLongCounter(String string, long l) {
-    writeMetric(EPAConstants.kLongCounter, string, Long.toString(l));
-  }
-
-  public void writeIntCounterForceExist(String metricname, int metric) {
-    writeMetric(EPAConstants.kIntCounter, metricname, Integer.toString(metric));
-  }
-
-  public void flushMetrics() {
-    // TODO: remove last ',' and close brackets
-    // TODO: send to agent
-    // TODO: error handling
-    // TODO: reset buffer
+    writeMetric(MetricWriter.kLongCounter, string, Long.toString(l));
   }
 
   public void writeIntCounter(String name, int metric) {
-    writeMetric(EPAConstants.kIntCounter, name, Integer.toString(metric));
+    writeMetric(MetricWriter.kIntCounter, name, Integer.toString(metric));
   }
 
+  public void writeIntCounterForceExist(String metricname, int metric) {
+    writeMetric(MetricWriter.kIntCounter, metricname, Integer.toString(metric));
+  }
 
+  public void flushMetrics() throws IOException {
+    if (null == buf) return;
+    
+    // remove last ',' and close brackets
+    if (',' == buf.charAt(buf.length()-1)) {
+      buf.deleteCharAt(buf.length()-1);
+    }
+    
+    buf.append("] }");
+    
+    // send to EP agent
+    URLConnection connection = url.openConnection();
+    connection.setRequestProperty(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON);
+
+    PrintStream outStream = new PrintStream(connection.getOutputStream());
+    outStream.println(buf.toString());
+    outStream.close();
+
+    // reset buffer
+    buf = null;
+
+    DataInputStream inStream = new DataInputStream(connection.getInputStream());
+    String inputLine;
+
+    while ((inputLine = inStream.readLine()) != null) {
+      // TODO: error handling
+        System.out.println(inputLine);
+    }
+    inStream.close();
+  }
 }

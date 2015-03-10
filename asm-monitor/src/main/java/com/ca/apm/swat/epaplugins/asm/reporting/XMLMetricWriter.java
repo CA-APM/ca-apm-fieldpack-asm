@@ -3,7 +3,6 @@ package com.ca.apm.swat.epaplugins.asm.reporting;
 import java.io.PrintStream;
 import java.util.Date;
 
-import com.ca.apm.swat.epaplugins.utils.EPAConstants;
 import com.wily.introscope.agent.AgentNotAvailableException;
 import com.wily.introscope.agent.AgentShim;
 import com.wily.introscope.agent.IAgent;
@@ -55,7 +54,7 @@ public class XMLMetricWriter implements MetricWriter {
   }
 
   public void writeErrorMessage(String message) {
-    writeMetric("StringEvent", EPAConstants.apmcmProductNameShort + " Integration:Error Message", message);
+    writeMetric("StringEvent", "Error Message", message);
   }
 
   public void writeMetric(String type, String name, float metric) {
@@ -64,7 +63,7 @@ public class XMLMetricWriter implements MetricWriter {
   }
 
   public void writeErrorDetectorEntry(String text, String resource) {
-    printStream.println("<event  resource=\"" + EPAConstants.apmcmProductNameShort + " Integration\"> <param name=\"Trace Type\" value=\"ErrorSnapshot\"/> <calledComponent  resource=\""
+    printStream.println("<event  resource=\"" + resource + "> <param name=\"Trace Type\" value=\"ErrorSnapshot\"/> <calledComponent  resource=\""
       + resource + "\"><param name=\"Error Message\" value=\"" + text + "\"/>  </calledComponent> </event>");
   }
 

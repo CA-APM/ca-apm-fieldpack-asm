@@ -48,9 +48,9 @@ public class CloudMonitorMetricReporter {
         continue;
       String thisMetricType = returnMetricType((String) metricPairs.getValue());
 
-      if (thisMetricType.equals(EPAConstants.kFloat)) {
+      if (thisMetricType.equals(MetricWriter.kFloat)) {
         metricPairs.setValue(((String) metricPairs.getValue()).split(SEPARATOR)[0]);
-        thisMetricType = EPAConstants.kIntCounter;
+        thisMetricType = MetricWriter.kIntCounter;
       }
 
       metricWriter.writeMetric(thisMetricType, EPAConstants.apmcmMetricTree + EPAConstants.kMetricPathSeparator + metricPairs.getKey(), metricPairs.getValue());
@@ -58,20 +58,20 @@ public class CloudMonitorMetricReporter {
   }
 
   private String returnMetricType(String thisMetric) {
-    String metricType = EPAConstants.kStringEvent;
+    String metricType = MetricWriter.kStringEvent;
     try {
       new Integer(thisMetric);
-      metricType = EPAConstants.kIntCounter;
+      metricType = MetricWriter.kIntCounter;
     } catch (NumberFormatException e) {
       try {
         new Long(thisMetric);
-        metricType = EPAConstants.kLongCounter;
+        metricType = MetricWriter.kLongCounter;
       } catch (NumberFormatException ee) {
         try {
           new Float(thisMetric);
-          metricType = EPAConstants.kFloat;
+          metricType = MetricWriter.kFloat;
         } catch (NumberFormatException eee) {
-          metricType = EPAConstants.kStringEvent;
+          metricType = MetricWriter.kStringEvent;
         }
       }
     }
@@ -84,7 +84,7 @@ public class CloudMonitorMetricReporter {
       while (metricIt.hasNext()) {
         Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
 
-        if (!returnMetricType((String) metricPairs.getValue()).equals(EPAConstants.kStringEvent))
+        if (!returnMetricType((String) metricPairs.getValue()).equals(MetricWriter.kStringEvent))
           metric_map.put((String) metricPairs.getKey(), EPAConstants.ZERO);
         else {
           metric_map.put((String) metricPairs.getKey(), EPAConstants.EMPTY_STRING);
