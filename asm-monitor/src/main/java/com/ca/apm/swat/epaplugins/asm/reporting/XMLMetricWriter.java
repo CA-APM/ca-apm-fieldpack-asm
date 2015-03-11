@@ -17,6 +17,7 @@ import com.wily.introscope.epagent.api.TimestampDataRecorder;
  * Implementation for writing the Introscope data in XML format to the EPA
  * 
  * @author Andreas Reiss - CA Wily Professional Service
+ * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
 public class XMLMetricWriter implements MetricWriter {
@@ -54,7 +55,7 @@ public class XMLMetricWriter implements MetricWriter {
   }
 
   public void writeErrorMessage(String message) {
-    writeMetric("StringEvent", "Error Message", message);
+    writeMetric(MetricWriter.kStringEvent, "Error Message", message);
   }
 
   public void writeMetric(String type, String name, float metric) {
@@ -67,8 +68,8 @@ public class XMLMetricWriter implements MetricWriter {
       + resource + "\"><param name=\"Error Message\" value=\"" + text + "\"/>  </calledComponent> </event>");
   }
 
-  public void writeStringMetric(String string, String string2) {
-    printStream.println(" <metric type=\"StringEvent\" name=\"" + string + "\" value=\"" + string2 + "\" />");
+  public void writeStringMetric(String name, String metric) {
+    printStream.println(" <metric type=\"" + MetricWriter.kStringEvent + "\" name=\"" + MetricWriter.kStringEvent + "\" value=\"" + metric + "\" />");
   }
 
   public void writeTimestamp(String string, Date date) {
@@ -113,6 +114,18 @@ public class XMLMetricWriter implements MetricWriter {
 
   public void flushMetrics() {
     // do nothing
+  }
+
+  public void writeIntAverage(String name, int metric) {
+    writeMetric(MetricWriter.kIntAverage, name, metric);
+  }
+
+  public void writeIntRate(String name, int metric) {
+    writeMetric(MetricWriter.kIntRate, name, metric);
+  }
+
+  public void writePerIntervalCounter(String name, int metric) {
+    writeMetric(MetricWriter.kPerIntervalCounter, name, metric);
   }
 
 

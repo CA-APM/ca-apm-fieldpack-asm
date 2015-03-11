@@ -59,7 +59,7 @@ public class RestfulMetricWriter implements MetricWriter {
   }
 
   public void writeTimestamp(String string, Date date) {
-    writeMetric(MetricWriter.kTimestamp, string, date.getTime());
+    writeMetric(MetricWriter.kTimestamp, string, Long.toString(date.getTime()));
   }
 
   public void writeLongAverage(String string, long l) {
@@ -91,7 +91,8 @@ public class RestfulMetricWriter implements MetricWriter {
     // send to EP agent
     URLConnection connection = url.openConnection();
     connection.setRequestProperty(CONTENT_TYPE_HEADER, CONTENT_TYPE_JSON);
-
+    connection.setDoOutput(true);
+    
     PrintStream outStream = new PrintStream(connection.getOutputStream());
     outStream.println(buf.toString());
     outStream.close();
@@ -104,8 +105,20 @@ public class RestfulMetricWriter implements MetricWriter {
 
     while ((inputLine = inStream.readLine()) != null) {
       // TODO: error handling
-        System.out.println(inputLine);
+      // System.out.println(inputLine);
     }
     inStream.close();
+  }
+
+  public void writeIntAverage(String name, int metric) {
+    writeMetric(MetricWriter.kIntAverage, name, Integer.toString(metric));
+  }
+
+  public void writeIntRate(String name, int metric) {
+    writeMetric(MetricWriter.kIntRate, name, Integer.toString(metric));
+  }
+
+  public void writePerIntervalCounter(String name, int metric) {
+    writeMetric(MetricWriter.kPerIntervalCounter, name, Integer.toString(metric));
   }
 }

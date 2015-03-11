@@ -37,10 +37,18 @@ public interface MetricWriter {
   public void writeStringMetric(String name, String metric);
   
   public void writeIntCounter(String name, int metric);
-  
+
+  public void writeIntAverage(String name, int metric);
+
+  public void writeIntRate(String name, int metric);
+
+  public void writePerIntervalCounter(String name, int metric);
+
   public void writeTimestamp(String name, Date date);
 
   public void writeLongAverage(String name, long l);
+
+  public void writeLongCounter(String name, long metric);
 
   public void writeIntCounterForceExist(String name, int i);
   

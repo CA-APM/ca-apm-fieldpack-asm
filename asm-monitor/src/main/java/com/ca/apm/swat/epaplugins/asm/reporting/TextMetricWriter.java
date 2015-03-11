@@ -73,4 +73,20 @@ public class TextMetricWriter implements MetricWriter {
     System.out.flush();
   }
 
+  public void writeIntAverage(String name, int metric) {
+    System.out.println("Type:" + "IntAverage" + " Name:" + name + " MetricValue:" + metric);
+  }
+
+  public void writeIntRate(String name, int metric) {
+    System.out.println("Type:" + "IntRate" + " Name:" + name + " MetricValue:" + metric);
+  }
+
+  public void writePerIntervalCounter(String name, int metric) {
+    System.out.println("Type:" + "PerIntervalCounter" + " Name:" + name + " MetricValue:" + metric);
+  }
+
+  public void writeLongCounter(String name, long metric) {
+    System.out.println("Type:" + "LongCounter" + " Name:" + name + " MetricValue:" + metric);
+  }
+
 }
