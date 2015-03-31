@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class JSONHelper {
   
   public static String unpadJSON(String jsonWithPadding) throws Exception {
-    String patternToMatch = EPAConstants.kJsonRegex;
+    String patternToMatch = ASMProperties.kJsonRegex;
 
     Pattern unpad = Pattern.compile(patternToMatch);
     Matcher matched = unpad.matcher(jsonWithPadding);

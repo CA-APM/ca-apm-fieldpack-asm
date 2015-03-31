@@ -7,7 +7,7 @@ import com.wily.introscope.agent.AgentNotAvailableException;
 import com.wily.introscope.agent.AgentShim;
 import com.wily.introscope.agent.IAgent;
 import com.wily.introscope.agent.stat.ILongIntervalCounterDataAccumulator;
-import com.wily.introscope.epagent.PropertiesReader;
+import com.wily.introscope.epagent.EpaUtils;
 import com.wily.introscope.epagent.api.DataRecorderFactory;
 import com.wily.introscope.epagent.api.LongAverageDataRecorder;
 import com.wily.introscope.epagent.api.LongCounterDataRecorder;
@@ -42,7 +42,7 @@ public class XMLMetricWriter implements MetricWriter {
       recorder = DataRecorderFactory.createPerIntervalCounterDataRecorder(name);
       recorder.recordMultipleIncidents(metric);
     } catch (Exception e) {
-      PropertiesReader.getFeedback().error(e);
+      EpaUtils.getFeedback().error(e);
     }
   }
 
@@ -78,7 +78,7 @@ public class XMLMetricWriter implements MetricWriter {
       recorder = DataRecorderFactory.createTimestampDataRecorder(string);
       recorder.recordTimestamp(date.getTime());
     } catch (Exception e) {
-      PropertiesReader.getFeedback().error(e);
+      EpaUtils.getFeedback().error(e);
     }
   }
 
@@ -88,7 +88,7 @@ public class XMLMetricWriter implements MetricWriter {
       recorder = DataRecorderFactory.createLongAverageDataRecorder(string);
       recorder.recordDataPoint(l);
     } catch (Exception e) {
-      PropertiesReader.getFeedback().error(e);
+      EpaUtils.getFeedback().error(e);
     }
   }
   public void writeLongCounter(String string, long l) {
@@ -97,7 +97,7 @@ public class XMLMetricWriter implements MetricWriter {
       recorder = DataRecorderFactory.createLongCounterDataRecorder(string);
       recorder.add(l);
     } catch (Exception e) {
-      PropertiesReader.getFeedback().error(e);
+      EpaUtils.getFeedback().error(e);
     }
   }
 
@@ -108,7 +108,7 @@ public class XMLMetricWriter implements MetricWriter {
       counterDataAccumulator.forceMetricToExist(null);
       counterDataAccumulator.ILongIntervalCounterDataAccumulator_addBatchIncidents(metric);
     } catch (Exception ex) {
-      PropertiesReader.getFeedback().error(ex);
+      EpaUtils.getFeedback().error(ex);
     }
   }
 

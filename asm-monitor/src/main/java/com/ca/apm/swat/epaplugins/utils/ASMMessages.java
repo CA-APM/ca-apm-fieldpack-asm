@@ -6,52 +6,54 @@ import java.util.ResourceBundle;
 
 public class ASMMessages {
 
-	public static final String initializationError	= "initializationError";
-	public static final String runError	 						= "runError";
-	public static final String readingProperties 		= "readingProperties";
-	public static final String folderThreadTimeout	= "folderThreadTimeout";
-	public static final String folderThreadError 		= "folderThreadError";
-	public static final String connectionError 			= "connectionError";
-	public static final String connectionRetry			= "connectionRetry";
-	public static final String connectionRetryError	= "connectionRetryError";
-	public static final String loginError						= "loginError";
-	public static final String loginInfo						= "loginInfo";
-	public static final String noError							= "noError";
-	public static final String noInfo							  = "noInfo";
-	public static final String parentThread					= "parentThread";
-	public static final String agentInitialization 	= "agentInitialization";
+    public static final String initializationError	= "initializationError";
+    public static final String runError	 			= "runError";
+    public static final String readingProperties 	= "readingProperties";
+    public static final String readingPropertiesError       = "readingPropertiesError";
+    public static final String readingPropertiesFinished    = "readingPropertiesFinished";
+    public static final String folderThreadTimeout	= "folderThreadTimeout";
+    public static final String folderThreadError 	= "folderThreadError";
+    public static final String connectionError 		= "connectionError";
+    public static final String connectionRetry		= "connectionRetry";
+    public static final String connectionRetryError	= "connectionRetryError";
+    public static final String loginError			= "loginError";
+    public static final String loginInfo			= "loginInfo";
+    public static final String noError				= "noError";
+    public static final String noInfo				= "noInfo";
+    public static final String parentThread			= "parentThread";
+    public static final String agentInitialization 	= "agentInitialization";
 
-	
-	private static ResourceBundle messages = null;
 
-	private static Locale locale = null;
+    private static ResourceBundle messages = null;
 
-	public static void setLocale(Locale loc) {
-		locale = loc;
-	}
+    private static Locale locale = null;
 
-	public static ResourceBundle getMessages() {
-		if (null == messages) {
-			if (null == locale) {
-				messages = ResourceBundle.getBundle("com.ca.apm.swat.epaplugins.utils.messages");
-			} else {
-				messages = ResourceBundle.getBundle("com.ca.apm.swat.epaplugins.utils.messages", locale);
-			}
-		}
+    public static void setLocale(Locale loc) {
+        locale = loc;
+    }
 
-		return messages;
-	}
+    public static ResourceBundle getMessages() {
+        if (null == messages) {
+            if (null == locale) {
+                messages = ResourceBundle.getBundle("com.ca.apm.swat.epaplugins.utils.messages");
+            } else {
+                messages = ResourceBundle.getBundle("com.ca.apm.swat.epaplugins.utils.messages", locale);
+            }
+        }
 
-	public static String getMessage(String key) {
-		return getMessages().getString(key);
-	}
+        return messages;
+    }
 
-	public static String getMessage(String key, Object[] params) {
-		MessageFormat formatter = new MessageFormat(getMessages().getString(key), locale);
-		return formatter.format(params);
-	}
+    public static String getMessage(String key) {
+        return getMessages().getString(key);
+    }
 
-	public static String getMessage(String key, String param) {
-		return getMessage(key, new Object[]{param});
-	}
+    public static String getMessage(String key, Object[] params) {
+        MessageFormat formatter = new MessageFormat(getMessages().getString(key), locale);
+        return formatter.format(params);
+    }
+
+    public static String getMessage(String key, String param) {
+        return getMessage(key, new Object[]{param});
+    }
 }

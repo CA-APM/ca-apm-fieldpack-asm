@@ -28,7 +28,7 @@ public class CryptoUtils
   {
     try {
       PBEKeySpec keySpec = new PBEKeySpec(passPhrase.toCharArray(), this.salt, this.iterationCount);
-      SecretKey key = SecretKeyFactory.getInstance(EPAConstants.kAlgorithm).generateSecret(keySpec);
+      SecretKey key = SecretKeyFactory.getInstance(ASMProperties.kAlgorithm).generateSecret(keySpec);
       this.ecipher = Cipher.getInstance(key.getAlgorithm());
       this.dcipher = Cipher.getInstance(key.getAlgorithm());
 
@@ -44,7 +44,7 @@ public class CryptoUtils
   public static void main(String[] args)
   {
     try {
-      CryptoUtils encrypter = new CryptoUtils(EPAConstants.kMsgDigest);
+      CryptoUtils encrypter = new CryptoUtils(ASMProperties.MESSAGE_DIGEST);
 
       String encrypted = encrypter.encrypt(args[0]);
       System.out.println("Put this in your APMCloudMonitor.properties file:");
