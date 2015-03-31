@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.Inflater;
 
+
+
 //import sun.misc.BASE64Decoder;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
@@ -18,236 +20,324 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
-import com.ca.apm.swat.epaplugins.utils.EPAConstants;
+import com.ca.apm.swat.epaplugins.utils.ASMProperties;
+import com.ca.apm.swat.epaplugins.utils.ASMPropertiesImpl;
 
-public class CloudMonitorMetricReporter {
+public class CloudMonitorMetricReporter implements ASMProperties {
 
-  private MetricWriter metricWriter;
-  private boolean apmcmDisplayMonitor;
-  private HashMap<String, String> cpMap;
-  private XMLAnalysisAdapter analysisAdapter;
+    private MetricWriter metricWriter;
+    private boolean apmcmDisplayCheckpoint;
+    private HashMap<String, String> checkpointMap;
+    private XmlAnalysisAdapter analysisAdapter;
 
-  protected final static String SEPARATOR = "\\.";
-  
-  public CloudMonitorMetricReporter(
-    MetricWriter metricWriter,
-    boolean apmcmDisplayMonitor,
-    HashMap<String, String> cpMap) {
-    this.metricWriter = metricWriter;
-    this.apmcmDisplayMonitor = apmcmDisplayMonitor;
-    this.cpMap = cpMap;
-    analysisAdapter = new XMLAnalysisAdapter(metricWriter);
-  }
+    protected  static final String SEPARATOR = "\\.";
 
-  public void printMetrics(HashMap<String, String> metric_map) throws Exception {
-    Iterator<Map.Entry<String, String>> metricIt = metric_map.entrySet().iterator();
-    while (metricIt.hasNext()) {
-      Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
-
-      if (((String) metricPairs.getValue()).length() == 0)
-        continue;
-      String thisMetricType = returnMetricType((String) metricPairs.getValue());
-
-      if (thisMetricType.equals(MetricWriter.kFloat)) {
-        metricPairs.setValue(((String) metricPairs.getValue()).split(SEPARATOR)[0]);
-        thisMetricType = MetricWriter.kIntCounter;
-      }
-
-      metricWriter.writeMetric(thisMetricType, EPAConstants.apmcmMetricTree + EPAConstants.kMetricPathSeparator + metricPairs.getKey(), metricPairs.getValue());
-    }
-  }
-
-  private String returnMetricType(String thisMetric) {
-    String metricType = MetricWriter.kStringEvent;
-    try {
-      new Integer(thisMetric);
-      metricType = MetricWriter.kIntCounter;
-    } catch (NumberFormatException e) {
-      try {
-        new Long(thisMetric);
-        metricType = MetricWriter.kLongCounter;
-      } catch (NumberFormatException ee) {
-        try {
-          new Float(thisMetric);
-          metricType = MetricWriter.kFloat;
-        } catch (NumberFormatException eee) {
-          metricType = MetricWriter.kStringEvent;
-        }
-      }
-    }
-    return metricType;
-  }
-
-  public HashMap<String, String> resetMetrics(HashMap<String, String> metric_map) throws Exception {
-    if (metric_map.size() != 0) {
-      Iterator<Map.Entry<String, String>> metricIt = metric_map.entrySet().iterator();
-      while (metricIt.hasNext()) {
-        Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
-
-        if (!returnMetricType((String) metricPairs.getValue()).equals(MetricWriter.kStringEvent))
-          metric_map.put((String) metricPairs.getKey(), EPAConstants.ZERO);
-        else {
-          metric_map.put((String) metricPairs.getKey(), EPAConstants.EMPTY_STRING);
-        }
-      }
+    /**
+     * Report metrics to APM via metric writer.
+     * @param metricWriter the metric writer
+     * @param apmcmDisplayCheckpoint display monitor info in metric path?
+     * @param checkpointMap map containing all checkpoints
+     */
+    public CloudMonitorMetricReporter(MetricWriter metricWriter,
+                                      boolean apmcmDisplayCheckpoint,
+                                      HashMap<String, String> checkpointMap) {
+        this.metricWriter = metricWriter;
+        this.apmcmDisplayCheckpoint = apmcmDisplayCheckpoint;
+        this.checkpointMap = checkpointMap;
+        analysisAdapter = new XmlAnalysisAdapter();
     }
 
-    return metric_map;
-  }
+    /**
+     * Write the metrics to the {@link MetricWriter}.
+     * @param metricMap map containing the metrics
+     * @throws Exception errors
+     */
+    public void printMetrics(HashMap<String, String> metricMap) throws Exception {
+        Iterator<Map.Entry<String, String>> metricIt = metricMap.entrySet().iterator();
+        while (metricIt.hasNext()) {
+            Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
 
-  protected HashMap<String, String> generateMetrics(String jsonString, String metricTree) throws Exception {
-    HashMap<String, String> metric_map = new HashMap<String, String>();
-
-    JSONObject thisJO = new JSONObject(jsonString);
-
-    if (thisJO.optString(EPAConstants.kAPMCMName, null) != null) {
-      metricTree = metricTree + EPAConstants.kMetricPathSeparator + thisJO.getString(EPAConstants.kAPMCMName);
-    }
-
-    if (apmcmDisplayMonitor) {
-      if (thisJO.optString(EPAConstants.kAPMCMLoc, null) != null) {
-        metricTree = metricTree + EPAConstants.kMetricPathSeparator + (String) this.cpMap.get(thisJO.getString(EPAConstants.kAPMCMLoc));
-      }
-    }
-
-    Iterator thisJOKeys = thisJO.keys();
-    while (thisJOKeys.hasNext()) {
-      String thisKey = thisJOKeys.next().toString();
-
-      if (thisJO.optJSONObject(thisKey) != null) {
-        JSONObject innerJO = thisJO.getJSONObject(thisKey);
-        metric_map.putAll(generateMetrics(innerJO.toString(), metricTree));
-      } else if (thisJO.optJSONArray(thisKey) != null) {
-        JSONArray innerJA = thisJO.optJSONArray(thisKey);
-        for (int i = 0; i < innerJA.length(); i++) {
-          if ((thisKey.equals(EPAConstants.kAPMCMResult)) || (thisKey.equals(EPAConstants.kAPMCMMonitors)) || (thisKey.equals(EPAConstants.kAPMCMStats)))
-            metric_map.putAll(generateMetrics(innerJA.getJSONObject(i).toString(), metricTree));
-          else {
-            metric_map.putAll(generateMetrics(innerJA.getJSONObject(i).toString(), metricTree + EPAConstants.kMetricPathSeparator + thisKey));
-          }
-        }
-      } else {
-        if ((thisKey.equals(EPAConstants.kAPMCMCode)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
-          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, EPAConstants.EMPTY_STRING).length() == 0))
-          continue;
-        String thisValue = thisJO.getString(thisKey);
-
-        if (thisKey.equals(EPAConstants.kAPMCMDescr)) {
-          String rawErrorMetric = metricTree + EPAConstants.kMetricNameSeparator + (String) EPAConstants.apmcmMetrics.get(EPAConstants.kAPMCMErrors);
-          metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), EPAConstants.ONE);
-        }
-
-        if (thisKey.equals(EPAConstants.kAPMCMColor)) {
-          String rawErrorMetric = metricTree + EPAConstants.kMetricNameSeparator + (String) EPAConstants.apmcmMetrics.get(EPAConstants.kAPMCMColors);
-          if (EPAConstants.apmcmColors.containsKey(thisValue))
-            metric_map.put(
-              CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
-              (String) EPAConstants.apmcmColors.get(thisValue));
-          else {
-            metric_map.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), EPAConstants.ZERO);
-          }
-
-        }
-
-        if (EPAConstants.apmcmMetrics.containsKey(thisKey)) {
-          thisKey = ((String) EPAConstants.apmcmMetrics.get(thisKey)).toString();
-        }
-
-        if (thisKey.equalsIgnoreCase(EPAConstants.kAPMCMOutput)) {
-
-          //Handled different
-          continue;
-        }
-
-        String rawMetric = metricTree + EPAConstants.kMetricNameSeparator + thisKey;
-        metric_map.put(CloudMonitorRequestHelper.fixMetric(rawMetric), CloudMonitorRequestHelper.fixMetric(thisValue));
-      }
-    }
-
-    return metric_map;
-  }
-
-  public byte[] decompress(byte[] data) {
-    try {
-      Inflater inflater = new Inflater();
-      inflater.setInput(data);
-
-      ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-      byte[] buffer = new byte[1024];
-      while (!inflater.finished()) {
-        int count = inflater.inflate(buffer);
-        outputStream.write(buffer, 0, count);
-      }
-      outputStream.close();
-      byte[] output = outputStream.toByteArray();
-
-      inflater.end();
-      return output;
-    } catch (Exception ex) {
-      return null;
-    }
-
-  }
-
-  class NullResolver implements EntityResolver {
-    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-      return new InputSource(new StringReader(EPAConstants.EMPTY_STRING));
-    }
-  }
-
-  public void analyzeContentResults(String jsonString, String folder, HashMap<String, String> metric_map)
-      throws JSONException {
-
-    JSONObject thisJO = new JSONObject(jsonString);
-
-    String name = EPAConstants.kAPMCMUndefined;
-    if (thisJO.optString(EPAConstants.kAPMCMName, null) != null) {
-      name = thisJO.getString(EPAConstants.kAPMCMName);
-    }
-    Iterator thisJOKeys = thisJO.keys();
-    while (thisJOKeys.hasNext()) {
-      String thisKey = thisJOKeys.next().toString();
-
-      if (thisJO.optJSONObject(thisKey) != null) {
-        JSONObject innerJO = thisJO.getJSONObject(thisKey);
-        analyzeContentResults(innerJO.toString(), folder, metric_map);
-      } else if (thisJO.optJSONArray(thisKey) != null) {
-        JSONArray innerJA = thisJO.optJSONArray(thisKey);
-        for (int i = 0; i < innerJA.length(); i++) {
-          analyzeContentResults(innerJA.getJSONObject(i).toString(), folder, metric_map);
-        }
-      } else {
-        if ((thisKey.equals(EPAConstants.kAPMCMColor)) || (thisKey.equals(EPAConstants.kAPMCMElapsed)) || (thisKey.equals(EPAConstants.kAPMCMInfo))
-          || (thisKey.equals(EPAConstants.kAPMCMVersion)) || (thisJO.optString(thisKey, EPAConstants.EMPTY_STRING).length() == 0))
-          continue;
-        String thisValue = thisJO.getString(thisKey);
-
-        // TODO: separate into different components - chain of responsibility discover, decode, handle
-        if (thisKey.equalsIgnoreCase(EPAConstants.kAPMCMOutput)) {
-          try {
-            String originalString = thisValue;
-            byte[] decoded = Base64.decodeBase64(originalString);
-            if (decoded != null) {
-              byte[] bytesDecompressed = decompress(decoded);
-              if (bytesDecompressed != null) {
-                String returnValue = new String(bytesDecompressed, 0, bytesDecompressed.length, EPAConstants.UTF8);
-                if (returnValue.startsWith(EPAConstants.kXMLPrefix)) {
-                  analysisAdapter.analyzeXML(returnValue, folder, name, metric_map);
-                } else {
-                  if (returnValue.startsWith(EPAConstants.kAPMCMHarOrLog)) {
-                    //Do nothing - already have seen it. and we don't need this log
-                  }
-                }
+            if (((String) metricPairs.getValue()).length() == 0) {
                 continue;
-              }
             }
-          } catch (Exception uee) {
-            uee.printStackTrace();
-            //Don't throw. Some formats are not yet supported
-          }
+
+            String thisMetricType = returnMetricType((String) metricPairs.getValue());
+
+            if (thisMetricType.equals(MetricWriter.kFloat)) {
+                metricPairs.setValue(((String) metricPairs.getValue()).split(SEPARATOR)[0]);
+                thisMetricType = MetricWriter.kIntCounter;
+            }
+
+            metricWriter.writeMetric(thisMetricType, METRIC_TREE + METRIC_PATH_SEPARATOR
+                + metricPairs.getKey(), metricPairs.getValue());
         }
-      }
     }
-  }
+
+    /**
+     * Get metric data type. 
+     * @param thisMetric input metric data
+     * @return metric type, one of {@link MetricWriter.kStringEvent},
+     * {@link MetricWriter.kIntCounter}, {@link MetricWriter.kLongCounter} or
+     * {@link MetricWriter.kFloat}
+     */
+    private String returnMetricType(String thisMetric) {
+        String metricType = MetricWriter.kStringEvent;
+
+        if (thisMetric.matches("^[+-]?[0-9]+$")) {
+            try {
+                new Integer(thisMetric);
+                metricType = MetricWriter.kIntCounter;
+            } catch (NumberFormatException e) {
+                metricType = MetricWriter.kLongCounter;
+            }
+        } else if (thisMetric.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
+            metricType = MetricWriter.kFloat;
+        } else {
+            metricType = MetricWriter.kStringEvent;
+        }
+        /*
+        try {
+            new Integer(thisMetric);
+            metricType = MetricWriter.kIntCounter;
+        } catch (NumberFormatException e) {
+            try {
+                new Long(thisMetric);
+                metricType = MetricWriter.kLongCounter;
+            } catch (NumberFormatException ee) {
+                try {
+                    new Float(thisMetric);
+                    metricType = MetricWriter.kFloat;
+                } catch (NumberFormatException eee) {
+                    metricType = MetricWriter.kStringEvent;
+                }
+            }
+        }
+         */
+        return metricType;
+    }
+
+    /**
+     * Reset all metrisc in <code>metricMap</code> to 0 or "".
+     * @param metricMap map containing the metrics
+     * @return the reset map
+     * @throws Exception errors
+     */
+    public HashMap<String, String> resetMetrics(HashMap<String, String> metricMap)
+            throws Exception {
+        if (metricMap.size() != 0) {
+            Iterator<Map.Entry<String, String>> metricIt = metricMap.entrySet().iterator();
+            while (metricIt.hasNext()) {
+                Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
+
+                if (!returnMetricType((String) metricPairs.getValue()).equals(
+                    MetricWriter.kStringEvent)) {
+                    metricMap.put((String) metricPairs.getKey(), ZERO);
+                } else {
+                    metricMap.put((String) metricPairs.getKey(), EMPTY_STRING);
+                }
+            }
+        }
+
+        return metricMap;
+    }
+
+    /**
+     * Recursively generate metrics from API call result. 
+     * @param jsonString API call result.
+     * @param metricTree metric tree prefix
+     * @return metricMap map containing the metrics
+     * @throws Exception errors
+     */
+    protected HashMap<String, String> generateMetrics(String jsonString, String metricTree)
+            throws Exception {
+        HashMap<String, String> metricMap = new HashMap<String, String>();
+
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        if (jsonObject.optString(kAPMCMName, null) != null) {
+            metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(kAPMCMName);
+        }
+
+        if (apmcmDisplayCheckpoint) {
+            if (jsonObject.optString(kAPMCMLoc, null) != null) {
+                metricTree = metricTree + METRIC_PATH_SEPARATOR
+                        + (String) this.checkpointMap.get(jsonObject.getString(kAPMCMLoc));
+            }
+        }
+
+        Iterator jsonObjectKeys = jsonObject.keys();
+        while (jsonObjectKeys.hasNext()) {
+            String thisKey = jsonObjectKeys.next().toString();
+
+            if (jsonObject.optJSONObject(thisKey) != null) {
+                JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
+                metricMap.putAll(generateMetrics(innerJsonObject.toString(), metricTree));
+            } else if (jsonObject.optJSONArray(thisKey) != null) {
+                JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
+                for (int i = 0; i < innerJsonArray.length(); i++) {
+                    if ((thisKey.equals(kAPMCMResult)) || (thisKey.equals(kAPMCMMonitors))
+                            || (thisKey.equals(kAPMCMStats))) {
+                        metricMap.putAll(generateMetrics(
+                            innerJsonArray.getJSONObject(i).toString(), metricTree));
+                    } else {
+                        metricMap.putAll(generateMetrics(
+                            innerJsonArray.getJSONObject(i).toString(), metricTree 
+                            + METRIC_PATH_SEPARATOR + thisKey));
+                    }
+                }
+            } else {
+                if ((thisKey.equals(kAPMCMCode)) || (thisKey.equals(kAPMCMElapsed))
+                        || (thisKey.equals(kAPMCMInfo)) || (thisKey.equals(kAPMCMVersion))
+                        || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
+                    continue;
+                }
+                String thisValue = jsonObject.getString(thisKey);
+
+                if (thisKey.equals(kAPMCMDescr)) {
+                    String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + (String) ASMPropertiesImpl.APM_CM_METRICS.get(kAPMCMErrors);
+                    metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ONE);
+                }
+
+                if (thisKey.equals(kAPMCMColor)) {
+                    String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + (String) ASMPropertiesImpl.APM_CM_METRICS.get(kAPMCMColors);
+                    if (ASMPropertiesImpl.APM_CM_COLORS.containsKey(thisValue)) {
+                        metricMap.put(
+                            CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
+                            (String) ASMPropertiesImpl.APM_CM_COLORS.get(thisValue));
+                    } else {
+                        metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ZERO);
+                    }
+
+                }
+
+                if (ASMPropertiesImpl.APM_CM_METRICS.containsKey(thisKey)) {
+                    thisKey = ((String) ASMPropertiesImpl.APM_CM_METRICS.get(thisKey)).toString();
+                }
+
+                if (thisKey.equalsIgnoreCase(kAPMCMOutput)) {
+
+                    //Handled different
+                    continue;
+                }
+
+                String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
+                metricMap.put(CloudMonitorRequestHelper.fixMetric(rawMetric),
+                    CloudMonitorRequestHelper.fixMetric(thisValue));
+            }
+        }
+
+        return metricMap;
+    }
+
+    /**
+     * Decompress compressed data.
+     * @param data compressed data
+     * @return uncompressed data
+     */
+    public byte[] decompress(byte[] data) {
+        try {
+            Inflater inflater = new Inflater();
+            inflater.setInput(data);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+            byte[] buffer = new byte[1024];
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            outputStream.close();
+            byte[] output = outputStream.toByteArray();
+
+            inflater.end();
+            return output;
+        } catch (Exception ex) {
+            return null;
+        }
+
+    }
+
+    /**
+     * Default {@link EntityResolver} that always resolves to empty string.
+     * Needed by SAXParser. 
+     */
+    class NullResolver implements EntityResolver {
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+            return new InputSource(new StringReader(EMPTY_STRING));
+        }
+    }
+
+    /**
+     * Recursively analyze the content.
+     * @param jsonString API call result.
+     * @param folder folder name
+     * @param metricMap map containing the metrics
+     * @throws JSONException errors
+     */
+    public void analyzeContentResults(String jsonString,
+                                      String folder,
+                                      HashMap<String, String> metricMap)
+                                              throws JSONException {
+
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        String name = kAPMCMUndefined;
+        if (jsonObject.optString(kAPMCMName, null) != null) {
+            name = jsonObject.getString(kAPMCMName);
+        }
+        Iterator jsonObjectKeys = jsonObject.keys();
+        while (jsonObjectKeys.hasNext()) {
+            String thisKey = jsonObjectKeys.next().toString();
+
+            if (jsonObject.optJSONObject(thisKey) != null) {
+                JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
+                analyzeContentResults(innerJsonObject.toString(), folder, metricMap);
+            } else if (jsonObject.optJSONArray(thisKey) != null) {
+                JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
+                for (int i = 0; i < innerJsonArray.length(); i++) {
+                    analyzeContentResults(innerJsonArray.getJSONObject(i).toString(), folder,
+                        metricMap);
+                }
+            } else {
+                if ((thisKey.equals(kAPMCMColor)) || (thisKey.equals(kAPMCMElapsed))
+                        || (thisKey.equals(kAPMCMInfo)) || (thisKey.equals(kAPMCMVersion))
+                        || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
+                    continue;
+                }
+                String thisValue = jsonObject.getString(thisKey);
+
+                // TODO: separate into different components -
+                // chain of responsibility discover, decode, handle
+                if (thisKey.equalsIgnoreCase(kAPMCMOutput)) {
+                    try {
+                        String originalString = thisValue;
+                        byte[] decoded = Base64.decodeBase64(originalString);
+                        if (decoded != null) {
+                            byte[] bytesDecompressed = decompress(decoded);
+                            if (bytesDecompressed != null) {
+                                String returnValue = new String(bytesDecompressed, 0,
+                                    bytesDecompressed.length, UTF8);
+                                if (returnValue.startsWith(kXMLPrefix)) {
+                                    analysisAdapter.analyzeXml(returnValue, folder, name,
+                                        metricMap);
+                                } else {
+                                    if (returnValue.startsWith(kAPMCMHarOrLog)) {
+                                        // Do nothing - already have seen it.
+                                        // and we don't need this log
+                                    }
+                                }
+                                continue;
+                            }
+                        }
+                    } catch (Exception uee) {
+                        uee.printStackTrace();
+                        //Don't throw. Some formats are not yet supported
+                    }
+                }
+            }
+        }
+    }
 
 }
