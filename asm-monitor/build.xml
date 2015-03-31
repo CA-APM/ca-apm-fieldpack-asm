@@ -1,0 +1,18 @@
+<project name="test" basedir="." default="help">
+	<property name="epagent.dir" location="/Users/grogu01/work/epagent" />
+	
+	<target name="help">
+		<echo message="Run mvn install!!!" />
+	</target>	
+	<target name="copy">
+		<copy todir="${epagent.dir}/lib">
+			<fileset dir="target" includes="ca.apm.swat.asm-monitor.jar"/>
+		</copy>
+	</target>
+	<target name = "clean">
+		<delete>
+        	<fileset dir="${epagent.dir}" includes="*.log*"/>
+        	<fileset dir="${epagent.dir}" includes="*.pid"/>
+		</delete>
+	</target>
+</project>
