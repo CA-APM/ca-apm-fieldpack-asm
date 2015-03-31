@@ -50,8 +50,7 @@ public class ASMReader implements ASMProperties {
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
-                ASMMessages.getMessage(ASMMessages.initializationError,
-                    new Object []{APMCM_PRODUCT_NAME, e.getMessage()}));
+                ASMMessages.getMessage(ASMMessages.initializationError, APMCM_PRODUCT_NAME, e.getMessage()));
             //e.printStackTrace();
             System.exit(1);
         }
@@ -78,7 +77,7 @@ public class ASMReader implements ASMProperties {
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
                 ASMMessages.getMessage(ASMMessages.initializationError,
-                    new Object []{APMCM_PRODUCT_NAME, e.getMessage()}));
+                    APMCM_PRODUCT_NAME, e.getMessage()));
             // e.printStackTrace();
             System.exit(1);
         }
@@ -125,7 +124,7 @@ public class ASMReader implements ASMProperties {
                 } else {
                     EpaUtils.getFeedback().error(
                         ASMMessages.getMessage(ASMMessages.initializationError,
-                            new Object []{APMCM_PRODUCT_NAME, e.getMessage()}));
+                            APMCM_PRODUCT_NAME, e.getMessage()));
                     // e.printStackTrace();
                     keepTrying = false;
                     System.exit(1);
@@ -167,8 +166,9 @@ public class ASMReader implements ASMProperties {
                 } else {
                     EpaUtils.getFeedback().error(
                         ASMMessages.getMessage(ASMMessages.runError,
-                            new Object []{APMCM_PRODUCT_NAME, ASMMessages.parentThread,
-                                          e.getMessage()}));
+                            APMCM_PRODUCT_NAME,
+                            ASMMessages.parentThread,
+                            e.getMessage()));
                     e.printStackTrace();
                     keepRunning = Boolean.valueOf(false);
                     System.exit(2);
@@ -185,10 +185,10 @@ public class ASMReader implements ASMProperties {
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
         EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.connectionError,
-            new Object[]{APMCM_PRODUCT_NAME, apmcmInfo}));
+            APMCM_PRODUCT_NAME, apmcmInfo));
         if (numRetriesLeft > 0) {
             EpaUtils.getFeedback().info(ASMMessages.getMessage(ASMMessages.connectionRetry,
-                new Object[]{numRetriesLeft}));
+                numRetriesLeft));
             numRetriesLeft--;
             try {
                 Thread.sleep(60000L);
@@ -217,14 +217,14 @@ public class ASMReader implements ASMProperties {
             properties.load(inStream);
         } catch (IOException e) {
             EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.readingPropertiesError,
-                new Object[]{filename, e.getMessage()}));
+                filename, e.getMessage()));
             throw e;
         }
         inStream.close();
 
         if (EpaUtils.getFeedback().isDebugEnabled()) {
             EpaUtils.getFeedback().debug(ASMMessages.getMessage(ASMMessages.readingProperties,
-                new Object[]{filename}));
+                filename));
             for (Iterator<Object> it = properties.keySet().iterator(); it.hasNext(); ) {
                 String key = (String) it.next();
                 EpaUtils.getFeedback().debug(key + "=" + properties.getProperty(key));

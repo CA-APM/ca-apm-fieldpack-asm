@@ -120,14 +120,14 @@ public class CloudMonitorAccessor implements ASMProperties {
             ASMMessages.getMessage(ASMMessages.noInfo));
 
         EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.loginError,
-            new Object[]{errorStr, errorCode, errorInfo}));
+            errorStr, errorCode, errorInfo));
 
         if (errorCode == 1000) {
             System.err.print(ASMMessages.getMessage(ASMMessages.loginInfo,
-                new Object[]{this.apmcmProperties.getProperty(URL),
-                             kAPMCMLoginCmd,
-                             APMCM_PRODUCT_NAME,
-                             apmcmPasswordPage}));
+                this.apmcmProperties.getProperty(URL),
+                kAPMCMLoginCmd,
+                APMCM_PRODUCT_NAME,
+                apmcmPasswordPage));
         }
 
         System.exit(1000);

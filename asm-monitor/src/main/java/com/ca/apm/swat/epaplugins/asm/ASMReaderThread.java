@@ -69,7 +69,7 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                 } else {
                     EpaUtils.getFeedback().error(ASMMessages.getMessage(
                             ASMMessages.folderThreadTimeout,
-                            new Object[]{this.thisFolder, new Long(apmcmEpaWaitTime)}));
+                            this.thisFolder, new Long(apmcmEpaWaitTime)));
                     Thread.sleep(60000L);
                 }
             } catch (Exception e) {
@@ -78,7 +78,7 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                 } else {
                     EpaUtils.getFeedback().error(ASMMessages.getMessage(
                         ASMMessages.folderThreadError,
-                        new Object[]{APMCM_PRODUCT_NAME, this.thisFolder, e.getMessage()}));
+                       APMCM_PRODUCT_NAME, this.thisFolder, e.getMessage()));
                     //e.printStackTrace();
                     this.keepRunning = Boolean.valueOf(false);
                 }
@@ -94,11 +94,11 @@ public class ASMReaderThread extends Thread implements ASMProperties {
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
         EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.connectionError,
-            new Object[]{APMCM_PRODUCT_NAME,apmcmInfo}));
+            APMCM_PRODUCT_NAME,apmcmInfo));
 
         if (numRetriesLeft > 0) {
             EpaUtils.getFeedback().debug(ASMMessages.getMessage(ASMMessages.connectionRetry,
-                new Object[]{numRetriesLeft}));
+                numRetriesLeft));
             
             numRetriesLeft--;
             try {

@@ -48,7 +48,7 @@ public class ASMMessages {
         return getMessages().getString(key);
     }
 
-    public static String getMessage(String key, Object[] params) {
+    public static String getMessage(String key, Object... params) {
         MessageFormat formatter = new MessageFormat(getMessages().getString(key), locale);
         return formatter.format(params);
     }
