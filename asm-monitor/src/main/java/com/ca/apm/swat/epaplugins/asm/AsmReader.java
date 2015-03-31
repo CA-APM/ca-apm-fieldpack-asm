@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
@@ -50,7 +52,8 @@ public class AsmReader implements AsmProperties {
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
-                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR, APMCM_PRODUCT_NAME, e.getMessage()));
+                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
+                    APMCM_PRODUCT_NAME, e.getMessage()));
             //e.printStackTrace();
             System.exit(1);
         }
@@ -225,7 +228,9 @@ public class AsmReader implements AsmProperties {
         if (EpaUtils.getFeedback().isDebugEnabled()) {
             EpaUtils.getFeedback().debug(AsmMessages.getMessage(
                 AsmMessages.READING_PROPERTIES, filename));
-            for (Iterator<Object> it = properties.keySet().iterator(); it.hasNext(); ) {
+            // use TreeSet so we get output alphabetically sorted
+            Set<Object> copy = new TreeSet<Object>(properties.keySet());
+            for (Iterator<Object> it = copy.iterator(); it.hasNext(); ) {
                 String key = (String) it.next();
                 EpaUtils.getFeedback().debug(key + "=" + properties.getProperty(key));
             }

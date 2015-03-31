@@ -60,8 +60,8 @@ public class RestClient {
      * @throws IOException if an I/O error happened
      */
     public String request(String method, URL url, String params) throws IOException {
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug(
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, url));
         }
 
@@ -96,13 +96,14 @@ public class RestClient {
         }
         connection.disconnect();
         final long time = System.currentTimeMillis() - startTime;
-
+        String response = responseBody.toString();
+        
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE,
                 responseBody.length(), time));
         }
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+        if (EpaUtils.getFeedback().isDebugEnabled()) {
             String header = null;
             String headerValue = null;
             int index = 0;
@@ -110,16 +111,17 @@ public class RestClient {
                 header = connection.getHeaderFieldKey(index);
 
                 if (null == header) {
-                    EpaUtils.getFeedback().verbose(headerValue);
+                    EpaUtils.getFeedback().debug(headerValue);
                 } else {
-                    EpaUtils.getFeedback().verbose(header + ": " + headerValue);
+                    EpaUtils.getFeedback().debug(header + ": " + headerValue);
                 }
                 index++;
             }
-            EpaUtils.getFeedback().verbose(AsmProperties.EMPTY_STRING);
+            EpaUtils.getFeedback().debug(response);
+            EpaUtils.getFeedback().debug(AsmProperties.EMPTY_STRING);
         }
 
-        return responseBody.toString();
+        return response;
     }
 
 
