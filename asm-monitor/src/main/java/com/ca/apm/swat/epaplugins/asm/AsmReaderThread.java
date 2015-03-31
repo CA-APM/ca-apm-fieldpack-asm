@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
-import com.ca.apm.swat.epaplugins.utils.ASMMessages;
-import com.ca.apm.swat.epaplugins.utils.ASMProperties;
-import com.ca.apm.swat.epaplugins.utils.JSONHelper;
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.JsonHelper;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**
@@ -14,7 +14,7 @@ import com.wily.introscope.epagent.EpaUtils;
  * One thread per folder.
  * 
  */
-public class ASMReaderThread extends Thread implements ASMProperties {
+public class AsmReaderThread extends Thread implements AsmProperties {
     private String thisFolder;
     private HashMap<String, String> thisMetricMap = new HashMap<String, String>();
     private boolean keepRunning = true;
@@ -33,7 +33,7 @@ public class ASMReaderThread extends Thread implements ASMProperties {
      * @param apmcmProperties the properties
      * @param metricReporter the metric reporter
      */
-    ASMReaderThread(
+    AsmReaderThread(
         String folderName,
         CloudMonitorRequestHelper requestHelper,
         HashMap<String, String[]> folderMap,
@@ -67,8 +67,8 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                 if (timeToSleep > 0L) {
                     Thread.sleep(timeToSleep);
                 } else {
-                    EpaUtils.getFeedback().error(ASMMessages.getMessage(
-                            ASMMessages.folderThreadTimeout,
+                    EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                            AsmMessages.FOLDER_THREAD_TIMEOUT,
                             this.thisFolder, new Long(apmcmEpaWaitTime)));
                     Thread.sleep(60000L);
                 }
@@ -76,8 +76,8 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                 if (kJavaNetExceptionRegex.matches(e.toString()) && (this.numRetriesLeft > 0)) {
                     this.numRetriesLeft = retryConnection(this.numRetriesLeft, this.thisFolder);
                 } else {
-                    EpaUtils.getFeedback().error(ASMMessages.getMessage(
-                        ASMMessages.folderThreadError,
+                    EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                        AsmMessages.FOLDER_THREAD_ERROR,
                        APMCM_PRODUCT_NAME, this.thisFolder, e.getMessage()));
                     //e.printStackTrace();
                     this.keepRunning = Boolean.valueOf(false);
@@ -93,11 +93,11 @@ public class ASMReaderThread extends Thread implements ASMProperties {
      * @return number of retries left
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
-        EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.connectionError,
+        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR,
             APMCM_PRODUCT_NAME,apmcmInfo));
 
         if (numRetriesLeft > 0) {
-            EpaUtils.getFeedback().debug(ASMMessages.getMessage(ASMMessages.connectionRetry,
+            EpaUtils.getFeedback().debug(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY,
                 numRetriesLeft));
             
             numRetriesLeft--;
@@ -107,7 +107,7 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                 e.printStackTrace();
             }
         } else {
-            EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.connectionRetryError));
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR));
         }
         return numRetriesLeft;
     }
@@ -139,20 +139,20 @@ public class ASMReaderThread extends Thread implements ASMProperties {
 
         if (TRUE.equals(apmcmProperties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
             String statsRequest = requestHelper.getStats(folder, EMPTY_STRING);
-            metricMap.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest),
+            metricMap.putAll(metricReporter.generateMetrics(JsonHelper.unpadJson(statsRequest),
                 folderPrefix));
         }
 
         if ((thisFolderRules[0].equals(ALL_RULES)) && (!folder.equals(EMPTY_STRING))) {
             if (apmcmProperties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
                 String pspRequest = requestHelper.getPsp(folder, EMPTY_STRING);
-                metricMap.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(pspRequest),
+                metricMap.putAll(metricReporter.generateMetrics(JsonHelper.unpadJson(pspRequest),
                     folderPrefix));
             }
             if (apmcmProperties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                 String logRequest = requestHelper.getLogs(folder, EMPTY_STRING,
                     thisFolderRules.length - 1);
-                String unpadded = JSONHelper.unpadJSON(logRequest);
+                String unpadded = JsonHelper.unpadJson(logRequest);
                 if (unpadded != null) {
                     HashMap<String, String> generatedMetrics =
                             metricReporter.generateMetrics(unpadded, folderPrefix);
@@ -176,7 +176,7 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                     String statsRequest =
                             requestHelper.getStats(folder, thisFolderRules[i]);
                     metricMap.putAll(metricReporter.generateMetrics(
-                        JSONHelper.unpadJSON(statsRequest), folderPrefix));
+                        JsonHelper.unpadJson(statsRequest), folderPrefix));
                 }
             }
         } else {
@@ -187,18 +187,18 @@ public class ASMReaderThread extends Thread implements ASMProperties {
                 if (apmcmProperties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
                     String pspRequest = requestHelper.getPsp(folder, thisFolderRules[j]);
                     metricMap.putAll(metricReporter.generateMetrics(
-                        JSONHelper.unpadJSON(pspRequest), folderPrefix));
+                        JsonHelper.unpadJson(pspRequest), folderPrefix));
                 }
                 if (apmcmProperties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
                     String statsRequest =
                         requestHelper.getStats(folder, thisFolderRules[j]);
                     metricMap.putAll(metricReporter.generateMetrics(
-                        JSONHelper.unpadJSON(statsRequest), folderPrefix));
+                        JsonHelper.unpadJson(statsRequest), folderPrefix));
                 }
                 if (apmcmProperties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                     String logRequest = requestHelper.getLogs(folder, thisFolderRules[j], 1);
                     metricMap.putAll(metricReporter.generateMetrics(
-                        JSONHelper.unpadJSON(logRequest), folderPrefix));
+                        JsonHelper.unpadJson(logRequest), folderPrefix));
                 }
             }
         }

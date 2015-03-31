@@ -12,15 +12,15 @@ import java.util.Properties;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XMLMetricWriter;
-import com.ca.apm.swat.epaplugins.utils.ASMMessages;
-import com.ca.apm.swat.epaplugins.utils.ASMProperties;
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 
 
 /**
- * Main thread for App Synthetic Monitor EPA plugin. 
+ * Main thread for App Synthetic Monitor EPA plugin.
  */
-public class ASMReader implements ASMProperties {
+public class AsmReader implements AsmProperties {
 
     private HashMap<String, String> creditsMap = new HashMap<String, String>();
     private boolean keepRunning;
@@ -38,10 +38,10 @@ public class ASMReader implements ASMProperties {
                 PROPERTY_FILE_NAME);
 
             String apmcmLocale = apmcmProperties.getProperty(LOCALE, DEFAULT_LOCALE);
-            ASMMessages.setLocale(new Locale(apmcmLocale.substring(0, 2),
+            AsmMessages.setLocale(new Locale(apmcmLocale.substring(0, 2),
                 apmcmLocale.substring(3,5)));
 
-            ASMReader thisReader = new ASMReader();
+            AsmReader thisReader = new AsmReader();
             int apmcmEpaWaitTime = Integer.parseInt(
                 apmcmProperties.getProperty(WAIT_TIME));
 
@@ -50,7 +50,7 @@ public class ASMReader implements ASMProperties {
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
-                ASMMessages.getMessage(ASMMessages.initializationError, APMCM_PRODUCT_NAME, e.getMessage()));
+                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR, APMCM_PRODUCT_NAME, e.getMessage()));
             //e.printStackTrace();
             System.exit(1);
         }
@@ -67,7 +67,7 @@ public class ASMReader implements ASMProperties {
             Properties apmcmProperties = getPropertiesFromFile(args.length != 0 ? args[0] :
                 PROPERTY_FILE_NAME);
 
-            ASMReader thisReader = new ASMReader();
+            AsmReader thisReader = new AsmReader();
             int apmcmEpaWaitTime = Integer.parseInt(
                 apmcmProperties.getProperty(WAIT_TIME));
 
@@ -76,7 +76,7 @@ public class ASMReader implements ASMProperties {
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
-                ASMMessages.getMessage(ASMMessages.initializationError,
+                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
                     APMCM_PRODUCT_NAME, e.getMessage()));
             // e.printStackTrace();
             System.exit(1);
@@ -120,10 +120,10 @@ public class ASMReader implements ASMProperties {
                 if ((e.toString().matches(kJavaNetExceptionRegex))
                         && (initNumRetriesLeft > 0)) {
                     initNumRetriesLeft = retryConnection(initNumRetriesLeft,
-                        ASMMessages.getMessage(ASMMessages.agentInitialization));
+                        AsmMessages.getMessage(AsmMessages.AGENT_INITIALIZATION));
                 } else {
                     EpaUtils.getFeedback().error(
-                        ASMMessages.getMessage(ASMMessages.initializationError,
+                        AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
                             APMCM_PRODUCT_NAME, e.getMessage()));
                     // e.printStackTrace();
                     keepTrying = false;
@@ -140,7 +140,7 @@ public class ASMReader implements ASMProperties {
 
         //Collect folders
         for (int i = 0; i < apmcmFolders.length; i++) {
-            ASMReaderThread rt = new ASMReaderThread(
+            AsmReaderThread rt = new AsmReaderThread(
                 apmcmFolders[i],
                 requestHelper,
                 folderMap,
@@ -162,12 +162,12 @@ public class ASMReader implements ASMProperties {
                 if ((e.toString().matches(kJavaNetExceptionRegex))
                         && (numRetriesLeft > 0)) {
                     numRetriesLeft = retryConnection(numRetriesLeft,
-                        ASMMessages.getMessage(ASMMessages.parentThread));
+                        AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
                 } else {
                     EpaUtils.getFeedback().error(
-                        ASMMessages.getMessage(ASMMessages.runError,
+                        AsmMessages.getMessage(AsmMessages.RUN_ERROR,
                             APMCM_PRODUCT_NAME,
-                            ASMMessages.parentThread,
+                            AsmMessages.PARENT_THREAD,
                             e.getMessage()));
                     e.printStackTrace();
                     keepRunning = Boolean.valueOf(false);
@@ -184,10 +184,10 @@ public class ASMReader implements ASMProperties {
      * @return number of retries left
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
-        EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.connectionError,
+        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR,
             APMCM_PRODUCT_NAME, apmcmInfo));
         if (numRetriesLeft > 0) {
-            EpaUtils.getFeedback().info(ASMMessages.getMessage(ASMMessages.connectionRetry,
+            EpaUtils.getFeedback().info(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY,
                 numRetriesLeft));
             numRetriesLeft--;
             try {
@@ -197,7 +197,7 @@ public class ASMReader implements ASMProperties {
             }
         } else {
             EpaUtils.getFeedback().error(
-                ASMMessages.getMessage(ASMMessages.connectionRetryError));
+                AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR));
         }
         return numRetriesLeft;
     }
@@ -216,14 +216,14 @@ public class ASMReader implements ASMProperties {
         try {
             properties.load(inStream);
         } catch (IOException e) {
-            EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.readingPropertiesError,
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.READING_PROPERTIES_ERROR,
                 filename, e.getMessage()));
             throw e;
         }
         inStream.close();
 
         if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug(ASMMessages.getMessage(ASMMessages.readingProperties,
+            EpaUtils.getFeedback().debug(AsmMessages.getMessage(AsmMessages.READING_PROPERTIES,
                 filename));
             for (Iterator<Object> it = properties.keySet().iterator(); it.hasNext(); ) {
                 String key = (String) it.next();
@@ -231,7 +231,7 @@ public class ASMReader implements ASMProperties {
             }
         }
 
-        EpaUtils.getFeedback().info(ASMMessages.getMessage(ASMMessages.readingPropertiesFinished));
+        EpaUtils.getFeedback().info(AsmMessages.getMessage(AsmMessages.READING_PROPERTIES_FINISHED));
         return properties;
     }
 }

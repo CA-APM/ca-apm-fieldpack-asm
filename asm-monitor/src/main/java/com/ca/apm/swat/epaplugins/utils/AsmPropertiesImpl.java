@@ -7,13 +7,19 @@ import java.util.HashMap;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class ASMPropertiesImpl implements ASMProperties {
+public class AsmPropertiesImpl implements AsmProperties {
 
+    /**
+     * Mapping table of ASM tags to APM metric names.
+     */
     public static final HashMap<String, String> APM_CM_METRICS = new HashMap<String, String>();
+    
+    /**
+     * Mapping table of status indicator colors.
+     */
     public static final HashMap<String, String> APM_CM_COLORS = new HashMap<String, String>();
 
-    static
-    {
+    static {
         APM_CM_METRICS.put(kAPMCMActive, "Active");
         APM_CM_METRICS.put("alerts", "Alerts Per Interval");
         APM_CM_METRICS.put("apdex", "Apdex Score");
@@ -65,9 +71,10 @@ public class ASMPropertiesImpl implements ASMProperties {
         APM_CM_METRICS.put("xspeed", "Transfer Speed (kB/s)");
         APM_CM_METRICS.put("xtime", "Transfer Time (ms)");
 
-        APM_CM_COLORS.put("green", "1");
-        APM_CM_COLORS.put("yellow", "2");
-        APM_CM_COLORS.put("orange", "2");
-        APM_CM_COLORS.put("red", "3");
+        // mapping table of status indicator colors
+        APM_CM_COLORS.put(GREEN, "1");
+        APM_CM_COLORS.put(YELLOW, "2");
+        APM_CM_COLORS.put(ORANGE, "2");
+        APM_CM_COLORS.put(RED, "3");
     }
 }
