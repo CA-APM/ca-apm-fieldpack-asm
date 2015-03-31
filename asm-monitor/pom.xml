@@ -29,9 +29,9 @@
 			<version>20131018</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.directory.studio</groupId>
-			<artifactId>org.apache.commons.codec</artifactId>
-			<version>1.8</version>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -67,7 +67,7 @@
 					<artifactSet>
 						<includes>
 							<include>org.json:json</include>
-							<include>org.apache.directory.studio:org.apache.commons.codec</include>
+							<include>commons-codec:commons-codec</include>
 						</includes>
 					</artifactSet>
 				</configuration>
