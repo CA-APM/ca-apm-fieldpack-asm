@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.ca.apm.swat.epaplugins.utils.JsonHelper;
