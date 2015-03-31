@@ -51,6 +51,7 @@ public class CloudMonitorAccessor {
     if (!apmcmLocalTest) {
       URL apiURL = new URL(this.apmcmProperties.getProperty(ASMProperties.URL) + "/" + callType);
       apiResponse = this.apmcmClient.request(EPAConstants.apmcmQuiet.booleanValue(), EPAConstants.apmcmMethod, apiURL, callParams);
+    } else if (!callType.equals(EPAConstants.kAPMCMLogoutCmd)) {
       String inputLine = null;
       String inputFileName = this.apmcmLocalTestPath + "\\" + callType + ".txt";
       BufferedReader inputFile = new BufferedReader(new FileReader(inputFileName));
@@ -116,24 +117,5 @@ public class CloudMonitorAccessor {
     }
     return null;
   }
-
-//  public String executeAPINew(String callType, String callParams) throws Exception {
-//    String apiResponse = "";
-//    if (!apmcmLocalTest) {
-//      URL apiURL = new URL(this.apmcmProperties.getProperty("apmcm.URL") + "/" + callType);
-//      apiResponse = this.apmcmClient.requestNew(EPAConstants.apmcmQuiet.booleanValue(), "POST", apiURL, callParams);
-//    } else if (!callType.equals("acct_logout")) {
-//      String inputLine = null;
-//      String inputFileName = this.apmcmLocalTestPath + "\\" + callType + ".txt";
-//      BufferedReader inputFile = new BufferedReader(new FileReader(inputFileName));
-//      while ((inputLine = inputFile.readLine()) != null)
-//        apiResponse = apiResponse + inputLine;
-//      inputFile.close();
-//    } else {
-//      return "Logged Out.";
-//    }
-//
-//    return apiResponse.trim();
-//  }
 
 }

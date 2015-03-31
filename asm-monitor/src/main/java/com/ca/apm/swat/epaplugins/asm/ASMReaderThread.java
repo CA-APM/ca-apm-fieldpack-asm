@@ -95,26 +95,30 @@ private String thisFolder;
       return metric_map;
     }
 
+    // prefix for metric name
+    String folderPrefix = EPAConstants.apmcmMonitorMetricPrefix + folder;
+    
     if (folder.equals(EPAConstants.apmcmRootFolder)) {
       folder = EPAConstants.EMPTY_STRING;
+      // remove trailing '|'
+      folderPrefix = EPAConstants.apmcmMonitorMetricPrefix.substring(0, EPAConstants.apmcmMonitorMetricPrefix.length() - 1);
     }
-
+      
     if (apmcmProperties.getProperty(ASMProperties.METRICS_STATS_FOLDER, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
-
       String statsRequest = requestHelper.getStats(folder, EPAConstants.EMPTY_STRING, apmcmUser);
-      metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
+      metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), folderPrefix));
     }
 
     if ((thisFolderRules[0].equals(EPAConstants.apmcmAllRules)) && (!folder.equals(EPAConstants.EMPTY_STRING))) {
       if (apmcmProperties.getProperty(ASMProperties.METRICS_PUBLIC, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
         String pspRequest = requestHelper.getPSP(folder, EPAConstants.EMPTY_STRING, apmcmUser);
-        metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(pspRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
+        metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(pspRequest), folderPrefix));
       }
       if (apmcmProperties.getProperty(ASMProperties.METRICS_LOGS, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
         String logRequest = requestHelper.getLogs(folder, EPAConstants.EMPTY_STRING, thisFolderRules.length - 1);
         String unpadded = JSONHelper.unpadJSON(logRequest);
         if (unpadded != null) {
-          HashMap<String, String> generatedMetrics = metricReporter.generateMetrics(unpadded, EPAConstants.apmcmMonitorMetricPrefix + folder);
+          HashMap<String, String> generatedMetrics = metricReporter.generateMetrics(unpadded, folderPrefix);
           metric_map.putAll(generatedMetrics);
 
           HashMap<String, String> metric_map_Content = new HashMap<String, String>();
@@ -133,7 +137,7 @@ private String thisFolder;
             continue;
           }
           String statsRequest = requestHelper.getStats(folder, thisFolderRules[i], apmcmUser);
-          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
+          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), folderPrefix));
         }
     } else {
       for (int j = 0; j < thisFolderRules.length; j++) {
@@ -142,15 +146,15 @@ private String thisFolder;
         }
         if (apmcmProperties.getProperty(ASMProperties.METRICS_PUBLIC, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
           String pspRequest = requestHelper.getPSP(folder, thisFolderRules[j], apmcmUser);
-          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(pspRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
+          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(pspRequest), folderPrefix));
         }
         if (apmcmProperties.getProperty(ASMProperties.METRICS_STATS_RULE, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
           String statsRequest = requestHelper.getStats(folder, thisFolderRules[j], apmcmUser);
-          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
+          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(statsRequest), folderPrefix));
         }
         if (apmcmProperties.getProperty(ASMProperties.METRICS_LOGS, ASMProperties.FALSE).equals(ASMProperties.TRUE)) {
           String logRequest = requestHelper.getLogs(folder, thisFolderRules[j], 1);
-          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(logRequest), EPAConstants.apmcmMonitorMetricPrefix + folder));
+          metric_map.putAll(metricReporter.generateMetrics(JSONHelper.unpadJSON(logRequest), folderPrefix));
         }
       }
     }

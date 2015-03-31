@@ -4,8 +4,8 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
+import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XMLMetricWriter;
 import com.ca.apm.swat.epaplugins.utils.ASMMessages;
 import com.ca.apm.swat.epaplugins.utils.ASMProperties;
@@ -24,6 +24,12 @@ public class ASMReader {
 	private boolean keepRunning;
 	private int numRetriesLeft;
 
+	/**
+	 * Called by EPAgent.
+	 * @param args arguments
+	 * @param psEPA interface to EPAgent, write metrics here
+	 * @throws Exception thrown if unrecoverable errors occur
+	 */
 	public static void main(String[] args, PrintStream psEPA) throws Exception {
 		try {
 			PropertiesUtils apmcmProperties;
@@ -181,7 +187,5 @@ public class ASMReader {
 		}
 		return numRetriesLeft;
 	}
-
-
 
 }
