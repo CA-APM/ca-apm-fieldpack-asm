@@ -5,10 +5,7 @@ package com.ca.apm.swat.epaplugins.utils;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public interface ASMProperties {
-
-    //TODO: GG reset to true
-    public static final Boolean apmcmQuiet = Boolean.valueOf(false);
+public interface AsmProperties {
 
     public static final String TRUE = "true";
     public static final String FALSE = "false";
@@ -21,10 +18,10 @@ public interface ASMProperties {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
     public static final String UTF8 = "UTF-8";
 
-    public static final String APMCM_PRODUCT_NAME = "App Synthetic Monitor";
+    public static final String APMCM_PRODUCT_NAME       = "App Synthetic Monitor";
     public static final String APMCM_PRODUCT_NAME_SHORT = "ASM";
 
-    public static final String PROPERTY_FILE_NAME     = "APMCloudMonitor.properties";
+    public static final String PROPERTY_FILE_NAME       = "APMCloudMonitor.properties";
 
     public static final String DEFAULT_LOCALE         = "en_US";
     public static final String LOCALE                 = "apmcm.locale";
@@ -53,6 +50,14 @@ public interface ASMProperties {
     public static final String SKIP_INACTIVE_FOLDERS  = "apmcm.skip_inactive.folders";
     public static final String FOLDER_PREFIX          = "apmcm.folder.";
     public static final String NUM_LOGS               = "apmcm.numlogs";
+
+    // error codes
+    public static final int AUTH_ERROR_CODE = 1000;
+    public static final int NORM_ERROR_CODE = 1001;
+
+    // retries
+    public static final int INIT_RETRIES = 10;
+    public static final int THREAD_RETRIES = 10;
 
     public static final String kDefaultDelimiter = ",";
     public static final String[] kNoStringArrayProperties = new String[0];
@@ -132,6 +137,7 @@ public interface ASMProperties {
     public static final String apmcmMethod = "POST";
     public static final String apmcmPasswordPage = "https://dashboard.cloudmonitor.ca.com/en/change_passwd.php";
 
+    // JMeter log result tags
     public static final String TEST_RESULTS         = "testResults";
     public static final String RESPONSE_CODE_TAG    = "rc";
     public static final String RESPONSE_MESSAGE_TAG = "rm";
@@ -145,6 +151,7 @@ public interface ASMProperties {
     public static final String ASSERTION_FAILURE    = " - Assertion Failure";
     public static final String ASSERTION_ERROR      = " - Assertion Error";
 
+    // JMeter metrics
     public static final String STATUS_MESSAGE       = "Status Message";
     public static final String STATUS_MESSAGE_VALUE = "Status Message Value";
     public static final String RESPONSE_CODE        = "Response Code";
@@ -152,9 +159,10 @@ public interface ASMProperties {
     public static final String ASSERTION_FAILURES   = "Assertion Failures";
     public static final String ASSERTION_ERRORS     = "Assertion Errors";
     public static final String TEST_URL             = "URL";
-
-    public static final int apmcmAuthErrorCode = 1000;
-    public static final int apmcmNormErrorCode = 1001;
-    public static final int INIT_RETRIES = 10;
-    public static final int THREAD_RETRIES = 10;
+   
+    //  status indicator colors, see AsmPropertiesImpl.APM_CM_COLORS
+    public static final String GREEN                = "green";
+    public static final String YELLOW               = "yellow";
+    public static final String ORANGE               = "orange";
+    public static final String RED                  = "red";
 }

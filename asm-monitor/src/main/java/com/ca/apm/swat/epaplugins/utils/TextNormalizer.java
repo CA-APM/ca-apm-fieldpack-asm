@@ -6,92 +6,120 @@ import java.lang.reflect.Method;
 
 public class TextNormalizer {
 
-  public static StringFilter getNormalizationStringFilter() throws ClassNotFoundException {
-    try {
-      return new Java6Normalizer();
-    } catch (Exception localException2) {
-      try {
-        return new Java5Normalizer();
-      } catch (Exception ex) {
-        throw new ClassNotFoundException("Cannot instantiate a Text Normalizer. Check your Java Runtime version.");
-      }
+    protected static final String JAVA_NORMALIZER_CLASS         = "java.text.Normalizer";
+    protected static final String JAVA_NORMALIZER_FORM_CLASS    = "java.text.Normalizer$Form";
+    protected static final String NORMALIZE                     = "normalize";
+    protected static final String NFD                           = "NFD";
+    protected static final String SUN_NORMALIZER_CLASS          = "sun.text.Normalizer";
+    protected static final String DECOMPOSE                     = "decompose";
+    
+    /**
+     * Get a normalization string filter.
+     * @return a StringFilter
+     * @throws ClassNotFoundException if no text normalizer class could be found
+     */
+    public static StringFilter getNormalizationStringFilter() throws ClassNotFoundException {
+        try {
+            return new Java6Normalizer();
+        } catch (Exception localException2) {
+            try {
+                return new Java5Normalizer();
+            } catch (Exception ex) {
+                throw new ClassNotFoundException(
+                    AsmMessages.getMessage(AsmMessages.TEXT_NORMALIZER_NOT_FOUND));
+            }
+        }
     }
-  }
-  public static class Java6Normalizer implements StringFilter {
-    private final Method normalizer;
-    private final Object nfd;
-    public Java6Normalizer() throws IllegalAccessException, ClassNotFoundException {
-      this.normalizer = java6GetMethodNormalizer();
-      this.nfd = java6GetNFD();
-    }
+    
+    public static class Java6Normalizer implements StringFilter {
+        private final Method normalizer;
+        private final Object nfd;
+        
+        public Java6Normalizer() throws IllegalAccessException, ClassNotFoundException {
+            this.normalizer = java6GetMethodNormalizer();
+            this.nfd = java6GetNfd();
+        }
 
-    public String filter(String text) {
-      try {
-        return TextNormalizer.java6Invoke(text, this.normalizer, this.nfd);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
-        throw new RuntimeException(e);
-      }
+        
+        /**
+         * Filter the text.
+         */
+        public String filter(String text) {
+            try {
+                return TextNormalizer.java6Invoke(text, this.normalizer, this.nfd);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-  }
-  private static String java6Invoke(String text, Method normalizer, Object nfd)
-      throws IllegalAccessException, InvocationTargetException {
-    return ((String) normalizer.invoke(null, new Object[]{text, nfd}));
-  }
-
-  private static Method java6GetMethodNormalizer() throws ClassNotFoundException {
-    Class c = Class.forName("java.text.Normalizer");
-    Method[] methods = c.getMethods();
-    for (int i = 0; i < methods.length; ++i) {
-      if (methods[i].getName().equals("normalize")) {
-        return methods[i];
-      }
-    }
-    return null;
-  }
-
-  private static Object java6GetNFD() throws ClassNotFoundException, IllegalAccessException {
-    Class x = Class.forName("java.text.Normalizer$Form");
-    Object nfd = null;
-    for (Field f : x.getDeclaredFields()) {
-      if (f.getName().equals("NFD")) {
-        nfd = f.get(null);
-      }
-    }
-
-    return nfd;
-  }
-  public static class Java5Normalizer implements StringFilter {
-    private final Method normalizer;
-    public Java5Normalizer() throws ClassNotFoundException {
-      this.normalizer = java5GetMethodNormalizer();
+    
+    private static String java6Invoke(String text, Method normalizer, Object nfd)
+            throws IllegalAccessException, InvocationTargetException {
+        return ((String) normalizer.invoke(null, new Object[]{text, nfd}));
     }
 
-    public String filter(String text) {
-      try {
-        return java5Invoke(text, normalizer);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
-        throw new RuntimeException(e);
-      }
+    private static Method java6GetMethodNormalizer() throws ClassNotFoundException {
+        Class clazz = Class.forName(JAVA_NORMALIZER_CLASS);
+        Method[] methods = clazz.getMethods();
+        for (int i = 0; i < methods.length; ++i) {
+            if (methods[i].getName().equals(NORMALIZE)) {
+                return methods[i];
+            }
+        }
+        return null;
     }
-  }
 
-  private static final Integer ZERO = Integer.valueOf(0);
+    private static Object java6GetNfd() throws ClassNotFoundException, IllegalAccessException {
+        Class clazz = Class.forName(JAVA_NORMALIZER_FORM_CLASS);
+        Object nfd = null;
+        for (Field f : clazz.getDeclaredFields()) {
+            if (f.getName().equals(NFD)) {
+                nfd = f.get(null);
+            }
+        }
 
-  private static String java5Invoke(String text, Method normalizer)
-      throws InvocationTargetException, IllegalAccessException {
-    return ((String) normalizer.invoke(null, new Object[]{text, Boolean.FALSE, ZERO}));
-  }
+        return nfd;
+    }
+    
+    public static class Java5Normalizer implements StringFilter {
+        private final Method normalizer;
+        
+        public Java5Normalizer() throws ClassNotFoundException {
+            this.normalizer = java5GetMethodNormalizer();
+        }
 
-  private static Method java5GetMethodNormalizer() throws ClassNotFoundException {
-    Class c = Class.forName("sun.text.Normalizer");
-    Method[] methods = c.getMethods();
-    for (int i = 0; i < methods.length; ++i)
-      if ((methods[i].getName().equals("decompose")) && (methods[i].getGenericParameterTypes().length == 3))
-        return methods[i];
-    return null;
-  }
+        /**
+         * Filter the text.
+         */
+        public String filter(String text) {
+            try {
+                return java5Invoke(text, normalizer);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static final Integer ZERO = Integer.valueOf(0);
+
+    private static String java5Invoke(String text, Method normalizer)
+            throws InvocationTargetException, IllegalAccessException {
+        return ((String) normalizer.invoke(null, new Object[]{text, Boolean.FALSE, ZERO}));
+    }
+
+    private static Method java5GetMethodNormalizer() throws ClassNotFoundException {
+        Class clazz = Class.forName(SUN_NORMALIZER_CLASS);
+        Method[] methods = clazz.getMethods();
+        for (int i = 0; i < methods.length; ++i) {
+            if ((methods[i].getName().equals(DECOMPOSE))
+                    && (methods[i].getGenericParameterTypes().length == 3)) {
+                return methods[i];
+            }
+        }
+        return null;
+    }
 }

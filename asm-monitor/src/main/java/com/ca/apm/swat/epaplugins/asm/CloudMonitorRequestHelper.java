@@ -12,16 +12,16 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.utils.ASMProperties;
-import com.ca.apm.swat.epaplugins.utils.ASMPropertiesImpl;
-import com.ca.apm.swat.epaplugins.utils.JSONHelper;
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
+import com.ca.apm.swat.epaplugins.utils.JsonHelper;
 import com.ca.apm.swat.epaplugins.utils.StringFilter;
 import com.ca.apm.swat.epaplugins.utils.TextNormalizer;
 
 /**
  * Interface to App Synthetic Monitor API.
  */
-public class CloudMonitorRequestHelper implements ASMProperties {
+public class CloudMonitorRequestHelper implements AsmProperties {
 
     private CloudMonitorAccessor cloudMonitorAccessor;
     private Properties apmcmProperties;
@@ -66,7 +66,7 @@ public class CloudMonitorRequestHelper implements ASMProperties {
 
     /**
      * Get the folders to monitor.
-     * @param folderList list of folders to query or {@link ASMProperties#ALL_FOLDERS}
+     * @param folderList list of folders to query or {@link AsmProperties#ALL_FOLDERS}
      * @return array of folders to monitor
      * @throws Exception errors
      */
@@ -110,7 +110,7 @@ public class CloudMonitorRequestHelper implements ASMProperties {
      * @throws Exception errors
      */
     private JSONArray extractJsonArray(String metricInput, String arrayName) throws Exception {
-        JSONObject entireJsonObject = new JSONObject(JSONHelper.unpadJSON(metricInput));
+        JSONObject entireJsonObject = new JSONObject(JsonHelper.unpadJson(metricInput));
         JSONArray thisJsonArray = new JSONArray();
 
         if (entireJsonObject.optJSONObject(kAPMCMResult) != null) {
@@ -155,8 +155,8 @@ public class CloudMonitorRequestHelper implements ASMProperties {
             String thisKey = thisCreditJsonObject.optString(kAPMCMType, NO_TYPE);
             String thisValue = thisCreditJsonObject.optString("available", ZERO);
 
-            if (ASMPropertiesImpl.APM_CM_METRICS.containsKey(thisKey)) {
-                thisKey = ((String) ASMPropertiesImpl.APM_CM_METRICS.get(thisKey)).toString();
+            if (AsmPropertiesImpl.APM_CM_METRICS.containsKey(thisKey)) {
+                thisKey = ((String) AsmPropertiesImpl.APM_CM_METRICS.get(thisKey)).toString();
             }
 
             String rawMetric = kCreditsCategory + ":" + thisKey;
@@ -294,7 +294,7 @@ public class CloudMonitorRequestHelper implements ASMProperties {
 
     /**
      * Get statistics for folder and rule.
-     * @param folder defaults to {@link ASMProperties#ROOT_FOLDER}
+     * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param rule gets all rules if empty
      * @return API result
      * @throws Exception errors
@@ -324,7 +324,7 @@ public class CloudMonitorRequestHelper implements ASMProperties {
 
     /**
      * Get PSP information for folder and rule.
-     * @param folder defaults to {@link ASMProperties#ROOT_FOLDER}
+     * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param rule gets all rules if empty
      * @return API result
      * @throws Exception errors
@@ -351,7 +351,7 @@ public class CloudMonitorRequestHelper implements ASMProperties {
 
     /**
      * Get logs for folder and rule.
-     * @param folder defaults to {@link ASMProperties#ROOT_FOLDER}
+     * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param rule gets all rules if empty
      * @param numRules number of rules in folder
      * @return API result
@@ -386,14 +386,9 @@ public class CloudMonitorRequestHelper implements ASMProperties {
      * @return today's date
      * @throws Exception errors
      */
-    private String getTodaysDate() throws Exception {
+    private static String getTodaysDate() throws Exception {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        String todaysDate = null;
-        todaysDate = dateFormat.format(calendar.getTime());
-        return todaysDate;
+        return dateFormat.format(calendar.getTime());
     }
-
-
-
 }

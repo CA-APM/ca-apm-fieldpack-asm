@@ -9,21 +9,21 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.utils.ASMMessages;
-import com.ca.apm.swat.epaplugins.utils.ASMProperties;
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.CryptoUtils;
-import com.ca.apm.swat.epaplugins.utils.RESTClient;
+import com.ca.apm.swat.epaplugins.utils.RestClient;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Access the App Synthetic Monitor API.
  * 
  */
-public class CloudMonitorAccessor implements ASMProperties {
+public class CloudMonitorAccessor implements AsmProperties {
 
     private boolean apmcmLocalTest;
     private Properties apmcmProperties;
-    private RESTClient apmcmClient;
+    private RestClient apmcmClient;
     public static final CryptoUtils apmcmCrypto = new CryptoUtils(MESSAGE_DIGEST);
     private String apmcmLocalTestPath = "";
 
@@ -48,7 +48,7 @@ public class CloudMonitorAccessor implements ASMProperties {
             proxyPass = this.apmcmProperties.getProperty(PROXY_PASS, "");
         }
 
-        this.apmcmClient = new RESTClient(proxyHost, proxyPort, proxyUser, proxyPass);
+        this.apmcmClient = new RestClient(proxyHost, proxyPort, proxyUser, proxyPass);
 
         this.apmcmLocalTest =
                 Boolean.parseBoolean(this.apmcmProperties.getProperty(LOCAL_TEST, FALSE));
@@ -68,7 +68,7 @@ public class CloudMonitorAccessor implements ASMProperties {
         String apiResponse = "";
         if (!apmcmLocalTest) {
             URL apiUrl = new URL(this.apmcmProperties.getProperty(URL) + "/" + callType);
-            apiResponse = this.apmcmClient.request(apmcmQuiet.booleanValue(), apmcmMethod, apiUrl,
+            apiResponse = this.apmcmClient.request(apmcmMethod, apiUrl,
                 callParams);
         } else if (!callType.equals(kAPMCMLogoutCmd)) {
             String inputLine = null;
@@ -114,16 +114,16 @@ public class CloudMonitorAccessor implements ASMProperties {
         }
 
         String errorStr = entireJsonObject.optString(kAPMCMError,
-            ASMMessages.getMessage(ASMMessages.noError));
+            AsmMessages.getMessage(AsmMessages.NO_ERROR));
         int errorCode = entireJsonObject.optInt(kAPMCMCode, -1);
         String errorInfo = entireJsonObject.optString(kAPMCMInfo,
-            ASMMessages.getMessage(ASMMessages.noInfo));
+            AsmMessages.getMessage(AsmMessages.NO_INFO));
 
-        EpaUtils.getFeedback().error(ASMMessages.getMessage(ASMMessages.loginError,
+        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
             errorStr, errorCode, errorInfo));
 
         if (errorCode == 1000) {
-            System.err.print(ASMMessages.getMessage(ASMMessages.loginInfo,
+            System.err.print(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
                 this.apmcmProperties.getProperty(URL),
                 kAPMCMLoginCmd,
                 APMCM_PRODUCT_NAME,

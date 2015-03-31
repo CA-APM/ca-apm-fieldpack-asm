@@ -12,7 +12,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.ca.apm.swat.epaplugins.utils.ASMProperties;
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 /**
  * Analyze XML from logs.
@@ -20,7 +20,7 @@ import com.ca.apm.swat.epaplugins.utils.ASMProperties;
  *
  */
 @SuppressWarnings("restriction")
-public class XmlAnalysisAdapter implements ASMProperties {
+public class XmlAnalysisAdapter implements AsmProperties {
 
     /**
      * Analyze the XML returned by the get logs API. 

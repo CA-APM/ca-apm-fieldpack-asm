@@ -20,10 +20,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
-import com.ca.apm.swat.epaplugins.utils.ASMProperties;
-import com.ca.apm.swat.epaplugins.utils.ASMPropertiesImpl;
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 
-public class CloudMonitorMetricReporter implements ASMProperties {
+public class CloudMonitorMetricReporter implements AsmProperties {
 
     private MetricWriter metricWriter;
     private boolean apmcmDisplayCheckpoint;
@@ -195,25 +195,25 @@ public class CloudMonitorMetricReporter implements ASMProperties {
 
                 if (thisKey.equals(kAPMCMDescr)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) ASMPropertiesImpl.APM_CM_METRICS.get(kAPMCMErrors);
+                            + (String) AsmPropertiesImpl.APM_CM_METRICS.get(kAPMCMErrors);
                     metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ONE);
                 }
 
                 if (thisKey.equals(kAPMCMColor)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) ASMPropertiesImpl.APM_CM_METRICS.get(kAPMCMColors);
-                    if (ASMPropertiesImpl.APM_CM_COLORS.containsKey(thisValue)) {
+                            + (String) AsmPropertiesImpl.APM_CM_METRICS.get(kAPMCMColors);
+                    if (AsmPropertiesImpl.APM_CM_COLORS.containsKey(thisValue)) {
                         metricMap.put(
                             CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
-                            (String) ASMPropertiesImpl.APM_CM_COLORS.get(thisValue));
+                            (String) AsmPropertiesImpl.APM_CM_COLORS.get(thisValue));
                     } else {
                         metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ZERO);
                     }
 
                 }
 
-                if (ASMPropertiesImpl.APM_CM_METRICS.containsKey(thisKey)) {
-                    thisKey = ((String) ASMPropertiesImpl.APM_CM_METRICS.get(thisKey)).toString();
+                if (AsmPropertiesImpl.APM_CM_METRICS.containsKey(thisKey)) {
+                    thisKey = ((String) AsmPropertiesImpl.APM_CM_METRICS.get(thisKey)).toString();
                 }
 
                 if (thisKey.equalsIgnoreCase(kAPMCMOutput)) {
@@ -256,17 +256,6 @@ public class CloudMonitorMetricReporter implements ASMProperties {
             return null;
         }
 
-    }
-
-    /**
-     * Default {@link EntityResolver} that always resolves to empty string.
-     * Needed by SAXParser. 
-     */
-    class NullResolver implements EntityResolver {
-        public InputSource resolveEntity(String publicId, String systemId)
-                throws SAXException, IOException {
-            return new InputSource(new StringReader(EMPTY_STRING));
-        }
     }
 
     /**
