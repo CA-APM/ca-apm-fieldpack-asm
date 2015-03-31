@@ -216,22 +216,23 @@ public class AsmReader implements AsmProperties {
         try {
             properties.load(inStream);
         } catch (IOException e) {
-            EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.READING_PROPERTIES_ERROR,
-                filename, e.getMessage()));
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.READING_PROPERTIES_ERROR, filename, e.getMessage()));
             throw e;
         }
         inStream.close();
 
         if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug(AsmMessages.getMessage(AsmMessages.READING_PROPERTIES,
-                filename));
+            EpaUtils.getFeedback().debug(AsmMessages.getMessage(
+                AsmMessages.READING_PROPERTIES, filename));
             for (Iterator<Object> it = properties.keySet().iterator(); it.hasNext(); ) {
                 String key = (String) it.next();
                 EpaUtils.getFeedback().debug(key + "=" + properties.getProperty(key));
             }
         }
 
-        EpaUtils.getFeedback().info(AsmMessages.getMessage(AsmMessages.READING_PROPERTIES_FINISHED));
+        EpaUtils.getFeedback().info(AsmMessages.getMessage(
+            AsmMessages.READING_PROPERTIES_FINISHED, filename));
         return properties;
     }
 }
