@@ -64,6 +64,10 @@ public class RestClient {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, url));
         }
+        if (EpaUtils.getFeedback().isDebugEnabled()) {
+            EpaUtils.getFeedback().debug(
+                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, params));
+        }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
@@ -100,7 +104,7 @@ public class RestClient {
         
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE,
-                responseBody.length(), time));
+                response.length(), time));
         }
 
         if (EpaUtils.getFeedback().isDebugEnabled()) {
