@@ -1,11 +1,8 @@
 package com.ca.apm.swat.epaplugins.utils;
 
-import java.io.UnsupportedEncodingException;
 import java.security.spec.AlgorithmParameterSpec;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -24,7 +21,9 @@ public class CryptoUtils implements AsmProperties {
     private byte[] salt = { -87, -101, -56, 50, 86, 53, -29, 3 };
 
     private int iterationCount = 19;
-  
+    private SecretKey key;
+    private AlgorithmParameterSpec paramSpec;
+    
     public static final String UTF8 = "UTF8";
     /**
      * Create new helper class for encryption.
@@ -34,22 +33,20 @@ public class CryptoUtils implements AsmProperties {
         try {
             PBEKeySpec keySpec = new PBEKeySpec(passPhrase.toCharArray(),
                 this.salt, this.iterationCount);
-            SecretKey key = SecretKeyFactory.getInstance(kAlgorithm).generateSecret(keySpec);
+            key = SecretKeyFactory.getInstance(kAlgorithm).generateSecret(keySpec);
             this.ecipher = Cipher.getInstance(key.getAlgorithm());
             this.dcipher = Cipher.getInstance(key.getAlgorithm());
 
-            AlgorithmParameterSpec paramSpec = new PBEParameterSpec(this.salt, this.iterationCount);
+            paramSpec = new PBEParameterSpec(this.salt, this.iterationCount);
 
-            this.ecipher.init(1, key, paramSpec);
-            this.dcipher.init(2, key, paramSpec);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Main method.
-     * @param args arguments
+     * Run encryption from command line.
+     * @param args enter plain text password as parameter
      */
     public static void main(String[] args) {
         try {
@@ -72,6 +69,9 @@ public class CryptoUtils implements AsmProperties {
      */
     public String encrypt(String str) {
         try {
+            // (re)init
+            this.ecipher.init(1, key, paramSpec);
+
             byte[] utf8 = str.getBytes(UTF8);
 
             byte[] enc = this.ecipher.doFinal(utf8);
@@ -90,16 +90,15 @@ public class CryptoUtils implements AsmProperties {
      */
     public String decrypt(String str) {
         try {
+            // (re)init
+            this.dcipher.init(2, key, paramSpec);
+
             byte[] dec = new Base64().decode(str);
 
             byte[] utf8 = this.dcipher.doFinal(dec);
 
             return new String(utf8, UTF8);
-        } catch (BadPaddingException localBadPaddingException) {
-            // ignore
-        } catch (IllegalBlockSizeException localIllegalBlockSizeException) {
-            // ignore
-        } catch (UnsupportedEncodingException localUnsupportedEncodingException) {
+        } catch (Exception e) {
             // ignore
         }
         return null;
