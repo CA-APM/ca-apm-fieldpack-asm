@@ -49,6 +49,7 @@ public interface AsmProperties {
     public static final String PASSWORD                 = "asm.APIPassword";
     public static final String PASSWORD_ENCRYPTED       = "asm.APIPasswordEncrypted";
     public static final String INCLUDE_FOLDERS          = "asm.includeFolders";
+    public static final String EXCLUDE_FOLDERS          = "asm.excludeFolders";
     public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
     public static final String FOLDER_PREFIX            = "asm.folder.";
     public static final String NUM_LOGS                 = "asm.numlogs";
@@ -69,7 +70,7 @@ public interface AsmProperties {
     public static final String NO_GROUPS                = "no_groups";
     public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
     public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
-    public static final String HTTP_RESPONSE_CODES      = "asm.HTTPResponseCodes";
+    public static final String HTTP_CODE_TRANSLATION    = "asm.HTTPCodeTrans";
     public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
     public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
     public static final String LOG_ASM_ISSUES           = "asm.logASMIssues=";
