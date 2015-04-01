@@ -53,7 +53,7 @@ public class AsmReader implements AsmProperties {
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
                 AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
-                    APMCM_PRODUCT_NAME, e.getMessage()));
+                    ASM_PRODUCT_NAME, e.getMessage()));
             //e.printStackTrace();
             System.exit(1);
         }
@@ -80,7 +80,7 @@ public class AsmReader implements AsmProperties {
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
                 AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
-                    APMCM_PRODUCT_NAME, e.getMessage()));
+                    ASM_PRODUCT_NAME, e.getMessage()));
             // e.printStackTrace();
             System.exit(1);
         }
@@ -127,7 +127,7 @@ public class AsmReader implements AsmProperties {
                 } else {
                     EpaUtils.getFeedback().error(
                         AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
-                            APMCM_PRODUCT_NAME, e.getMessage()));
+                            ASM_PRODUCT_NAME, e.getMessage()));
                     // e.printStackTrace();
                     keepTrying = false;
                     System.exit(1);
@@ -169,7 +169,7 @@ public class AsmReader implements AsmProperties {
                 } else {
                     EpaUtils.getFeedback().error(
                         AsmMessages.getMessage(AsmMessages.RUN_ERROR,
-                            APMCM_PRODUCT_NAME,
+                            ASM_PRODUCT_NAME,
                             AsmMessages.PARENT_THREAD,
                             e.getMessage()));
                     e.printStackTrace();
@@ -188,7 +188,7 @@ public class AsmReader implements AsmProperties {
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
         EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR,
-            APMCM_PRODUCT_NAME, apmcmInfo));
+            ASM_PRODUCT_NAME, apmcmInfo));
         if (numRetriesLeft > 0) {
             EpaUtils.getFeedback().info(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY,
                 numRetriesLeft));

@@ -8,6 +8,9 @@
 		<copy todir="${epagent.dir}/lib">
 			<fileset dir="target" includes="ca.apm.swat.asm-monitor.jar"/>
 		</copy>
+		<copy todir="${epagent.dir}/">
+			<fileset dir="target" includes="classes/*.properties"/>
+		</copy>
 	</target>
 	<target name = "clean">
 		<delete>

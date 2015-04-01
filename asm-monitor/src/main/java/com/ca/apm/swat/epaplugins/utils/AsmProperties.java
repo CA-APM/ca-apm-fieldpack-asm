@@ -18,38 +18,39 @@ public interface AsmProperties {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
     public static final String UTF8 = "UTF-8";
 
-    public static final String APMCM_PRODUCT_NAME       = "App Synthetic Monitor";
-    public static final String APMCM_PRODUCT_NAME_SHORT = "ASM";
+    public static final String ASM_PRODUCT_NAME       = "App Synthetic Monitor";
+    public static final String ASM_PRODUCT_NAME_SHORT = "ASM";
 
-    public static final String PROPERTY_FILE_NAME       = "APMCloudMonitor.properties";
+    public static final String PROPERTY_FILE_NAME     = "AppSyntheticMonitor.properties";
 
     public static final String DEFAULT_LOCALE         = "en_US";
-    public static final String LOCALE                 = "apmcm.locale";
-    public static final String WAIT_TIME              = "apmcm.waittime";
-    public static final String USER                   = "apmcm.user";
-    public static final String DISPLAY_CHECKPOINTS    = "apmcm.displaycheckpoints";
+    public static final String LOCALE                 = "asm.locale";
+    public static final String WAIT_TIME              = "asm.waittime";
+    public static final String DISPLAY_CHECKPOINTS    = "asm.displaycheckpoints";
 
-    public static final String METRICS_STATS_FOLDER   = "apmcm.metrics.stats.folder";
-    public static final String METRICS_CREDITS        = "apmcm.metrics.credits";
-    public static final String METRICS_PUBLIC         = "apmcm.metrics.public";
-    public static final String METRICS_LOGS           = "apmcm.metrics.logs";
-    public static final String METRICS_STATS_RULE     = "apmcm.metrics.stats.rule";
+    public static final String METRICS_STATS_FOLDER   = "asm.metrics.stats.folder";
+    public static final String METRICS_CREDITS        = "asm.metrics.credits";
+    public static final String METRICS_PUBLIC         = "asm.metrics.public";
+    public static final String METRICS_LOGS           = "asm.metrics.logs";
+    public static final String METRICS_STATS_RULE     = "asm.metrics.stats.rule";
 
-    public static final String PROXY_HOST             = "apmcm.proxy.host";
-    public static final String PROXY_PORT             = "apmcm.proxy.port";
-    public static final String PROXY_USER             = "apmcm.proxy.user";
-    public static final String PROXY_PASS_ENCRYPTED   = "apmcm.proxy.pass.encrypted";
-    public static final String PROXY_PASS             = "apmcm.proxy.pass";
+    public static final String PROXY_HOST             = "asm.proxy.host";
+    public static final String PROXY_PORT             = "asm.proxy.port";
+    public static final String PROXY_USER             = "asm.proxy.user";
+    public static final String PROXY_PASS_ENCRYPTED   = "asm.proxy.pass.encrypted";
+    public static final String PROXY_PASS             = "asm.proxy.pass";
 
-    public static final String LOCAL_TEST             = "apmcm.localtest";
+    public static final String LOCAL_TEST             = "asm.localtest";
+    public static final String LOCAL_TEST_PATH        = "asm.localtestpath";
 
-    public static final String URL                    = "apmcm.URL";
-    public static final String PASSWORD_ENCRYPTED     = "apmcm.pass.encrypted";
-    public static final String PASSWORD               = "apmcm.pass";
-    public static final String FOLDERS                = "apmcm.folders";
-    public static final String SKIP_INACTIVE_FOLDERS  = "apmcm.skip_inactive.folders";
-    public static final String FOLDER_PREFIX          = "apmcm.folder.";
-    public static final String NUM_LOGS               = "apmcm.numlogs";
+    public static final String URL                    = "asm.URL";
+    public static final String USER                   = "asm.userEmail";
+    public static final String PASSWORD               = "asm.APIPassword";
+    public static final String PASSWORD_ENCRYPTED     = "asm.APIPasswordEncrypted";
+    public static final String FOLDERS                = "asm.folders";
+    public static final String SKIP_INACTIVE_FOLDERS  = "asm.skip_inactive.folders";
+    public static final String FOLDER_PREFIX          = "asm.folder.";
+    public static final String NUM_LOGS               = "asm.numlogs";
 
     // error codes
     public static final int AUTH_ERROR_CODE = 1000;
@@ -126,7 +127,7 @@ public interface AsmProperties {
     public static final String kAPMCMOutput = "output";
     public static final String kAPMCMHarOrLog = "{\"har\": {\"log\"";
     public static final String kAPMCMUndefined = "Undefined";
-    public static final String METRIC_TREE = "APM Cloud Monitor";
+    public static final String METRIC_TREE = "App Synthetic Monitor";
     public static final String MONITOR_METRIC_PREFIX = "Monitors|";
     public static final String STATUS_METRIC_PREFIX = "Status Monitoring|";
     public static final String ROOT_FOLDER = "root_folder";
