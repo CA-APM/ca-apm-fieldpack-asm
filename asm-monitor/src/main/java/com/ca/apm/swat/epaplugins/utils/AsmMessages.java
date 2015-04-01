@@ -25,6 +25,8 @@ public class AsmMessages {
     public static final String CONNECTION_RETRY_ERROR       = "connectionRetryError";
     public static final String LOGIN_ERROR                  = "loginError";
     public static final String LOGIN_INFO                   = "loginInfo";
+    public static final String DECRYPT_ERROR                = "decryptError";
+    public static final String DECRYPT_INFO                 = "decryptInfo";
     public static final String NO_ERROR                     = "noError";
     public static final String NO_INFO                      = "noInfo";
     public static final String PARENT_THREAD                = "parentThread";
@@ -84,7 +86,14 @@ public class AsmMessages {
      * @return formatted message
      */
     public static String getMessage(String key, Object... params) {
-        MessageFormat formatter = new MessageFormat(getMessages().getString(key), locale);
+        MessageFormat formatter = null;
+        
+        if (null == locale) {
+            formatter = new MessageFormat(getMessages().getString(key));
+        } else {
+            formatter = new MessageFormat(getMessages().getString(key), locale);
+        }
+        
         return formatter.format(params);
     }
 }

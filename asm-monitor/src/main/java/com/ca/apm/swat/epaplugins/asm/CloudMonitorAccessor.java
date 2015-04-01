@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.asm.error.LoginException;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.CryptoUtils;
@@ -62,7 +63,7 @@ public class CloudMonitorAccessor implements AsmProperties {
      * @param callType API call
      * @param callParams parameters
      * @return API call result
-     * @throws Exception errors
+     * @throws Exception errors if an error occurred
      */
     public String executeApi(String callType, String callParams) throws Exception {
         String apiResponse = "";
@@ -88,14 +89,23 @@ public class CloudMonitorAccessor implements AsmProperties {
     /**
      * Login to the App Synthetic Monitor API.
      * @return the token returned or {@link FAILED}
-     * @throws Exception errors
+     * @throws LoginException if the authentication fails
+     * @throws Exception if another error occurred
      */
-    public String login() throws Exception {
+    public String login() throws LoginException, Exception {
         String apmcmUser = this.apmcmProperties.getProperty(USER);
         String apmcmPass = null;
         if (this.apmcmProperties.getProperty(PASSWORD_ENCRYPTED).equals(TRUE)) {
             apmcmPass = CloudMonitorAccessor.apmcmCrypto.decrypt(
                 this.apmcmProperties.getProperty(PASSWORD));
+            if (null == apmcmPass) {
+                String errorMessage = AsmMessages.getMessage(AsmMessages.DECRYPT_ERROR);
+                EpaUtils.getFeedback().error(errorMessage);
+
+                System.err.print(AsmMessages.getMessage(AsmMessages.DECRYPT_INFO,
+                    PROPERTY_FILE_NAME, PASSWORD_ENCRYPTED));
+                throw new LoginException(errorMessage);
+            }
         } else {
             apmcmPass = this.apmcmProperties.getProperty(PASSWORD);
         }
@@ -110,7 +120,8 @@ public class CloudMonitorAccessor implements AsmProperties {
             if (resultJsonObject != null) {
                 return resultJsonObject.optString(kAPMCMNKey, null);
             }
-            return FAILED;
+            // should not happen
+            // return FAILED;
         }
 
         String errorStr = entireJsonObject.optString(kAPMCMError,
@@ -119,29 +130,28 @@ public class CloudMonitorAccessor implements AsmProperties {
         String errorInfo = entireJsonObject.optString(kAPMCMInfo,
             AsmMessages.getMessage(AsmMessages.NO_INFO));
 
-        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
-            errorStr, errorCode, errorInfo));
+        String errorMessage = AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
+            errorStr, errorCode, errorInfo);
+        EpaUtils.getFeedback().error(errorMessage);
+
 
         if (errorCode == 1000) {
             System.err.print(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
                 this.apmcmProperties.getProperty(URL),
                 kAPMCMLoginCmd,
-                APMCM_PRODUCT_NAME,
+                ASM_PRODUCT_NAME,
                 apmcmPasswordPage));
         }
-
-        System.exit(1000);
-
-        return FAILED;
+        throw new LoginException(errorMessage);
+        //System.exit(1000);
     }
 
     /**
      * Remove padding from JSON string. 
      * @param jsonWithPadding JSON string with padding
      * @return JSON string without padding
-     * @throws Exception error
      */
-    private String unpadJson(String jsonWithPadding) throws Exception {
+    private String unpadJson(String jsonWithPadding) {
         String patternToMatch = kJsonRegex;
 
         Pattern unpad = Pattern.compile(patternToMatch);
