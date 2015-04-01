@@ -23,6 +23,7 @@ public class AsmMessages {
     public static final String CONNECTION_ERROR             = "connectionError";
     public static final String CONNECTION_RETRY             = "connectionRetry";
     public static final String CONNECTION_RETRY_ERROR       = "connectionRetryError";
+    public static final String CONNECTED                    = "connected";
     public static final String LOGIN_ERROR                  = "loginError";
     public static final String LOGIN_INFO                   = "loginInfo";
     public static final String DECRYPT_ERROR                = "decryptError";
@@ -35,6 +36,7 @@ public class AsmMessages {
     public static final String HTTP_REQUEST                 = "httpRequest";
     public static final String HTTP_RESPONSE                = "httpResponse";
     public static final String TEXT_NORMALIZER_NOT_FOUND    = "textNormalizerNotFound";
+    public static final String THREAD_STARTED               = "threadStarted";
     
     /**
      * The resource bundle.

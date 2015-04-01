@@ -21,33 +21,38 @@ import com.wily.introscope.epagent.EpaUtils;
 
 
 public class RestClient {
-    
+
     public static final String HTTP_PROXY_HOST = "http.proxyHost";
     public static final String HTTPS_PROXY_HOST = "https.proxyHost";
     public static final String HTTP_PROXY_PORT = "http.proxyPort";
     public static final String HTTPS_PROXY_PORT = "https.proxyPort";
 
     private static final int BUFFER_LENGTH = 8192;
-    
+
     /**
      * Create a new REST client.
+     * @param useProxy use a proxy?
      * @param proxyHost proxy host
      * @param proxyPort proxy port
      * @param proxyUser proxy user
      * @param proxyPassword proxy password
      */
-    public RestClient(String proxyHost, String proxyPort, String proxyUser, String proxyPassword) {
-        if ((null != proxyHost) && (0 != proxyHost.length())) {
-            System.setProperty(HTTP_PROXY_HOST, proxyHost);
-            System.setProperty(HTTPS_PROXY_HOST, proxyHost);
-        }
-        if ((null != proxyPort) && (0 != proxyPort.length())) {
-            System.setProperty(HTTP_PROXY_PORT, proxyPort);
-            System.setProperty(HTTPS_PROXY_PORT, proxyPort);
-        }
-        if ((null != proxyUser) && (0 != proxyUser.length())
-                && (null != proxyPassword) && (0 != proxyPassword.length())) {
-            Authenticator.setDefault(new ProxyAuthenticator(proxyUser, proxyPassword));
+    public RestClient(boolean useProxy, String proxyHost, String proxyPort, String proxyUser, String proxyPassword) {
+        if (useProxy) {
+            if ((null != proxyHost) && (0 != proxyHost.length())) {
+                System.setProperty(HTTP_PROXY_HOST, proxyHost);
+                System.setProperty(HTTPS_PROXY_HOST, proxyHost);
+            }
+            
+            if ((null != proxyPort) && (0 != proxyPort.length())) {
+                System.setProperty(HTTP_PROXY_PORT, proxyPort);
+                System.setProperty(HTTPS_PROXY_PORT, proxyPort);
+            }
+            
+            if ((null != proxyUser) && (0 != proxyUser.length())
+                    && (null != proxyPassword) && (0 != proxyPassword.length())) {
+                Authenticator.setDefault(new ProxyAuthenticator(proxyUser, proxyPassword));
+            }
         }
     }
 
@@ -101,7 +106,7 @@ public class RestClient {
         connection.disconnect();
         final long time = System.currentTimeMillis() - startTime;
         String response = responseBody.toString();
-        
+
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE,
                 response.length(), time));
@@ -211,7 +216,7 @@ public class RestClient {
 
         return db.parse(is);
     }
-    
+
     /**
      * Default {@link EntityResolver} that always resolves to empty string.
      * Needed by SAXParser. 

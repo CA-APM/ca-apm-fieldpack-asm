@@ -16,37 +16,37 @@ import com.wily.introscope.epagent.EpaUtils;
  */
 public class AsmReaderThread extends Thread implements AsmProperties {
     private String thisFolder;
-    private HashMap<String, String> thisMetricMap = new HashMap<String, String>();
+    private HashMap<String, String> metricMap = new HashMap<String, String>();
     private boolean keepRunning = true;
     private int numRetriesLeft;
     private CloudMonitorRequestHelper requestHelper;
     private HashMap<String, String[]> folderMap;
-    private Properties apmcmProperties;
+    private Properties properties;
     private CloudMonitorMetricReporter metricReporter;
-    private final int apmcmEpaWaitTime;
+    private final int epaWaitTime;
 
     /**
      * Main thread for App Synthetic Monitor EPA plugin.
      * @param folderName name of the folder to monitor
      * @param requestHelper the request helper
      * @param folderMap the folder map containing all folders and monitors (rules)
-     * @param apmcmProperties the properties
+     * @param properties the properties
      * @param metricReporter the metric reporter
      */
     AsmReaderThread(
         String folderName,
         CloudMonitorRequestHelper requestHelper,
         HashMap<String, String[]> folderMap,
-        Properties apmcmProperties,
+        Properties properties,
         CloudMonitorMetricReporter metricReporter) {
         
         this.thisFolder = folderName;
         this.requestHelper = requestHelper;
         this.folderMap = folderMap;
-        this.apmcmProperties = apmcmProperties;
+        this.properties = properties;
         this.metricReporter = metricReporter;
         this.numRetriesLeft = 10;
-        this.apmcmEpaWaitTime = Integer.parseInt(apmcmProperties.getProperty(WAIT_TIME));
+        this.epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
     }
 
 
@@ -54,22 +54,27 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * Run the main loop.
      */
     public void run() {
+
+        EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+            AsmMessages.THREAD_STARTED, this.thisFolder));
+        
         while (this.keepRunning) {
             try {
                 final Date startTime = new Date();
-                this.thisMetricMap.putAll(getFolderMetrics(this.thisFolder));
-                metricReporter.printMetrics(this.thisMetricMap);
-                this.thisMetricMap.putAll(metricReporter.resetMetrics(this.thisMetricMap));
+                this.metricMap.putAll(getFolderMetrics(this.thisFolder));
+                metricReporter.printMetrics(this.metricMap);
+                // TODO: is putAll redundant?                
+                this.metricMap.putAll(metricReporter.resetMetrics(this.metricMap));
                 final Date endTime = new Date();
 
                 long timeElapsed = endTime.getTime() - startTime.getTime();
-                long timeToSleep = apmcmEpaWaitTime - timeElapsed;
+                long timeToSleep = epaWaitTime - timeElapsed;
                 if (timeToSleep > 0L) {
                     Thread.sleep(timeToSleep);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                             AsmMessages.FOLDER_THREAD_TIMEOUT,
-                            this.thisFolder, new Long(apmcmEpaWaitTime)));
+                            this.thisFolder, new Long(epaWaitTime)));
                     Thread.sleep(60000L);
                 }
             } catch (Exception e) {
@@ -120,12 +125,12 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * @throws Exception errors
      */
     public HashMap<String, String> getFolderMetrics(String folder) throws Exception {
-        HashMap<String, String> metricMap = new HashMap<String, String>();
+        HashMap<String, String> resultMetricMap = new HashMap<String, String>();
 
         String[] thisFolderRules = (String[]) this.folderMap.get(folder);
 
         if (thisFolderRules.length == 1) {
-            return metricMap;
+            return resultMetricMap;
         }
 
         // prefix for metric name
@@ -138,45 +143,45 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 MONITOR_METRIC_PREFIX.length() - 1);
         }
 
-        if (TRUE.equals(apmcmProperties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
+        if (TRUE.equals(properties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
             String statsRequest = requestHelper.getStats(folder, EMPTY_STRING);
-            metricMap.putAll(metricReporter.generateMetrics(JsonHelper.unpadJson(statsRequest),
+            resultMetricMap.putAll(metricReporter.generateMetrics(JsonHelper.unpadJson(statsRequest),
                 folderPrefix));
         }
 
         if ((thisFolderRules[0].equals(ALL_RULES)) && (!folder.equals(EMPTY_STRING))) {
-            if (apmcmProperties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
+            if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
                 String pspRequest = requestHelper.getPsp(folder, EMPTY_STRING);
-                metricMap.putAll(metricReporter.generateMetrics(JsonHelper.unpadJson(pspRequest),
+                resultMetricMap.putAll(metricReporter.generateMetrics(JsonHelper.unpadJson(pspRequest),
                     folderPrefix));
             }
-            if (apmcmProperties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
+            if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                 String logRequest = requestHelper.getLogs(folder, EMPTY_STRING,
                     thisFolderRules.length - 1);
                 String unpadded = JsonHelper.unpadJson(logRequest);
                 if (unpadded != null) {
                     HashMap<String, String> generatedMetrics =
                             metricReporter.generateMetrics(unpadded, folderPrefix);
-                    metricMap.putAll(generatedMetrics);
+                    resultMetricMap.putAll(generatedMetrics);
 
                     HashMap<String, String> metricMapContent = new HashMap<String, String>();
                     // this is what Andreas changed
                     metricReporter.analyzeContentResults(unpadded, folder, metricMapContent);
-                    metricMap.putAll(metricMapContent);
+                    resultMetricMap.putAll(metricMapContent);
                 } else {
                     //TODO error
                 }
 
             }
             //TODO RULE or FOLDER???
-            if (apmcmProperties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
+            if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
                 for (int i = 0; i < thisFolderRules.length; i++) {
                     if (thisFolderRules[i] == ALL_RULES) {
                         continue;
                     }
                     String statsRequest =
                             requestHelper.getStats(folder, thisFolderRules[i]);
-                    metricMap.putAll(metricReporter.generateMetrics(
+                    resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(statsRequest), folderPrefix));
                 }
             }
@@ -185,25 +190,25 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 if (thisFolderRules[j].equals(ALL_RULES)) {
                     continue;
                 }
-                if (apmcmProperties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
+                if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
                     String pspRequest = requestHelper.getPsp(folder, thisFolderRules[j]);
-                    metricMap.putAll(metricReporter.generateMetrics(
+                    resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(pspRequest), folderPrefix));
                 }
-                if (apmcmProperties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
+                if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
                     String statsRequest =
                         requestHelper.getStats(folder, thisFolderRules[j]);
-                    metricMap.putAll(metricReporter.generateMetrics(
+                    resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(statsRequest), folderPrefix));
                 }
-                if (apmcmProperties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
+                if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                     String logRequest = requestHelper.getLogs(folder, thisFolderRules[j], 1);
-                    metricMap.putAll(metricReporter.generateMetrics(
+                    resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(logRequest), folderPrefix));
                 }
             }
         }
 
-        return metricMap;
+        return resultMetricMap;
     }
 }

@@ -9,7 +9,7 @@
 			<fileset dir="target" includes="ca.apm.swat.asm-monitor.jar"/>
 		</copy>
 		<copy todir="${epagent.dir}/">
-			<fileset dir="target" includes="classes/*.properties"/>
+			<fileset dir="target/classes" includes="*.properties"/>
 		</copy>
 	</target>
 	<target name = "clean">

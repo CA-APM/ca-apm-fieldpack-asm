@@ -19,7 +19,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 public class CloudMonitorMetricReporter implements AsmProperties {
 
     private MetricWriter metricWriter;
-    private boolean apmcmDisplayCheckpoint;
+    private boolean displayCheckpoint;
     private HashMap<String, String> checkpointMap;
     private XmlAnalysisAdapter analysisAdapter;
 
@@ -28,14 +28,14 @@ public class CloudMonitorMetricReporter implements AsmProperties {
     /**
      * Report metrics to APM via metric writer.
      * @param metricWriter the metric writer
-     * @param apmcmDisplayCheckpoint display monitor info in metric path?
+     * @param displayCheckpoint display monitor info in metric path?
      * @param checkpointMap map containing all checkpoints
      */
     public CloudMonitorMetricReporter(MetricWriter metricWriter,
-                                      boolean apmcmDisplayCheckpoint,
+                                      boolean displayCheckpoint,
                                       HashMap<String, String> checkpointMap) {
         this.metricWriter = metricWriter;
-        this.apmcmDisplayCheckpoint = apmcmDisplayCheckpoint;
+        this.displayCheckpoint = displayCheckpoint;
         this.checkpointMap = checkpointMap;
         analysisAdapter = new XmlAnalysisAdapter();
     }
@@ -151,7 +151,7 @@ public class CloudMonitorMetricReporter implements AsmProperties {
             metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(kAPMCMName);
         }
 
-        if (apmcmDisplayCheckpoint) {
+        if (displayCheckpoint) {
             if (jsonObject.optString(kAPMCMLoc, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
                         + (String) this.checkpointMap.get(jsonObject.getString(kAPMCMLoc));
@@ -188,25 +188,25 @@ public class CloudMonitorMetricReporter implements AsmProperties {
 
                 if (thisKey.equals(kAPMCMDescr)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.APM_CM_METRICS.get(kAPMCMErrors);
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(kAPMCMErrors);
                     metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ONE);
                 }
 
                 if (thisKey.equals(kAPMCMColor)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.APM_CM_METRICS.get(kAPMCMColors);
-                    if (AsmPropertiesImpl.APM_CM_COLORS.containsKey(thisValue)) {
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(kAPMCMColors);
+                    if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
                         metricMap.put(
                             CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
-                            (String) AsmPropertiesImpl.APM_CM_COLORS.get(thisValue));
+                            (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
                     } else {
                         metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ZERO);
                     }
 
                 }
 
-                if (AsmPropertiesImpl.APM_CM_METRICS.containsKey(thisKey)) {
-                    thisKey = ((String) AsmPropertiesImpl.APM_CM_METRICS.get(thisKey)).toString();
+                if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
+                    thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
                 }
 
                 if (thisKey.equalsIgnoreCase(kAPMCMOutput)) {

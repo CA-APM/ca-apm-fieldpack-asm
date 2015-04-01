@@ -34,23 +34,45 @@ public interface AsmProperties {
     public static final String METRICS_LOGS           = "asm.metrics.logs";
     public static final String METRICS_STATS_RULE     = "asm.metrics.stats.rule";
 
-    public static final String PROXY_HOST             = "asm.proxy.host";
-    public static final String PROXY_PORT             = "asm.proxy.port";
-    public static final String PROXY_USER             = "asm.proxy.user";
-    public static final String PROXY_PASS_ENCRYPTED   = "asm.proxy.pass.encrypted";
-    public static final String PROXY_PASS             = "asm.proxy.pass";
+    public static final String USE_PROXY                = "asm.useProxy";
+    public static final String PROXY_HOST               = "asm.proxyHost";
+    public static final String PROXY_PORT               = "asm.proxyPort";
+    public static final String PROXY_USER               = "asm.proxyUser";
+    public static final String PROXY_PASSWORD_ENCRYPTED = "asm.proxyPasswordEncrypted";
+    public static final String PROXY_PASSWORD           = "asm.proxyPassword";
 
-    public static final String LOCAL_TEST             = "asm.localtest";
-    public static final String LOCAL_TEST_PATH        = "asm.localtestpath";
+    public static final String LOCAL_TEST               = "asm.localtest";
+    public static final String LOCAL_TEST_PATH          = "asm.localtestpath";
 
-    public static final String URL                    = "asm.URL";
-    public static final String USER                   = "asm.userEmail";
-    public static final String PASSWORD               = "asm.APIPassword";
-    public static final String PASSWORD_ENCRYPTED     = "asm.APIPasswordEncrypted";
-    public static final String FOLDERS                = "asm.folders";
-    public static final String SKIP_INACTIVE_FOLDERS  = "asm.skip_inactive.folders";
-    public static final String FOLDER_PREFIX          = "asm.folder.";
-    public static final String NUM_LOGS               = "asm.numlogs";
+    public static final String URL                      = "asm.URL";
+    public static final String USER                     = "asm.userEmail";
+    public static final String PASSWORD                 = "asm.APIPassword";
+    public static final String PASSWORD_ENCRYPTED       = "asm.APIPasswordEncrypted";
+    public static final String INCLUDE_FOLDERS          = "asm.includeFolders";
+    public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
+    public static final String FOLDER_PREFIX            = "asm.folder.";
+    public static final String NUM_LOGS                 = "asm.numlogs";
+
+    public static final String ROOT_FOLDER              = "root_folder";
+    public static final String ALL_FOLDERS              = "all_folders";
+
+    // TODO: not implemented yet!!!
+    public static final String INCLUDE_TAGS             = "asm.includeTags";
+    public static final String INCLUDE_MONITORS         = "asm.includeMonitors";
+    public static final String RESULT_GROUPS            = "asm.resultsGroups";
+    public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
+    public static final String ALL_RULES                = "all_rules";
+    public static final String ALL_TAGS                 = "all_tags";
+    public static final String BY_FOLDER                = "by_folder";
+    public static final String BY_STATION               = "by_station";
+    public static final String MIXED                    = "mixed";
+    public static final String NO_GROUPS                = "no_groups";
+    public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
+    public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
+    public static final String HTTP_RESPONSE_CODES      = "asm.HTTPResponseCodes";
+    public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
+    public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
+    public static final String LOG_ASM_ISSUES           = "asm.logASMIssues=";
 
     // error codes
     public static final int AUTH_ERROR_CODE = 1000;
@@ -127,12 +149,10 @@ public interface AsmProperties {
     public static final String kAPMCMOutput = "output";
     public static final String kAPMCMHarOrLog = "{\"har\": {\"log\"";
     public static final String kAPMCMUndefined = "Undefined";
+
     public static final String METRIC_TREE = "App Synthetic Monitor";
     public static final String MONITOR_METRIC_PREFIX = "Monitors|";
     public static final String STATUS_METRIC_PREFIX = "Status Monitoring|";
-    public static final String ROOT_FOLDER = "root_folder";
-    public static final String ALL_FOLDERS = "all_folders";
-    public static final String ALL_RULES = "all_rules";
 
     public static final String apmcmCallback = "doCallback";
     public static final String apmcmMethod = "POST";

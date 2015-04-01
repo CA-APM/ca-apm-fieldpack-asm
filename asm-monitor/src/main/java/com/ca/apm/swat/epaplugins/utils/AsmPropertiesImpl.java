@@ -12,69 +12,69 @@ public class AsmPropertiesImpl implements AsmProperties {
     /**
      * Mapping table of ASM tags to APM metric names.
      */
-    public static final HashMap<String, String> APM_CM_METRICS = new HashMap<String, String>();
+    public static final HashMap<String, String> ASM_METRICS = new HashMap<String, String>();
     
     /**
      * Mapping table of status indicator colors.
      */
-    public static final HashMap<String, String> APM_CM_COLORS = new HashMap<String, String>();
+    public static final HashMap<String, String> ASM_COLORS = new HashMap<String, String>();
 
     static {
-        APM_CM_METRICS.put(kAPMCMActive, "Active");
-        APM_CM_METRICS.put("alerts", "Alerts Per Interval");
-        APM_CM_METRICS.put("apdex", "Apdex Score");
-        APM_CM_METRICS.put("api", "API Credits Available");
-        APM_CM_METRICS.put("avg_perf_cur", "Performance Current Average (ms)");
-        APM_CM_METRICS.put("avg_perf_day", "Performance Daily Average (ms)");
-        APM_CM_METRICS.put("avg_uptime_cur", "Uptime Current Average (%)");
-        APM_CM_METRICS.put("avg_uptime_day", "Uptime Daily Average (%)");
-        APM_CM_METRICS.put("check", "Check Credits Available");
-        APM_CM_METRICS.put("check_errors", "Check Errors");
-        APM_CM_METRICS.put("checks", "Checks");
-        APM_CM_METRICS.put(kAPMCMCode, "Error Code");
-        APM_CM_METRICS.put(kAPMCMColor, "Color");
-        APM_CM_METRICS.put(kAPMCMColors, "Performance Status");
-        APM_CM_METRICS.put("consecutive_errors", "Consecutive Errors");
-        APM_CM_METRICS.put("ctime", "Connect Time (ms)");
-        APM_CM_METRICS.put("descr", "Error Description");
-        APM_CM_METRICS.put("dsize", "Download Size (kB)");
-        APM_CM_METRICS.put("dspeed", "Download Speed (kB/s)");
-        APM_CM_METRICS.put("dtime", "Download Time (ms)");
-        APM_CM_METRICS.put("elapsed", "API Call Time (ms)");
-        APM_CM_METRICS.put("end", "Check End Time");
-        APM_CM_METRICS.put("errors", "Errors Per Interval");
-        APM_CM_METRICS.put("gmtoffset", "Agent GMT Offset");
-        APM_CM_METRICS.put("info", "Info");
-        APM_CM_METRICS.put("ipaddr", "IP Address");
-        APM_CM_METRICS.put("loc", "Location Code");
-        APM_CM_METRICS.put("name", "Rule Name");
-        APM_CM_METRICS.put("probe_errors", "Probe Errors");
-        APM_CM_METRICS.put("probes", "Probes");
-        APM_CM_METRICS.put("ptime", "Processing Time (ms)");
-        APM_CM_METRICS.put("repeat", "Repeat");
-        APM_CM_METRICS.put("result", "Result Code");
-        APM_CM_METRICS.put("rid", "Rule ID");
-        APM_CM_METRICS.put("rtime", "Resolve Time (ms)");
-        APM_CM_METRICS.put("secscan", "Vulnerability Scan Credits Available");
-        APM_CM_METRICS.put("sla_poor", "SLA Violation Poor (%)");
-        APM_CM_METRICS.put("sla_warn", "SLA Violation Warning (%)");
-        APM_CM_METRICS.put("sms", "SMS Credits Available");
-        APM_CM_METRICS.put("spi", "Site Performance Index");
-        APM_CM_METRICS.put("start", "Check Start Time");
-        APM_CM_METRICS.put("timepoor", "Time Threshold Poor (ms)");
-        APM_CM_METRICS.put("timewarn", "Time Threshold Warning (ms)");
-        APM_CM_METRICS.put("ttime", "Total Time (ms)");
-        APM_CM_METRICS.put(kAPMCMType, "Type");
-        APM_CM_METRICS.put("tz", "Agent Time Zone");
-        APM_CM_METRICS.put("uptime", "Uptime (%)");
-        APM_CM_METRICS.put("version", "API Version");
-        APM_CM_METRICS.put("xspeed", "Transfer Speed (kB/s)");
-        APM_CM_METRICS.put("xtime", "Transfer Time (ms)");
+        ASM_METRICS.put(kAPMCMActive, "Active");
+        ASM_METRICS.put("alerts", "Alerts Per Interval");
+        ASM_METRICS.put("apdex", "Apdex Score");
+        ASM_METRICS.put("api", "API Credits Available");
+        ASM_METRICS.put("avg_perf_cur", "Performance Current Average (ms)");
+        ASM_METRICS.put("avg_perf_day", "Performance Daily Average (ms)");
+        ASM_METRICS.put("avg_uptime_cur", "Uptime Current Average (%)");
+        ASM_METRICS.put("avg_uptime_day", "Uptime Daily Average (%)");
+        ASM_METRICS.put("check", "Check Credits Available");
+        ASM_METRICS.put("check_errors", "Check Errors");
+        ASM_METRICS.put("checks", "Checks");
+        ASM_METRICS.put(kAPMCMCode, "Error Code");
+        ASM_METRICS.put(kAPMCMColor, "Color");
+        ASM_METRICS.put(kAPMCMColors, "Performance Status");
+        ASM_METRICS.put("consecutive_errors", "Consecutive Errors");
+        ASM_METRICS.put("ctime", "Connect Time (ms)");
+        ASM_METRICS.put("descr", "Error Description");
+        ASM_METRICS.put("dsize", "Download Size (kB)");
+        ASM_METRICS.put("dspeed", "Download Speed (kB/s)");
+        ASM_METRICS.put("dtime", "Download Time (ms)");
+        ASM_METRICS.put("elapsed", "API Call Time (ms)");
+        ASM_METRICS.put("end", "Check End Time");
+        ASM_METRICS.put("errors", "Errors Per Interval");
+        ASM_METRICS.put("gmtoffset", "Agent GMT Offset");
+        ASM_METRICS.put("info", "Info");
+        ASM_METRICS.put("ipaddr", "IP Address");
+        ASM_METRICS.put("loc", "Location Code");
+        ASM_METRICS.put("name", "Rule Name");
+        ASM_METRICS.put("probe_errors", "Probe Errors");
+        ASM_METRICS.put("probes", "Probes");
+        ASM_METRICS.put("ptime", "Processing Time (ms)");
+        ASM_METRICS.put("repeat", "Repeat");
+        ASM_METRICS.put("result", "Result Code");
+        ASM_METRICS.put("rid", "Rule ID");
+        ASM_METRICS.put("rtime", "Resolve Time (ms)");
+        ASM_METRICS.put("secscan", "Vulnerability Scan Credits Available");
+        ASM_METRICS.put("sla_poor", "SLA Violation Poor (%)");
+        ASM_METRICS.put("sla_warn", "SLA Violation Warning (%)");
+        ASM_METRICS.put("sms", "SMS Credits Available");
+        ASM_METRICS.put("spi", "Site Performance Index");
+        ASM_METRICS.put("start", "Check Start Time");
+        ASM_METRICS.put("timepoor", "Time Threshold Poor (ms)");
+        ASM_METRICS.put("timewarn", "Time Threshold Warning (ms)");
+        ASM_METRICS.put("ttime", "Total Time (ms)");
+        ASM_METRICS.put(kAPMCMType, "Type");
+        ASM_METRICS.put("tz", "Agent Time Zone");
+        ASM_METRICS.put("uptime", "Uptime (%)");
+        ASM_METRICS.put("version", "API Version");
+        ASM_METRICS.put("xspeed", "Transfer Speed (kB/s)");
+        ASM_METRICS.put("xtime", "Transfer Time (ms)");
 
         // mapping table of status indicator colors
-        APM_CM_COLORS.put(GREEN, "1");
-        APM_CM_COLORS.put(YELLOW, "2");
-        APM_CM_COLORS.put(ORANGE, "2");
-        APM_CM_COLORS.put(RED, "3");
+        ASM_COLORS.put(GREEN, "1");
+        ASM_COLORS.put(YELLOW, "2");
+        ASM_COLORS.put(ORANGE, "2");
+        ASM_COLORS.put(RED, "3");
     }
 }

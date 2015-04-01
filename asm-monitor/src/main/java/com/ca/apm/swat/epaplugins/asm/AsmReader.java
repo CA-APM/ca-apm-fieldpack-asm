@@ -36,19 +36,18 @@ public class AsmReader implements AsmProperties {
      */
     public static void main(String[] args, PrintStream psEpa) throws Exception {
         try {
-            Properties apmcmProperties = getPropertiesFromFile((args.length != 0) ? args[0] :
+            Properties properties = getPropertiesFromFile((args.length != 0) ? args[0] :
                 PROPERTY_FILE_NAME);
 
-            String apmcmLocale = apmcmProperties.getProperty(LOCALE, DEFAULT_LOCALE);
-            AsmMessages.setLocale(new Locale(apmcmLocale.substring(0, 2),
-                apmcmLocale.substring(3,5)));
+            String locale = properties.getProperty(LOCALE, DEFAULT_LOCALE);
+            AsmMessages.setLocale(new Locale(locale.substring(0, 2),
+                locale.substring(3,5)));
 
             AsmReader thisReader = new AsmReader();
-            int apmcmEpaWaitTime = Integer.parseInt(
-                apmcmProperties.getProperty(WAIT_TIME));
+            int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
             MetricWriter metricWriter = new XMLMetricWriter(psEpa);
-            thisReader.work(apmcmEpaWaitTime, apmcmProperties, metricWriter);
+            thisReader.work(epaWaitTime, properties, metricWriter);
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
@@ -67,15 +66,14 @@ public class AsmReader implements AsmProperties {
     public static void main(String[] args) {
 
         try {
-            Properties apmcmProperties = getPropertiesFromFile(args.length != 0 ? args[0] :
+            Properties properties = getPropertiesFromFile(args.length != 0 ? args[0] :
                 PROPERTY_FILE_NAME);
 
             AsmReader thisReader = new AsmReader();
-            int apmcmEpaWaitTime = Integer.parseInt(
-                apmcmProperties.getProperty(WAIT_TIME));
+            int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
             MetricWriter metricWriter = new TextMetricWriter();
-            thisReader.work(apmcmEpaWaitTime, apmcmProperties, metricWriter);
+            thisReader.work(epaWaitTime, properties, metricWriter);
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
@@ -90,34 +88,37 @@ public class AsmReader implements AsmProperties {
 
     /**
      * Main method of ASMReader.
-     * @param apmcmEpaWaitTime sleep time in main loop
-     * @param apmcmProperties properties read from config file
+     * Connects to ASM API and gets all folder, monitor and checkpoint information.
+     * Then starts a thread per folder to collect the monitor metrics.
+     * @param epaWaitTime sleep time in main loop
+     * @param properties properties read from config file
      * @param metricWriter interface to EPAgent, write metrics here
      */
-    private void work(int apmcmEpaWaitTime, Properties apmcmProperties, MetricWriter metricWriter) {
-        final boolean apmcmDisplayMonitor = Boolean.valueOf(
-            Boolean.parseBoolean(apmcmProperties.getProperty(DISPLAY_CHECKPOINTS, TRUE)));
+    private void work(int epaWaitTime, Properties properties, MetricWriter metricWriter) {
+        final boolean displayMonitor = Boolean.valueOf(
+            Boolean.parseBoolean(properties.getProperty(DISPLAY_CHECKPOINTS, TRUE)));
 
-        CloudMonitorAccessor cloudMonitorAccessor = new CloudMonitorAccessor(apmcmProperties);
+        CloudMonitorAccessor accessor = new CloudMonitorAccessor(properties);
         CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
-            cloudMonitorAccessor, apmcmProperties);
+            accessor, properties);
 
 
         this.keepRunning = true;
         this.numRetriesLeft = 10;
 
-        String[] apmcmFolders = null;
-        HashMap<String, String> cpMap = null;
+        String[] folders = null;
+        HashMap<String, String> checkpointMap = null;
         HashMap<String, String[]> folderMap = null;
         boolean keepTrying = true;
         int initNumRetriesLeft = 10;
 
+        // try to connect
         while (keepTrying) {
             try {
                 requestHelper.connect();
-                apmcmFolders = requestHelper.getFolders();
-                folderMap = requestHelper.getFoldersAndRules(apmcmFolders);
-                cpMap = requestHelper.getCheckpoints();
+                folders = requestHelper.getFolders();
+                folderMap = requestHelper.getFoldersAndRules(folders);
+                checkpointMap = requestHelper.getCheckpoints();
                 keepTrying = false;
             } catch (Exception e) {
                 if ((e.toString().matches(kJavaNetExceptionRegex))
@@ -135,32 +136,35 @@ public class AsmReader implements AsmProperties {
             }
         }
 
-        CloudMonitorMetricReporter cloudMonitorMetricReporter = new CloudMonitorMetricReporter(
+        EpaUtils.getFeedback().info(AsmMessages.getMessage(
+            AsmMessages.CONNECTED, properties.getProperty(URL)));
+
+        CloudMonitorMetricReporter metricReporter = new CloudMonitorMetricReporter(
             metricWriter,
-            apmcmDisplayMonitor,
-            cpMap);
+            displayMonitor,
+            checkpointMap);
 
 
         //Collect folders
-        for (int i = 0; i < apmcmFolders.length; i++) {
+        for (int i = 0; i < folders.length; i++) {
             AsmReaderThread rt = new AsmReaderThread(
-                apmcmFolders[i],
+                folders[i],
                 requestHelper,
                 folderMap,
-                apmcmProperties,
-                cloudMonitorMetricReporter);
+                properties,
+                metricReporter);
             rt.start();
         }
 
         while (keepRunning) {
             try {
-                if (apmcmProperties.getProperty(METRICS_CREDITS,
+                if (properties.getProperty(METRICS_CREDITS,
                     FALSE).equals(TRUE)) {
                     creditsMap.putAll(requestHelper.getCredits());
-                    cloudMonitorMetricReporter.printMetrics(creditsMap);
-                    creditsMap.putAll(cloudMonitorMetricReporter.resetMetrics(creditsMap));
+                    metricReporter.printMetrics(creditsMap);
+                    creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
                 }
-                Thread.sleep(apmcmEpaWaitTime);
+                Thread.sleep(epaWaitTime);
             } catch (Exception e) {
                 if ((e.toString().matches(kJavaNetExceptionRegex))
                         && (numRetriesLeft > 0)) {
