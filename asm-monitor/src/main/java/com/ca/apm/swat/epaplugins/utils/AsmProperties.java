@@ -29,10 +29,10 @@ public interface AsmProperties {
     public static final String DISPLAY_CHECKPOINTS    = "asm.displaycheckpoints";
 
     public static final String METRICS_STATS_FOLDER   = "asm.metrics.stats.folder";
+    public static final String METRICS_STATS_RULE     = "asm.metrics.stats.rule";
     public static final String METRICS_CREDITS        = "asm.metrics.credits";
     public static final String METRICS_PUBLIC         = "asm.metrics.public";
     public static final String METRICS_LOGS           = "asm.metrics.logs";
-    public static final String METRICS_STATS_RULE     = "asm.metrics.stats.rule";
 
     public static final String USE_PROXY                = "asm.useProxy";
     public static final String PROXY_HOST               = "asm.proxyHost";
