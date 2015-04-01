@@ -1,23 +1,16 @@
 package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.Inflater;
-
-
 
 //import sun.misc.BASE64Decoder;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
