@@ -79,6 +79,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                         AsmMessages.FOLDER_THREAD_ERROR,
                        APMCM_PRODUCT_NAME, this.thisFolder, e.getMessage()));
+                    //TODO: remove
                     //e.printStackTrace();
                     this.keepRunning = Boolean.valueOf(false);
                 }

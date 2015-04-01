@@ -292,6 +292,7 @@ public class CloudMonitorMetricReporter implements AsmProperties {
             } else {
                 if ((thisKey.equals(kAPMCMColor)) || (thisKey.equals(kAPMCMElapsed))
                         || (thisKey.equals(kAPMCMInfo)) || (thisKey.equals(kAPMCMVersion))
+                        || (thisKey.equals(kAPMCMCode))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
                     continue;
                 }
