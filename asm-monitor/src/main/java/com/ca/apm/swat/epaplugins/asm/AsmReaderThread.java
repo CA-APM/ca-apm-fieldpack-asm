@@ -129,9 +129,8 @@ public class AsmReaderThread extends Thread implements AsmProperties {
 
         String[] folderRules = (String[]) this.folderMap.get(folder);
 
-        // TODO: remove or convert to message
-        EpaUtils.getFeedback().verbose("getting data for " + folderRules.length
-            + " rules of folder " + folder);
+        EpaUtils.getFeedback().verbose(
+            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderRules.length, folder));
 
         if ((null == folderRules) || (0 == folderRules.length)) {
             return resultMetricMap;
@@ -147,15 +146,15 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         }
 
         if (TRUE.equals(properties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
-            // TODO: remove or convert to message
-            EpaUtils.getFeedback().verbose("getting stats for all " + folderRules.length
-                + " rules of folder " + folder);
+            EpaUtils.getFeedback().verbose(
+                AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderRules.length, folder));
+
             String statsRequest = requestHelper.getStats(folder, EMPTY_STRING);
             resultMetricMap.putAll(metricReporter.generateMetrics(
                 JsonHelper.unpadJson(statsRequest), folderPrefix));
         } else {
-            // TODO: remove or convert to message
-            EpaUtils.getFeedback().verbose("not getting any stats for folder " + folder);
+            EpaUtils.getFeedback().verbose(
+                AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA, folder));
         }
 
         if ((folderRules[0].equals(ALL_RULES)) && (!folder.equals(EMPTY_STRING))) {

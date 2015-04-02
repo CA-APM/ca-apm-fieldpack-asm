@@ -39,7 +39,11 @@ public class AsmMessages {
     public static final String THREAD_STARTED               = "threadStarted";
     public static final String SKIP_FOLDER                  = "skipFolder";
     public static final String SKIP_MONITOR                 = "skipMonitor";
-        
+    public static final String GET_FOLDER_DATA              = "getFolderData";
+    public static final String GET_STATS_DATA               = "getStatsData";
+    public static final String GET_NO_STATS_DATA            = "getNoStatsData";
+
+
     
     /**
      * The resource bundle.
