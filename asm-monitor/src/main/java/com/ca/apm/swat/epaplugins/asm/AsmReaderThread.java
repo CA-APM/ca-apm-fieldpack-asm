@@ -2,8 +2,12 @@ package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
+import com.ca.apm.swat.epaplugins.asm.rules.Rule;
+import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.JsonHelper;
@@ -20,7 +24,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     private boolean keepRunning = true;
     private int numRetriesLeft;
     private CloudMonitorRequestHelper requestHelper;
-    private HashMap<String, String[]> folderMap;
+    private HashMap<String, List<Rule>> folderMap;
     private Properties properties;
     private CloudMonitorMetricReporter metricReporter;
     private final int epaWaitTime;
@@ -36,7 +40,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     AsmReaderThread(
         String folderName,
         CloudMonitorRequestHelper requestHelper,
-        HashMap<String, String[]> folderMap,
+        HashMap<String, List<Rule>> folderMap,
         Properties properties,
         CloudMonitorMetricReporter metricReporter) {
 
@@ -127,12 +131,14 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     public HashMap<String, String> getFolderMetrics() throws Exception {
         HashMap<String, String> resultMetricMap = new HashMap<String, String>();
 
-        String[] folderRules = (String[]) this.folderMap.get(folder);
-
+        List<Rule> folderRules = this.folderMap.get(folder);
+        Rule allRulesRule = RuleFactory.getAllRulesRule();
+        Rule rule = null;
+        
         EpaUtils.getFeedback().verbose(
-            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderRules.length, folder));
+            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderRules.size(), folder));
 
-        if ((null == folderRules) || (0 == folderRules.length)) {
+        if ((null == folderRules) || (0 == folderRules.size())) {
             return resultMetricMap;
         }
 
@@ -147,9 +153,9 @@ public class AsmReaderThread extends Thread implements AsmProperties {
 
         if (TRUE.equals(properties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
             EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderRules.length, folder));
+                AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderRules.size(), folder));
 
-            String statsRequest = requestHelper.getStats(folder, EMPTY_STRING);
+            String statsRequest = requestHelper.getStats(folder, null);
             resultMetricMap.putAll(metricReporter.generateMetrics(
                 JsonHelper.unpadJson(statsRequest), folderPrefix));
         } else {
@@ -157,15 +163,18 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA, folder));
         }
 
-        if ((folderRules[0].equals(ALL_RULES)) && (!folder.equals(EMPTY_STRING))) {
+        if ((folderRules.get(0).equals(allRulesRule))
+                && (!folder.equals(EMPTY_STRING))) {
+            
             if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
-                String pspRequest = requestHelper.getPsp(folder, EMPTY_STRING);
+                String pspRequest = requestHelper.getPsp(folder, null);
                 resultMetricMap.putAll(metricReporter.generateMetrics(
                     JsonHelper.unpadJson(pspRequest), folderPrefix));
             }
+            
             if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
-                String logRequest = requestHelper.getLogs(folder, EMPTY_STRING,
-                    folderRules.length - 1);
+                String logRequest = requestHelper.getLogs(folder, null,
+                    folderRules.size() - 1);
                 String unpadded = JsonHelper.unpadJson(logRequest);
                 if (unpadded != null) {
                     HashMap<String, String> generatedMetrics =
@@ -183,34 +192,36 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             }
             //TODO RULE or FOLDER???
             if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
-                for (int i = 0; i < folderRules.length; i++) {
-                    if (folderRules[i] == ALL_RULES) {
+                for (Iterator<Rule> it = folderRules.iterator(); it.hasNext(); ) {
+                    rule = it.next();
+                    if (rule.equals(allRulesRule)) {
                         continue;
                     }
                     String statsRequest =
-                            requestHelper.getStats(folder, folderRules[i]);
+                            requestHelper.getStats(folder, rule);
                     resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(statsRequest), folderPrefix));
                 }
             }
         } else {
-            for (int j = 0; j < folderRules.length; j++) {
-                if (folderRules[j].equals(ALL_RULES)) {
+            for (Iterator<Rule> it = folderRules.iterator(); it.hasNext(); ) {
+                rule = it.next();
+                if (rule.equals(ALL_RULES)) {
                     continue;
                 }
                 if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
-                    String pspRequest = requestHelper.getPsp(folder, folderRules[j]);
+                    String pspRequest = requestHelper.getPsp(folder, rule);
                     resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(pspRequest), folderPrefix));
                 }
                 if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
                     String statsRequest =
-                            requestHelper.getStats(folder, folderRules[j]);
+                            requestHelper.getStats(folder, rule);
                     resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(statsRequest), folderPrefix));
                 }
                 if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
-                    String logRequest = requestHelper.getLogs(folder, folderRules[j], 1);
+                    String logRequest = requestHelper.getLogs(folder,rule, 1);
                     resultMetricMap.putAll(metricReporter.generateMetrics(
                         JsonHelper.unpadJson(logRequest), folderPrefix));
                 }

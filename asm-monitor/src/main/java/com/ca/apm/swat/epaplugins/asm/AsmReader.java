@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.TreeSet;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XMLMetricWriter;
+import com.ca.apm.swat.epaplugins.asm.rules.Rule;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -110,7 +112,7 @@ public class AsmReader implements AsmProperties {
 
         String[] folders = null;
         HashMap<String, String> checkpointMap = null;
-        HashMap<String, String[]> folderMap = null;
+        HashMap<String, List<Rule>> folderMap = null;
         boolean keepTrying = true;
         int initNumRetriesLeft = 10;
 
@@ -134,12 +136,12 @@ public class AsmReader implements AsmProperties {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose("read rules: ");
                     Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
-                    for (Iterator<Object> it = copy.iterator(); it.hasNext(); ) {
-                        String key = (String) it.next();
-                        StringBuffer buf = new StringBuffer("  " + key + " = ");
-                        String[] rules = folderMap.get(key);
-                        for (int i = 0; i < rules.length; ++i) {
-                            buf.append(rules[i] + ", ");
+                    for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
+                        String folder = (String) fit.next();
+                        StringBuffer buf = new StringBuffer("  " + folder + " = ");
+                        List<Rule> rules = folderMap.get(folder);
+                        for (Iterator<Rule> rit = rules.iterator(); rit.hasNext(); ) {
+                            buf.append(rit.next().getName() + ", ");
                         }
                         EpaUtils.getFeedback().verbose(buf.toString());
                     }

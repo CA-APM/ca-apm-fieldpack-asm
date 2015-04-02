@@ -168,9 +168,17 @@ public interface AsmProperties {
     public static final String TYPE_TAG                 = "type";
     public static final String VERSION_TAG              = "version";
     public static final String OUTPUT_TAG               = "output";
+    public static final String TAGS_TAG                 = "tags";   
     public static final String HAR_OR_LOG_TAG           = "{\"har\": {\"log\"";
     public static final String UNDEFINED                = "Undefined";
 
+    // rule types
+    public static final String HTTP_RULE                = "http";
+    public static final String HTTPS_RULE               = "https";
+    public static final String SCRIPT_RULE              = "script";
+    public static final String BROWSER_RULE             = "browser";
+    public static final String RBM_RULE                 = "script_firefox";
+    
     // JMeter log result tags
     public static final String TEST_RESULTS             = "testResults";
     public static final String RESPONSE_CODE_TAG        = "rc";

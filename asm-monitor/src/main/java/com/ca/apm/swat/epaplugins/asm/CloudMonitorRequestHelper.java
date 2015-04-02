@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
+import com.ca.apm.swat.epaplugins.asm.rules.Rule;
+import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -73,7 +75,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
 
     /**
      * Get the folders to monitor.
-     * @param folderList comma-separated list of folders to query or {@link AsmProperties#ALL_FOLDERS}
+     * @param folderList comma-separated list of folders to query or
+     * {@link AsmProperties#ALL_FOLDERS}
      * @param excludeList comma-separated list of folders to exclude
      * @return array of folders to monitor
      * @throws Exception errors
@@ -142,11 +145,13 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     /**
      * Compare list with comma-separated string.
      * All list entries that are not matched in the comparison string are removed from the list.
+     * @param <T> a type that can be compared to a string,
+     * i.e. implements <code>equals(String s)</code>
      * @param masterList master list
      * @param comparisonString comma-separated string of entries to match
      * @return reduced list matching <code>comparisonString</code>
      */
-    private List<String> matchList(List<String> masterList, String comparisonString) {
+    private <T> List<T> matchList(List<T> masterList, String comparisonString) {
         List<String> checkList = Arrays.asList(comparisonString.split(","));
         masterList.retainAll(checkList);
         return masterList;
@@ -259,8 +264,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @return list of rules/monitors
      * @throws Exception errors
      */
-    private String[] getRules(String folder, String rulesList) throws Exception {
-        List<String> ruleQueryOutput = new ArrayList<String>();
+    private List<Rule> getRules(String folder, String rulesList) throws Exception {
+        List<Rule> rules = new ArrayList<Rule>();
         String folderStr = EMPTY_STRING;
         if (folder.equals(ROOT_FOLDER)) {
             folder = EMPTY_STRING; // for later comparison
@@ -268,8 +273,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             folderStr = FOLDER_PARAM + folder;
         }
 
-        String ruleRequest = accessor.executeApi(RULE_CMD,
-            getCommandString() + folderStr);
+        String ruleRequest = accessor.executeApi(RULE_CMD, getCommandString() + folderStr);
 
         JSONArray ruleJsonArray = extractJsonArray(ruleRequest, RULES_TAG);
 
@@ -278,6 +282,15 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             if (!ruleJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
                 continue;
             }
+
+            if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                EpaUtils.getFeedback().verbose(
+                    "found rule '" + ruleJsonObject.getString(NAME_TAG)
+                    + "' of type " + ruleJsonObject.getString(TYPE_TAG)
+                    + " in folder" + (ruleJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
+                        ruleJsonObject.getString(FOLDER_TAG)));
+            }
+            
             if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
                     && (!YES.equals(ruleJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
@@ -287,14 +300,20 @@ public class CloudMonitorRequestHelper implements AsmProperties {
                 }
                 continue;
             }
-            ruleQueryOutput.add(ruleJsonObject.getString(NAME_TAG));
+            rules.add(RuleFactory.getRule(
+                ruleJsonObject.getString(NAME_TAG),
+                ruleJsonObject.getString(TYPE_TAG),
+                ruleJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
+                    ruleJsonObject.getString(FOLDER_TAG),
+                ruleJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
+                    ruleJsonObject.getString(TAGS_TAG).split(",")));
         }
 
         if (!rulesList.equals(ALL_RULES)) {
-            ruleQueryOutput = matchList(ruleQueryOutput, rulesList);
+            rules = matchList(rules, rulesList);
         }
         
-        return (String[]) ruleQueryOutput.toArray(EMPTY_STRING_ARRAY);
+        return rules;
     }
 
     /**
@@ -304,27 +323,23 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @return map of folders and rules
      * @throws Exception errors
      */
-    public HashMap<String, String[]> getFoldersAndRules(String[] folders) throws Exception {
-        HashMap<String, String[]> foldersAndRules = new HashMap<String, String[]>();
+    public HashMap<String, List<Rule>> getFoldersAndRules(String[] folders) throws Exception {
+        HashMap<String, List<Rule>> foldersAndRules = new HashMap<String, List<Rule>>();
 
 
         for (int i = 0; i < folders.length; i++) {
             String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i], ALL_RULES);
-            String[] rules;
+            List<Rule> rules;
             if (((folderProp.length() == 0) || (folderProp.equals(ALL_RULES)))
                     // if we skip inactive monitors we can't use ALL_RULES
                     && (!TRUE.equals(properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))) {
-                String[] allRules = getRules(folders[i], ALL_RULES);
-                rules = new String[allRules.length + 1];
-                rules[0] = ALL_RULES;
-                for (int j = 0; j < allRules.length; j++) {
-                    rules[(j + 1)] = allRules[j];
-                }
+                rules = getRules(folders[i], ALL_RULES);
+                rules.add(0, RuleFactory.getAllRulesRule());
             } else {
                 rules = getRules(folders[i], folderProp);
             }
             // must be at least one rule != ALL_RULES
-            if (((rules.length > 0) && !rules[0].equals(ALL_RULES)) || (rules.length > 1))  {
+            if (((rules.size() > 0) && !rules.get(0).equals(ALL_RULES)) || (rules.size() > 1))  {
                 foldersAndRules.put(folders[i], rules);
             }
         }
@@ -334,11 +349,11 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     /**
      * Get statistics for folder and rule.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param rule gets all rules if empty
+     * @param rule gets all rules if null
      * @return API result
      * @throws Exception errors
      */
-    public String getStats(String folder, String rule) throws Exception {
+    public String getStats(String folder, Rule rule) throws Exception {
         String statsRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String ruleStr = EMPTY_STRING;
@@ -349,9 +364,9 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (rule.length() != 0) {
-            ruleStr = NAME_PARAM + rule;
-            folder = folder + "|" + rule;
+        if (rule != null) {
+            ruleStr = NAME_PARAM + rule.getName();
+            folder = folder + "|" + rule.getName();
         }
 
         String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
@@ -364,11 +379,11 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     /**
      * Get PSP information for folder and rule.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param rule gets all rules if empty
+     * @param rule gets all rules if null
      * @return API result
      * @throws Exception errors
      */
-    public String getPsp(String folder, String rule) throws Exception {
+    public String getPsp(String folder, Rule rule) throws Exception {
         String pspRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String ruleStr = EMPTY_STRING;
@@ -379,8 +394,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (rule.length() != 0) {
-            ruleStr = NAME_PARAM + rule;
+        if (rule != null) {
+            ruleStr = NAME_PARAM + rule.getName();
         }
 
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
@@ -391,12 +406,12 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     /**
      * Get logs for folder and rule.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param rule gets all rules if empty
+     * @param rule gets all rules if null
      * @param numRules number of rules in folder
      * @return API result
      * @throws Exception errors
      */
-    public String getLogs(String folder, String rule, int numRules) throws Exception {
+    public String getLogs(String folder, Rule rule, int numRules) throws Exception {
         String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String ruleStr = EMPTY_STRING;
@@ -407,8 +422,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (rule.length() != 0) {
-            ruleStr = NAME_PARAM + rule;
+        if (rule != null) {
+            ruleStr = NAME_PARAM + rule.getName();
         }
         String logStr = NKEY_PARAM + this.nkey + folderStr + ruleStr
                 + NUM_PARAM + numLogs + REVERSE_PARAM + CALLBACK_PARAM 
