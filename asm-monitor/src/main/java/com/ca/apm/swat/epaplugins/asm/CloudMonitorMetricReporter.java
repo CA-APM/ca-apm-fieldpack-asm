@@ -139,10 +139,8 @@ public class CloudMonitorMetricReporter implements AsmProperties {
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
-     * @throws Exception errors
      */
-    protected HashMap<String, String> generateMetrics(String jsonString, String metricTree)
-            throws Exception {
+    protected HashMap<String, String> generateMetrics(String jsonString, String metricTree) {
         HashMap<String, String> metricMap = new HashMap<String, String>();
 
         JSONObject jsonObject = new JSONObject(jsonString);

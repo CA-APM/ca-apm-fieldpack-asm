@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.asm.error.LoginException;
+import com.ca.apm.swat.epaplugins.asm.error.LoginError;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.CryptoUtils;
@@ -98,22 +98,17 @@ public class CloudMonitorAccessor implements AsmProperties {
     /**
      * Login to the App Synthetic Monitor API.
      * @return the token returned or {@link FAILED}
-     * @throws LoginException if the authentication fails
+     * @throws LoginError if the authentication fails
      * @throws Exception if another error occurred
      */
-    public String login() throws LoginException, Exception {
+    public String login() throws LoginError, Exception {
         String user = this.properties.getProperty(USER);
         String password = null;
         if (this.properties.getProperty(PASSWORD_ENCRYPTED).equals(TRUE)) {
             password = CloudMonitorAccessor.crypto.decrypt(
                 this.properties.getProperty(PASSWORD));
             if (null == password) {
-                String errorMessage = AsmMessages.getMessage(AsmMessages.DECRYPT_ERROR);
-                EpaUtils.getFeedback().error(errorMessage);
-
-                System.err.print(AsmMessages.getMessage(AsmMessages.DECRYPT_INFO,
-                    PROPERTY_FILE_NAME, PASSWORD_ENCRYPTED));
-                throw new LoginException(errorMessage);
+                throw new LoginError(AsmMessages.getMessage(AsmMessages.DECRYPT_ERROR));
             }
         } else {
             password = this.properties.getProperty(PASSWORD);
@@ -141,18 +136,16 @@ public class CloudMonitorAccessor implements AsmProperties {
 
         String errorMessage = AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
             errorStr, errorCode, errorInfo);
-        EpaUtils.getFeedback().error(errorMessage);
-
 
         if (errorCode == AUTH_ERROR_CODE) {
-            System.err.print(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
+            EpaUtils.getFeedback().error(errorMessage);
+            throw new LoginError(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
                 this.properties.getProperty(URL),
                 LOGIN_CMD,
                 ASM_PRODUCT_NAME,
                 PASSWORD_URL));
         }
-        throw new LoginException(errorMessage);
-        //System.exit(AUTH_ERROR_CODE);
+        throw new LoginError(errorMessage);
     }
 
     /**

@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -182,8 +183,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             normalizer = TextNormalizer.getNormalizationStringFilter();
         } catch (ClassNotFoundException e) {
             EpaUtils.getFeedback().error(e.getMessage());
-            System.err.print(e.getMessage());
-            System.exit(NORM_ERROR_CODE);
+            throw new InitializationError(
+                AsmMessages.getMessage(AsmMessages.NORMALIZER_INFO, e.getMessage()));
         }
 
         String metricKeyNormalized = normalizer.filter(rawMetric);

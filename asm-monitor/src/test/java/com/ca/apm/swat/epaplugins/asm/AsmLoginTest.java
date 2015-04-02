@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.error.LoginException;
+import com.ca.apm.swat.epaplugins.asm.error.LoginError;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 
@@ -124,7 +124,7 @@ public class AsmLoginTest implements AsmProperties {
 
             Assert.fail("login with wrong plain password succeeded");
 
-        } catch (LoginException e) {
+        } catch (LoginError e) {
             Assert.assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +153,7 @@ public class AsmLoginTest implements AsmProperties {
 
             Assert.fail("login with wrong encrypted password succeeded");
 
-        } catch (LoginException e) {
+        } catch (LoginError e) {
             Assert.assertTrue(true);
         } catch (Exception e) {
             e.printStackTrace();

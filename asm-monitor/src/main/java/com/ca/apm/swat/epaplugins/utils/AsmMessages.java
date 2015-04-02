@@ -42,6 +42,7 @@ public class AsmMessages {
     public static final String GET_FOLDER_DATA              = "getFolderData";
     public static final String GET_STATS_DATA               = "getStatsData";
     public static final String GET_NO_STATS_DATA            = "getNoStatsData";
+    public static final String NORMALIZER_INFO              = "normalizerInfo";
 
 
     

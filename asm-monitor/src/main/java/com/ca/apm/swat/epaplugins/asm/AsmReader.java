@@ -53,7 +53,9 @@ public class AsmReader implements AsmProperties {
             EpaUtils.getFeedback().error(
                 AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
                     ASM_PRODUCT_NAME, e.getMessage()));
-            //e.printStackTrace();
+            System.exit(1);
+        } catch (Error e) {
+            EpaUtils.getFeedback().error(e.getMessage());
             System.exit(1);
         }
 
@@ -125,9 +127,9 @@ public class AsmReader implements AsmProperties {
                     }
                     EpaUtils.getFeedback().verbose(buf.toString());
                 }
-                
+
                 folderMap = requestHelper.getFoldersAndRules(folders);
-                
+
                 // TODO: remove or convert to message
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose("read rules: ");
@@ -142,7 +144,7 @@ public class AsmReader implements AsmProperties {
                         EpaUtils.getFeedback().verbose(buf.toString());
                     }
                 }
-                
+
                 checkpointMap = requestHelper.getCheckpoints();
                 keepTrying = false;
             } catch (Exception e) {
