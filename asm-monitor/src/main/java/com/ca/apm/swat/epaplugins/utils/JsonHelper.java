@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class JsonHelper {
 
-    private static final Pattern unpad = Pattern.compile(AsmProperties.kJsonRegex);
+    private static final Pattern unpad = Pattern.compile(AsmProperties.JSON_REGEX);
 
     /**
      * Unpad a padded JSON string.

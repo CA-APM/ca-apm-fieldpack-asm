@@ -28,7 +28,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     private Properties properties;
     private String nkey;
     private String user;
-    
+
     /**
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
@@ -54,12 +54,13 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @throws Exception errors
      */
     public String[] getFolders() throws Exception {
+        String folderProperty = properties.getProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
         String[] folders;
-        if ((properties.getProperty(INCLUDE_FOLDERS, EMPTY_STRING).length() == 0)
-                || (properties.getProperty(INCLUDE_FOLDERS, EMPTY_STRING).contains(ALL_FOLDERS))) {
+
+        if ((folderProperty.length() == 0) || (folderProperty.contains(ALL_FOLDERS))) {
             folders = getFolders(ALL_FOLDERS);
         } else {
-            folders = getFolders(properties.getProperty(INCLUDE_FOLDERS));
+            folders = getFolders(folderProperty);
         }
 
         return folders;
@@ -73,34 +74,32 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      */
     private String[] getFolders(String folderList) throws Exception {
         List<String> folderQueryOutput = new ArrayList<String>();
-        String folderRequest = accessor.executeApi(kAPMCMFoldersCmd,
-            getCommandString());
+        String folderRequest = accessor.executeApi(FOLDER_CMD, getCommandString());
 
-        JSONArray folderJsonArray = extractJsonArray(folderRequest, kAPMCMFolders);
+        JSONArray folderJsonArray = extractJsonArray(folderRequest, FOLDERS_TAG);
 
         folderQueryOutput.add(ROOT_FOLDER);
         for (int i = 0; i < folderJsonArray.length(); i++) {
             JSONObject folderJsonObject = folderJsonArray.getJSONObject(i);
 
-            if ((!folderJsonObject.optString(kAPMCMActive, EMPTY_STRING).equals(YES))
-                    && (properties.getProperty(SKIP_INACTIVE_FOLDERS, EMPTY_STRING)
-                            .equals(TRUE))) {
+            if ((!folderJsonObject.optString(ACTIVE_TAG, NO).equals(YES))
+                    && (properties.getProperty(SKIP_INACTIVE_FOLDERS, NO).equals(TRUE))) {
                 continue;
             }
-            folderQueryOutput.add(folderJsonObject.get(kAPMCMName).toString());
+            folderQueryOutput.add(folderJsonObject.get(NAME_TAG).toString());
         }
 
         if (!folderList.equals(ALL_FOLDERS)) {
             return compareList(folderQueryOutput, folderList);
         }
-        return (String[]) folderQueryOutput.toArray(kNoStringArrayProperties);
+        return (String[]) folderQueryOutput.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**
      * Get the command string.
      */
     private String getCommandString() {
-        return kAPMCMNKeyParam + this.nkey + kAPMCMCallbackParam + apmcmCallback;
+        return NKEY_PARAM + this.nkey + CALLBACK_PARAM + DO_CALLBACK;
     }
 
     /**
@@ -114,8 +113,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         JSONObject entireJsonObject = new JSONObject(JsonHelper.unpadJson(metricInput));
         JSONArray thisJsonArray = new JSONArray();
 
-        if (entireJsonObject.optJSONObject(kAPMCMResult) != null) {
-            JSONObject resultJsonObject = entireJsonObject.getJSONObject(kAPMCMResult);
+        if (entireJsonObject.optJSONObject(RESULT_TAG) != null) {
+            JSONObject resultJsonObject = entireJsonObject.getJSONObject(RESULT_TAG);
 
             if (resultJsonObject.optJSONArray(arrayName) != null) {
                 thisJsonArray = resultJsonObject.optJSONArray(arrayName);
@@ -135,7 +134,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     private String[] compareList(List<String> masterList, String comparisonString) {
         List<String> checkList = Arrays.asList(comparisonString.split(","));
         masterList.retainAll(checkList);
-        return (String[]) masterList.toArray(kNoStringArrayProperties);
+        return (String[]) masterList.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**
@@ -146,22 +145,22 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     public HashMap<String, String> getCredits() throws Exception {
         HashMap<String, String> metricMap = new HashMap<String, String>();
         String creditsRequest = EMPTY_STRING;
-        creditsRequest = accessor.executeApi(kAPMCMCreditsCmd, getCommandString());
+        creditsRequest = accessor.executeApi(CREDITS_CMD, getCommandString());
 
-        JSONArray creditJsonArray = extractJsonArray(creditsRequest, kAPMCMCredits);
+        JSONArray creditJsonArray = extractJsonArray(creditsRequest, CREDITS_TAG);
 
         for (int i = 0; i < creditJsonArray.length(); i++) {
-            JSONObject thisCreditJsonObject = creditJsonArray.getJSONObject(i);
+            JSONObject creditJsonObject = creditJsonArray.getJSONObject(i);
 
-            String thisKey = thisCreditJsonObject.optString(kAPMCMType, NO_TYPE);
-            String thisValue = thisCreditJsonObject.optString("available", ZERO);
+            String key = creditJsonObject.optString(TYPE_TAG, NO_TYPE);
+            String value = creditJsonObject.optString(AVAILABLE_TAG, ZERO);
 
-            if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
-                thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
+            if (AsmPropertiesImpl.ASM_METRICS.containsKey(key)) {
+                key = ((String) AsmPropertiesImpl.ASM_METRICS.get(key)).toString();
             }
 
-            String rawMetric = kCreditsCategory + ":" + thisKey;
-            metricMap.put(fixMetric(rawMetric), fixMetric(thisValue));
+            String rawMetric = CREDITS_CATEGORY + METRIC_NAME_SEPARATOR + key;
+            metricMap.put(fixMetric(rawMetric), fixMetric(value));
         }
 
         return metricMap;
@@ -183,7 +182,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         }
 
         String metricKeyNormalized = normalizer.filter(rawMetric);
-        Pattern pattern = Pattern.compile(kJsonPattern);
+        Pattern pattern = Pattern.compile(JSON_PATTERN);
         String fixedMetric = pattern.matcher(metricKeyNormalized).replaceAll(EMPTY_STRING);
 
         return fixedMetric.replace("\\", "-")
@@ -201,22 +200,24 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     public HashMap<String, String> getCheckpoints() throws Exception {
         HashMap<String, String> returnCp = new HashMap<String, String>();
 
-        String cpRequest = accessor.executeApi(kAPMCMCheckptsCmd, getCommandString());
+        String cpRequest = accessor.executeApi(CHECKPOINTS_CMD, getCommandString());
 
-        JSONArray cpJsonArray = extractJsonArray(cpRequest, kAPMCMCheckpoints);
+        JSONArray cpJsonArray = extractJsonArray(cpRequest, CHECKPOINTS_TAG);
 
         for (int i = 0; i < cpJsonArray.length(); i++) {
             JSONObject cpJsonObject = cpJsonArray.getJSONObject(i);
-            if (cpJsonObject.get(kAPMCMAreas).toString().contains(",")) {
+            if (cpJsonObject.get(AREA_TAG).toString().contains(DEFAULT_DELIMITER)) {
                 returnCp.put(
-                    cpJsonObject.get(kAPMCMLoc).toString(),
-                    cpJsonObject.get(kAPMCMAreas).toString().split(",")[1] + "|"
-                            + cpJsonObject.get(kAPMCMCountry) + "|" + cpJsonObject.get(kAPMCMCity));
+                    cpJsonObject.get(LOCATION_TAG).toString(),
+                    cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1] 
+                            + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
+                            + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
             } else {
                 returnCp.put(
-                    cpJsonObject.get(kAPMCMLoc).toString(),
-                    cpJsonObject.get(kAPMCMAreas) + "|" + cpJsonObject.get(kAPMCMCountry)
-                    + "|" + cpJsonObject.get(kAPMCMCity));
+                    cpJsonObject.get(LOCATION_TAG).toString(),
+                    cpJsonObject.get(AREA_TAG)
+                    + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
+                    + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
             }
         }
 
@@ -234,33 +235,33 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         List<String> ruleQueryOutput = new ArrayList<String>();
         String folderStr = EMPTY_STRING;
         if (!folder.equals(ROOT_FOLDER)) {
-            folderStr = kAPMCMFolderParam + folder;
+            folderStr = FOLDER_PARAM + folder;
         } else {
             folder = EMPTY_STRING;
         }
 
-        String ruleRequest = accessor.executeApi(kAPMCMRuleCmd,
+        String ruleRequest = accessor.executeApi(RULE_CMD,
             getCommandString() + folderStr);
 
-        JSONArray ruleJsonArray = extractJsonArray(ruleRequest, kAPMCMRules);
+        JSONArray ruleJsonArray = extractJsonArray(ruleRequest, RULES_TAG);
 
         for (int i = 0; i < ruleJsonArray.length(); i++) {
-            JSONObject thisRuleJsonObject = ruleJsonArray.getJSONObject(i);
-            if (!thisRuleJsonObject.optString(kAPMCMFolder, EMPTY_STRING).equals(folder)) {
+            JSONObject ruleJsonObject = ruleJsonArray.getJSONObject(i);
+            if (!ruleJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
                 continue;
             }
-            if ((!thisRuleJsonObject.optString(kAPMCMActive, NO).equals(YES))
+            if ((!ruleJsonObject.optString(ACTIVE_TAG, NO).equals(YES))
                     && (this.properties.getProperty(SKIP_INACTIVE_FOLDERS, FALSE)
                             .equals(TRUE))) {
                 continue;
             }
-            ruleQueryOutput.add(thisRuleJsonObject.getString(kAPMCMName));
+            ruleQueryOutput.add(ruleJsonObject.getString(NAME_TAG));
         }
 
         if (!rulesList.equals(ALL_RULES)) {
             return compareList(ruleQueryOutput, rulesList);
         }
-        return (String[]) ruleQueryOutput.toArray(kNoStringArrayProperties);
+        return (String[]) ruleQueryOutput.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**
@@ -274,8 +275,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
 
 
         for (int i = 0; i < folders.length; i++) {
-            String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i],
-                EMPTY_STRING);
+            String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i], ALL_RULES);
             String[] rules;
             if ((folderProp.length() == 0) || (folderProp.equals(ALL_RULES))) {
                 String[] allRules = getRules(folders[i], ALL_RULES);
@@ -307,20 +307,20 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         String ruleStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = kAPMCMFolderParam + folder;
+            folderStr = FOLDER_PARAM + folder;
         } else {
             folder = ROOT_FOLDER;
         }
 
         if (rule.length() != 0) {
-            ruleStr = kAPMCMNameParam + rule;
+            ruleStr = NAME_PARAM + rule;
             folder = folder + "|" + rule;
         }
 
-        String statsStr = kAPMCMNKeyParam + this.nkey + kAPMCMAccountParam + this.user
-                + folderStr + ruleStr + kAPMCMStartDateParam
-                + getTodaysDate() + kAPMCMCallbackParam + apmcmCallback;
-        statsRequest = accessor.executeApi(kAPMCMStatsCmd, statsStr);
+        String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
+                + folderStr + ruleStr + START_DATE_PARAM
+                + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
+        statsRequest = accessor.executeApi(STATS_CMD, statsStr);
         return statsRequest;
     }
 
@@ -337,16 +337,16 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         String ruleStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = kAPMCMFolderParam + folder;
+            folderStr = FOLDER_PARAM + folder;
         } else {
             folder = ROOT_FOLDER;
         }
 
         if (rule.length() != 0) {
-            ruleStr = kAPMCMNameParam + rule;
+            ruleStr = NAME_PARAM + rule;
         }
 
-        pspRequest = accessor.executeApi(kAPMCMPSPCmd, getCommandString()
+        pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
             + folderStr + ruleStr);
         return pspRequest;
     }
@@ -365,21 +365,21 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         String ruleStr = EMPTY_STRING;
         int numLogs = Integer.parseInt(this.properties.getProperty(NUM_LOGS)) * numRules;
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = kAPMCMFolderParam + folder;
+            folderStr = FOLDER_PARAM + folder;
         } else {
             folder = ROOT_FOLDER;
         }
 
         if (rule.length() != 0) {
-            ruleStr = kAPMCMNameParam + rule;
+            ruleStr = NAME_PARAM + rule;
         }
-        String logStr = kAPMCMNKeyParam + this.nkey + folderStr + ruleStr
-                + kAPMCMNumParam + numLogs + kAPMCMReverseParam + kAPMCMCallbackParam 
-                + apmcmCallback + kAPMCMFullParam;
+        String logStr = NKEY_PARAM + this.nkey + folderStr + ruleStr
+                + NUM_PARAM + numLogs + REVERSE_PARAM + CALLBACK_PARAM 
+                + DO_CALLBACK + FULL_PARAM;
         //    String logStr = "nkey=" + this.nkey + folderStr + ruleStr
         //        + "&num=" + numLogs + "&reverse=y&full=y";
 
-        logRequest = accessor.executeApi(kAPMCMLogsCmd, logStr);
+        logRequest = accessor.executeApi(LOGS_CMD, logStr);
         return logRequest;
     }
 

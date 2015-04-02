@@ -102,14 +102,14 @@ public class XmlAnalysisAdapter implements AsmProperties {
                 NodeList assertionResultEntries = stepChild.getChildNodes();
                 for (int l = 0; l < assertionResultEntries.getLength(); l++) {
                     org.w3c.dom.Node assertionResultEntry = assertionResultEntries.item(l);
-                    if (assertionResultEntry.getNodeName().equals(kAPMCMName)) {
+                    if (assertionResultEntry.getNodeName().equals(NAME_TAG)) {
                         assertionName = assertionResultEntry.getFirstChild().getNodeValue();
                     }
                     if (assertionResultEntry.getNodeName().equals(FAILURE)) {
                         assertionFailure = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());
                     }
-                    if (assertionResultEntry.getNodeName().equals(kAPMCMError)) {
+                    if (assertionResultEntry.getNodeName().equals(ERROR_TAG)) {
                         assertionError = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());
                     }

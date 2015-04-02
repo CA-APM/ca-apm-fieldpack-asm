@@ -95,7 +95,7 @@ public class AsmReader implements AsmProperties {
      * @param metricWriter interface to EPAgent, write metrics here
      */
     private void work(int epaWaitTime, Properties properties, MetricWriter metricWriter) {
-        final boolean displayMonitor = Boolean.valueOf(
+        final boolean displayCheckpoints = Boolean.valueOf(
             Boolean.parseBoolean(properties.getProperty(DISPLAY_CHECKPOINTS, TRUE)));
 
         CloudMonitorAccessor accessor = new CloudMonitorAccessor(properties);
@@ -117,11 +117,36 @@ public class AsmReader implements AsmProperties {
             try {
                 requestHelper.connect();
                 folders = requestHelper.getFolders();
+                // TODO: remove or convert to message
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    StringBuffer buf = new StringBuffer("read folders: ");
+                    for (int i = 0; i < folders.length; ++i) {
+                        buf.append(folders[i] + ", ");
+                    }
+                    EpaUtils.getFeedback().verbose(buf.toString());
+                }
+                
                 folderMap = requestHelper.getFoldersAndRules(folders);
+                
+                // TODO: remove or convert to message
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose("read rules: ");
+                    Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
+                    for (Iterator<Object> it = copy.iterator(); it.hasNext(); ) {
+                        String key = (String) it.next();
+                        StringBuffer buf = new StringBuffer("  " + key + " = ");
+                        String[] rules = folderMap.get(key);
+                        for (int i = 0; i < rules.length; ++i) {
+                            buf.append(rules[i] + ", ");
+                        }
+                        EpaUtils.getFeedback().verbose(buf.toString());
+                    }
+                }
+                
                 checkpointMap = requestHelper.getCheckpoints();
                 keepTrying = false;
             } catch (Exception e) {
-                if ((e.toString().matches(kJavaNetExceptionRegex))
+                if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                         && (initNumRetriesLeft > 0)) {
                     initNumRetriesLeft = retryConnection(initNumRetriesLeft,
                         AsmMessages.getMessage(AsmMessages.AGENT_INITIALIZATION));
@@ -141,7 +166,7 @@ public class AsmReader implements AsmProperties {
 
         CloudMonitorMetricReporter metricReporter = new CloudMonitorMetricReporter(
             metricWriter,
-            displayMonitor,
+            displayCheckpoints,
             checkpointMap);
 
 
@@ -166,7 +191,7 @@ public class AsmReader implements AsmProperties {
                 }
                 Thread.sleep(epaWaitTime);
             } catch (Exception e) {
-                if ((e.toString().matches(kJavaNetExceptionRegex))
+                if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                         && (numRetriesLeft > 0)) {
                     numRetriesLeft = retryConnection(numRetriesLeft,
                         AsmMessages.getMessage(AsmMessages.PARENT_THREAD));

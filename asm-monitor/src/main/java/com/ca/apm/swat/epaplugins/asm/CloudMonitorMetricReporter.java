@@ -147,14 +147,14 @@ public class CloudMonitorMetricReporter implements AsmProperties {
 
         JSONObject jsonObject = new JSONObject(jsonString);
 
-        if (jsonObject.optString(kAPMCMName, null) != null) {
-            metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(kAPMCMName);
+        if (jsonObject.optString(NAME_TAG, null) != null) {
+            metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(NAME_TAG);
         }
 
         if (displayCheckpoint) {
-            if (jsonObject.optString(kAPMCMLoc, null) != null) {
+            if (jsonObject.optString(LOCATION_TAG, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
-                        + (String) this.checkpointMap.get(jsonObject.getString(kAPMCMLoc));
+                        + (String) this.checkpointMap.get(jsonObject.getString(LOCATION_TAG));
             }
         }
 
@@ -168,8 +168,8 @@ public class CloudMonitorMetricReporter implements AsmProperties {
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
                 for (int i = 0; i < innerJsonArray.length(); i++) {
-                    if ((thisKey.equals(kAPMCMResult)) || (thisKey.equals(kAPMCMMonitors))
-                            || (thisKey.equals(kAPMCMStats))) {
+                    if ((thisKey.equals(RESULT_TAG)) || (thisKey.equals(MONITORS_TAG))
+                            || (thisKey.equals(STATS_TAG))) {
                         metricMap.putAll(generateMetrics(
                             innerJsonArray.getJSONObject(i).toString(), metricTree));
                     } else {
@@ -179,22 +179,22 @@ public class CloudMonitorMetricReporter implements AsmProperties {
                     }
                 }
             } else {
-                if ((thisKey.equals(kAPMCMCode)) || (thisKey.equals(kAPMCMElapsed))
-                        || (thisKey.equals(kAPMCMInfo)) || (thisKey.equals(kAPMCMVersion))
+                if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
+                        || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
                     continue;
                 }
                 String thisValue = jsonObject.getString(thisKey);
 
-                if (thisKey.equals(kAPMCMDescr)) {
+                if (thisKey.equals(DESCR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.ASM_METRICS.get(kAPMCMErrors);
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
                     metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ONE);
                 }
 
-                if (thisKey.equals(kAPMCMColor)) {
+                if (thisKey.equals(COLOR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.ASM_METRICS.get(kAPMCMColors);
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
                     if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
                         metricMap.put(
                             CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
@@ -209,7 +209,7 @@ public class CloudMonitorMetricReporter implements AsmProperties {
                     thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
                 }
 
-                if (thisKey.equalsIgnoreCase(kAPMCMOutput)) {
+                if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
 
                     //Handled different
                     continue;
@@ -265,9 +265,9 @@ public class CloudMonitorMetricReporter implements AsmProperties {
 
         JSONObject jsonObject = new JSONObject(jsonString);
 
-        String name = kAPMCMUndefined;
-        if (jsonObject.optString(kAPMCMName, null) != null) {
-            name = jsonObject.getString(kAPMCMName);
+        String name = UNDEFINED;
+        if (jsonObject.optString(NAME_TAG, null) != null) {
+            name = jsonObject.getString(NAME_TAG);
         }
         Iterator jsonObjectKeys = jsonObject.keys();
         while (jsonObjectKeys.hasNext()) {
@@ -283,9 +283,9 @@ public class CloudMonitorMetricReporter implements AsmProperties {
                         metricMap);
                 }
             } else {
-                if ((thisKey.equals(kAPMCMColor)) || (thisKey.equals(kAPMCMElapsed))
-                        || (thisKey.equals(kAPMCMInfo)) || (thisKey.equals(kAPMCMVersion))
-                        || (thisKey.equals(kAPMCMCode))
+                if ((thisKey.equals(COLOR_TAG)) || (thisKey.equals(ELAPSED_TAG))
+                        || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
+                        || (thisKey.equals(CODE_TAG))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
                     continue;
                 }
@@ -293,7 +293,7 @@ public class CloudMonitorMetricReporter implements AsmProperties {
 
                 // TODO: separate into different components -
                 // chain of responsibility discover, decode, handle
-                if (thisKey.equalsIgnoreCase(kAPMCMOutput)) {
+                if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
                     try {
                         String originalString = thisValue;
                         byte[] decoded = Base64.decodeBase64(originalString);
@@ -302,11 +302,11 @@ public class CloudMonitorMetricReporter implements AsmProperties {
                             if (bytesDecompressed != null) {
                                 String returnValue = new String(bytesDecompressed, 0,
                                     bytesDecompressed.length, UTF8);
-                                if (returnValue.startsWith(kXMLPrefix)) {
+                                if (returnValue.startsWith(XML_PREFIX)) {
                                     analysisAdapter.analyzeXml(returnValue, folder, name,
                                         metricMap);
                                 } else {
-                                    if (returnValue.startsWith(kAPMCMHarOrLog)) {
+                                    if (returnValue.startsWith(HAR_OR_LOG_TAG)) {
                                         // Do nothing - already have seen it.
                                         // and we don't need this log
                                     }

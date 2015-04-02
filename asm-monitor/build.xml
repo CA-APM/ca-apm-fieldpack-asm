@@ -15,7 +15,6 @@
 	<target name = "clean">
 		<delete>
         	<fileset dir="${epagent.dir}" includes="*.log*"/>
-        	<fileset dir="${epagent.dir}" includes="*.pid"/>
 		</delete>
 	</target>
 </project>

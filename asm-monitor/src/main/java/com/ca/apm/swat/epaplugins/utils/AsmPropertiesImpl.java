@@ -20,7 +20,7 @@ public class AsmPropertiesImpl implements AsmProperties {
     public static final HashMap<String, String> ASM_COLORS = new HashMap<String, String>();
 
     static {
-        ASM_METRICS.put(kAPMCMActive, "Active");
+        ASM_METRICS.put(ACTIVE_TAG, "Active");
         ASM_METRICS.put("alerts", "Alerts Per Interval");
         ASM_METRICS.put("apdex", "Apdex Score");
         ASM_METRICS.put("api", "API Credits Available");
@@ -31,9 +31,9 @@ public class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("check", "Check Credits Available");
         ASM_METRICS.put("check_errors", "Check Errors");
         ASM_METRICS.put("checks", "Checks");
-        ASM_METRICS.put(kAPMCMCode, "Error Code");
-        ASM_METRICS.put(kAPMCMColor, "Color");
-        ASM_METRICS.put(kAPMCMColors, "Performance Status");
+        ASM_METRICS.put(CODE_TAG, "Error Code");
+        ASM_METRICS.put(COLOR_TAG, "Color");
+        ASM_METRICS.put(COLORS_TAG, "Performance Status");
         ASM_METRICS.put("consecutive_errors", "Consecutive Errors");
         ASM_METRICS.put("ctime", "Connect Time (ms)");
         ASM_METRICS.put("descr", "Error Description");
@@ -64,7 +64,7 @@ public class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("timepoor", "Time Threshold Poor (ms)");
         ASM_METRICS.put("timewarn", "Time Threshold Warning (ms)");
         ASM_METRICS.put("ttime", "Total Time (ms)");
-        ASM_METRICS.put(kAPMCMType, "Type");
+        ASM_METRICS.put(TYPE_TAG, "Type");
         ASM_METRICS.put("tz", "Agent Time Zone");
         ASM_METRICS.put("uptime", "Uptime (%)");
         ASM_METRICS.put("version", "API Version");

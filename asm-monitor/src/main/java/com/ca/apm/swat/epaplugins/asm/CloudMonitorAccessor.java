@@ -78,9 +78,9 @@ public class CloudMonitorAccessor implements AsmProperties {
         String apiResponse = "";
         if (!localTest) {
             URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType);
-            apiResponse = this.restClient.request(apmcmMethod, apiUrl,
+            apiResponse = this.restClient.request(HTTP_POST, apiUrl,
                 callParams);
-        } else if (!callType.equals(kAPMCMLogoutCmd)) {
+        } else if (!callType.equals(LOGOUT_CMD)) {
             String inputLine = null;
             String inputFileName = this.localTestPath + "\\" + callType + ".txt";
             BufferedReader inputFile = new BufferedReader(new FileReader(inputFileName));
@@ -120,23 +120,23 @@ public class CloudMonitorAccessor implements AsmProperties {
         }
 
         String loginStr = "user=" + user + "&password=" + password + "&callback="
-                + apmcmCallback;
-        String loginRequest = executeApi(kAPMCMLoginCmd, loginStr);
+                + DO_CALLBACK;
+        String loginRequest = executeApi(LOGIN_CMD, loginStr);
         JSONObject entireJsonObject = new JSONObject(unpadJson(loginRequest));
 
-        if (entireJsonObject.getInt(kAPMCMCode) == 0) {
-            JSONObject resultJsonObject = entireJsonObject.optJSONObject(kAPMCMResult);
+        if (entireJsonObject.getInt(CODE_TAG) == 0) {
+            JSONObject resultJsonObject = entireJsonObject.optJSONObject(RESULT_TAG);
             if (resultJsonObject != null) {
-                return resultJsonObject.optString(kAPMCMNKey, null);
+                return resultJsonObject.optString(NKEY_TAG, null);
             }
             // should not happen
             // return FAILED;
         }
 
-        String errorStr = entireJsonObject.optString(kAPMCMError,
+        String errorStr = entireJsonObject.optString(ERROR_TAG,
             AsmMessages.getMessage(AsmMessages.NO_ERROR));
-        int errorCode = entireJsonObject.optInt(kAPMCMCode, -1);
-        String errorInfo = entireJsonObject.optString(kAPMCMInfo,
+        int errorCode = entireJsonObject.optInt(CODE_TAG, -1);
+        String errorInfo = entireJsonObject.optString(INFO_TAG,
             AsmMessages.getMessage(AsmMessages.NO_INFO));
 
         String errorMessage = AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
@@ -147,9 +147,9 @@ public class CloudMonitorAccessor implements AsmProperties {
         if (errorCode == AUTH_ERROR_CODE) {
             System.err.print(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
                 this.properties.getProperty(URL),
-                kAPMCMLoginCmd,
+                LOGIN_CMD,
                 ASM_PRODUCT_NAME,
-                apmcmPasswordPage));
+                PASSWORD_URL));
         }
         throw new LoginException(errorMessage);
         //System.exit(AUTH_ERROR_CODE);
@@ -161,7 +161,7 @@ public class CloudMonitorAccessor implements AsmProperties {
      * @return JSON string without padding
      */
     private String unpadJson(String jsonWithPadding) {
-        String patternToMatch = kJsonRegex;
+        String patternToMatch = JSON_REGEX;
 
         Pattern unpad = Pattern.compile(patternToMatch);
         Matcher matched = unpad.matcher(jsonWithPadding);
