@@ -287,7 +287,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             } else {
                 rules = getRules(folders[i], folderProp);
             }
-            if (rules.length > 0) {
+            // must be at least one rule != ALL_RULES
+            if (((rules.length > 0) && !rules[0].equals(ALL_RULES)) || (rules.length > 1))  {
                 foldersAndRules.put(folders[i], rules);
             }
         }
