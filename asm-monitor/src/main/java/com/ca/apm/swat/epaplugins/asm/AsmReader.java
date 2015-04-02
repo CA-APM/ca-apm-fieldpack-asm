@@ -170,10 +170,10 @@ public class AsmReader implements AsmProperties {
             checkpointMap);
 
 
-        //Collect folders
-        for (int i = 0; i < folders.length; i++) {
+        // Collect folders
+        for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
             AsmReaderThread rt = new AsmReaderThread(
-                folders[i],
+                it.next(),
                 requestHelper,
                 folderMap,
                 properties,
@@ -254,14 +254,14 @@ public class AsmReader implements AsmProperties {
         }
         inStream.close();
 
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug(AsmMessages.getMessage(
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
                 AsmMessages.READING_PROPERTIES, filename));
             // use TreeSet so we get output alphabetically sorted
             Set<Object> copy = new TreeSet<Object>(properties.keySet());
             for (Iterator<Object> it = copy.iterator(); it.hasNext(); ) {
                 String key = (String) it.next();
-                EpaUtils.getFeedback().debug(key + "=" + properties.getProperty(key));
+                EpaUtils.getFeedback().verbose(key + "=" + properties.getProperty(key));
             }
         }
 
