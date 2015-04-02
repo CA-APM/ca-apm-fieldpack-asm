@@ -52,17 +52,20 @@ public class CloudMonitorRequestHelper implements AsmProperties {
 
     /**
      * Get the folders to monitor.
+     * Properties like asm.includeFolders and asm.excludeFolders are taken
+     * into account.
      * @return array of folders to monitor
      * @throws Exception errors
      */
     public String[] getFolders() throws Exception {
-        String folderProperty = properties.getProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+        String includeFolders = properties.getProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+        String excludeFolders = properties.getProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
         String[] folders;
 
-        if ((folderProperty.length() == 0) || (folderProperty.contains(ALL_FOLDERS))) {
-            folders = getFolders(ALL_FOLDERS);
+        if ((includeFolders.length() == 0) || (includeFolders.contains(ALL_FOLDERS))) {
+            folders = getFolders(ALL_FOLDERS, excludeFolders);
         } else {
-            folders = getFolders(folderProperty);
+            folders = getFolders(includeFolders, excludeFolders);
         }
 
         return folders;
@@ -70,11 +73,12 @@ public class CloudMonitorRequestHelper implements AsmProperties {
 
     /**
      * Get the folders to monitor.
-     * @param folderList list of folders to query or {@link AsmProperties#ALL_FOLDERS}
+     * @param folderList comma-separated list of folders to query or {@link AsmProperties#ALL_FOLDERS}
+     * @param excludeList comma-separated list of folders to exclude
      * @return array of folders to monitor
      * @throws Exception errors
      */
-    private String[] getFolders(String folderList) throws Exception {
+    private String[] getFolders(String folderList, String excludeList) throws Exception {
         List<String> folderQueryOutput = new ArrayList<String>();
         String folderRequest = accessor.executeApi(FOLDER_CMD, getCommandString());
 
@@ -96,8 +100,13 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         }
 
         if (!folderList.equals(ALL_FOLDERS)) {
-            return compareList(folderQueryOutput, folderList);
+            folderQueryOutput = matchList(folderQueryOutput, folderList);
         }
+
+        if (!excludeList.equals(EMPTY_STRING)) {
+            folderQueryOutput = removeList(folderQueryOutput, excludeList);
+        }
+
         return (String[]) folderQueryOutput.toArray(EMPTY_STRING_ARRAY);
     }
 
@@ -137,10 +146,23 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @param comparisonString comma-separated string of entries to match
      * @return reduced list matching <code>comparisonString</code>
      */
-    private String[] compareList(List<String> masterList, String comparisonString) {
+    private List<String> matchList(List<String> masterList, String comparisonString) {
         List<String> checkList = Arrays.asList(comparisonString.split(","));
         masterList.retainAll(checkList);
-        return (String[]) masterList.toArray(EMPTY_STRING_ARRAY);
+        return masterList;
+    }
+
+    /**
+     * Remove from a list all entries that match an item in the <code>removeString</code>.
+     * All list entries that are matched in the removeString are removed from the list.
+     * @param masterList master list
+     * @param removeString comma-separated string of entries to remove
+     * @return reduced list
+     */
+    private List<String> removeList(List<String> masterList, String removeString) {
+        List<String> checkList = Arrays.asList(removeString.split(","));
+        masterList.removeAll(checkList);
+        return masterList;
     }
 
     /**
@@ -269,13 +291,15 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         }
 
         if (!rulesList.equals(ALL_RULES)) {
-            return compareList(ruleQueryOutput, rulesList);
+            ruleQueryOutput = matchList(ruleQueryOutput, rulesList);
         }
+        
         return (String[]) ruleQueryOutput.toArray(EMPTY_STRING_ARRAY);
     }
 
     /**
      * Get the folders and rules (monitors) from the App Synthetic Monitor API.
+     * Properties like asm.skipInactiveMonitors are taken into account.
      * @param folders list of folders
      * @return map of folders and rules
      * @throws Exception errors
