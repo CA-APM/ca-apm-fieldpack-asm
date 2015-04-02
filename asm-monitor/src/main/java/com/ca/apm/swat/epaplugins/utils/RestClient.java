@@ -68,9 +68,7 @@ public class RestClient {
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, url));
-        }
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug(
+            EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, params));
         }
 

@@ -57,6 +57,7 @@ public interface AsmProperties {
     public static final String INCLUDE_FOLDERS          = "asm.includeFolders";
     public static final String EXCLUDE_FOLDERS          = "asm.excludeFolders";
     public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
+    public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String FOLDER_PREFIX            = "asm.folder.";
     public static final String NUM_LOGS                 = "asm.numlogs";
 
@@ -68,7 +69,6 @@ public interface AsmProperties {
     public static final String INCLUDE_TAGS             = "asm.includeTags";
     public static final String INCLUDE_MONITORS         = "asm.includeMonitors";
     public static final String RESULT_GROUPS            = "asm.resultsGroups";
-    public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String ALL_RULES                = "all_rules";
     public static final String ALL_TAGS                 = "all_tags";
     public static final String BY_FOLDER                = "by_folder";

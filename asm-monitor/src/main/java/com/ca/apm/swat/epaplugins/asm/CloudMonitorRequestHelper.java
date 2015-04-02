@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.ca.apm.swat.epaplugins.utils.JsonHelper;
@@ -82,8 +83,12 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         for (int i = 0; i < folderJsonArray.length(); i++) {
             JSONObject folderJsonObject = folderJsonArray.getJSONObject(i);
 
-            if ((!folderJsonObject.optString(ACTIVE_TAG, NO).equals(YES))
-                    && (properties.getProperty(SKIP_INACTIVE_FOLDERS, NO).equals(TRUE))) {
+            if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_FOLDERS, FALSE)))
+                    && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_FOLDER,
+                        folderJsonObject.getString(NAME_TAG)));
+                }
                 continue;
             }
             folderQueryOutput.add(folderJsonObject.get(NAME_TAG).toString());
@@ -234,10 +239,10 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     private String[] getRules(String folder, String rulesList) throws Exception {
         List<String> ruleQueryOutput = new ArrayList<String>();
         String folderStr = EMPTY_STRING;
-        if (!folder.equals(ROOT_FOLDER)) {
-            folderStr = FOLDER_PARAM + folder;
+        if (folder.equals(ROOT_FOLDER)) {
+            folder = EMPTY_STRING; // for later comparison
         } else {
-            folder = EMPTY_STRING;
+            folderStr = FOLDER_PARAM + folder;
         }
 
         String ruleRequest = accessor.executeApi(RULE_CMD,
@@ -250,9 +255,13 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             if (!ruleJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
                 continue;
             }
-            if ((!ruleJsonObject.optString(ACTIVE_TAG, NO).equals(YES))
-                    && (this.properties.getProperty(SKIP_INACTIVE_FOLDERS, FALSE)
-                            .equals(TRUE))) {
+            if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
+                    && (!YES.equals(ruleJsonObject.optString(ACTIVE_TAG, NO)))) {
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_MONITOR,
+                        ruleJsonObject.getString(NAME_TAG),
+                        folder.length() > 0 ? folder : ROOT_FOLDER));
+                }
                 continue;
             }
             ruleQueryOutput.add(ruleJsonObject.getString(NAME_TAG));
@@ -277,7 +286,9 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         for (int i = 0; i < folders.length; i++) {
             String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i], ALL_RULES);
             String[] rules;
-            if ((folderProp.length() == 0) || (folderProp.equals(ALL_RULES))) {
+            if (((folderProp.length() == 0) || (folderProp.equals(ALL_RULES)))
+                    // if we skip inactive monitors we can't use ALL_RULES
+                    && (!TRUE.equals(properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))) {
                 String[] allRules = getRules(folders[i], ALL_RULES);
                 rules = new String[allRules.length + 1];
                 rules[0] = ALL_RULES;

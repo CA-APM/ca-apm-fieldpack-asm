@@ -37,6 +37,9 @@ public class AsmMessages {
     public static final String HTTP_RESPONSE                = "httpResponse";
     public static final String TEXT_NORMALIZER_NOT_FOUND    = "textNormalizerNotFound";
     public static final String THREAD_STARTED               = "threadStarted";
+    public static final String SKIP_FOLDER                  = "skipFolder";
+    public static final String SKIP_MONITOR                 = "skipMonitor";
+        
     
     /**
      * The resource bundle.
