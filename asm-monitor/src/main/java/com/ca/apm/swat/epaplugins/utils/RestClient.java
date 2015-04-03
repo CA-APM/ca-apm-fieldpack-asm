@@ -67,9 +67,7 @@ public class RestClient {
     public String request(String method, URL url, String params) throws IOException {
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, url));
-            EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, params));
+                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, url, params));
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
