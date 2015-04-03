@@ -31,6 +31,8 @@ public class CloudMonitorAccessor implements AsmProperties {
     public static final String FAILED = "Failed";
     public static final String LOGGED_OUT = "Logged Out.";
 
+    private static final Pattern unpad = Pattern.compile(JSON_REGEX);
+
     /**
      * Access the App Synthetic Monitor API.
      * @param properties properties
@@ -71,7 +73,7 @@ public class CloudMonitorAccessor implements AsmProperties {
      * Execute a call against the App Synthetic Monitor API.
      * @param callType API call
      * @param callParams parameters
-     * @return API call result
+     * @return unpadded API call result
      * @throws Exception errors if an error occurred
      */
     public String executeApi(String callType, String callParams) throws Exception {
@@ -92,7 +94,7 @@ public class CloudMonitorAccessor implements AsmProperties {
             return LOGGED_OUT;
         }
 
-        return apiResponse.trim();
+        return CloudMonitorAccessor.unpadJson(apiResponse.trim());
     }
 
     /**
@@ -117,7 +119,7 @@ public class CloudMonitorAccessor implements AsmProperties {
         String loginStr = "user=" + user + "&password=" + password + "&callback="
                 + DO_CALLBACK;
         String loginRequest = executeApi(LOGIN_CMD, loginStr);
-        JSONObject entireJsonObject = new JSONObject(unpadJson(loginRequest));
+        JSONObject entireJsonObject = new JSONObject(loginRequest);
 
         if (entireJsonObject.getInt(CODE_TAG) == 0) {
             JSONObject resultJsonObject = entireJsonObject.optJSONObject(RESULT_TAG);
@@ -153,14 +155,11 @@ public class CloudMonitorAccessor implements AsmProperties {
      * @param jsonWithPadding JSON string with padding
      * @return JSON string without padding
      */
-    private String unpadJson(String jsonWithPadding) {
-        String patternToMatch = JSON_REGEX;
+    private static String unpadJson(String jsonWithPadding) {
+        Matcher matcher = unpad.matcher(jsonWithPadding);
 
-        Pattern unpad = Pattern.compile(patternToMatch);
-        Matcher matched = unpad.matcher(jsonWithPadding);
-
-        if (matched.find()) {
-            return matched.group(1);
+        if (matcher.find()) {
+            return matcher.group(1);
         }
         return null;
     }
