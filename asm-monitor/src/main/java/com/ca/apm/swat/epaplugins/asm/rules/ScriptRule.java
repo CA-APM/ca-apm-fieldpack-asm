@@ -297,7 +297,7 @@ public class ScriptRule extends BaseRule {
         metricMap.put(metric + METRIC_NAME_SEPARATOR + ASSERTION_ERRORS,
             Integer.toString(assertionErrors));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + TEST_URL,
-            AsmRequestHelper.fixMetric(url));
+            EpaUtils.fixMetric(url));
         return step;
     }
 

@@ -194,36 +194,10 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             String rawMetric = CREDITS_CATEGORY + METRIC_NAME_SEPARATOR + key;
-            metricMap.put(fixMetric(rawMetric), fixMetric(value));
+            metricMap.put(EpaUtils.fixMetric(rawMetric), EpaUtils.fixMetric(value));
         }
 
         return metricMap;
-    }
-
-    /**
-     * Replace unsupported characters in metric name.
-     * @param rawMetric raw metric name
-     * @return cleansed metric name
-     */
-    public static String fixMetric(String rawMetric) {
-        StringFilter normalizer = null;
-        try {
-            normalizer = TextNormalizer.getNormalizationStringFilter();
-        } catch (ClassNotFoundException e) {
-            EpaUtils.getFeedback().error(e.getMessage());
-            throw new InitializationError(
-                AsmMessages.getMessage(AsmMessages.NORMALIZER_INFO, e.getMessage()));
-        }
-
-        String metricKeyNormalized = normalizer.filter(rawMetric);
-        Pattern pattern = Pattern.compile(JSON_PATTERN);
-        String fixedMetric = pattern.matcher(metricKeyNormalized).replaceAll(EMPTY_STRING);
-
-        return fixedMetric.replace("\\", "-")
-                .replace("/", "-")
-                .replace(",", "_")
-                .replace(";", "-")
-                .replace("&", "and");
     }
 
     /**
