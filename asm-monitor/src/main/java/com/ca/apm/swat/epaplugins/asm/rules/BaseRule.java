@@ -1,9 +1,23 @@
 package com.ca.apm.swat.epaplugins.asm.rules;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Properties;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.ca.apm.swat.epaplugins.asm.CloudMonitorRequestHelper;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
 
-public abstract class BaseRule implements Rule, AsmProperties {
+/**
+ * Base class for implementations of the {@link Rule} interface.
+ * @author Guenter Grossberger - CA APM SWAT Team
+ *
+ */
+public class BaseRule implements Rule, AsmProperties {
 
     private String name = null;
     private String folder = null;
@@ -16,10 +30,11 @@ public abstract class BaseRule implements Rule, AsmProperties {
      * @param folder folder of the rule
      * @param tags tags of the rule
      */
-    protected BaseRule(String name, String folder, String[] tags) {
+    protected BaseRule(String name, String type, String folder, String[] tags) {
         this.name = name;
         this.folder = folder;
         this.tags = tags;
+        this.type = type;
     }
 
     public String getName() {
@@ -38,10 +53,6 @@ public abstract class BaseRule implements Rule, AsmProperties {
         return type;
     }
 
-    protected void setType(String type) {
-        this.type = type;
-    }
-
     /**
      * Compare the name of the rule with a string.
      * Needed to include/exclude rules by name.
@@ -49,7 +60,8 @@ public abstract class BaseRule implements Rule, AsmProperties {
      * @return true if the rule name equals anotherName
      */
     public boolean equals(String anotherName) {
-        EpaUtils.getFeedback().debug("equals(String s) called for Rule " + name + " with s = anotherName"); 
+        EpaUtils.getFeedback().debug("equals(String s) called for Rule " + name
+            + " with s = anotherName"); 
         return this.name.equals(anotherName);
     }
 
@@ -60,5 +72,104 @@ public abstract class BaseRule implements Rule, AsmProperties {
      */
     public boolean equals(Rule anotherRule) {
         return this.name.equals(anotherRule.getName());
+    }
+
+
+    /**
+     * Recursively generate metrics from API call result. 
+     * @param jsonString API call result.
+     * @param metricTree metric tree prefix
+     * @return metricMap map containing the metrics
+     */
+    public HashMap<String, String> generateMetrics(
+        String jsonString,
+        String metricTree,
+        Properties properties,
+        HashMap<String, String> checkpointMap) {
+
+        HashMap<String, String> metricMap = new HashMap<String, String>();
+
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        if (jsonObject.optString(NAME_TAG, null) != null) {
+            metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(NAME_TAG);
+        }
+
+        if (TRUE.equals(properties.getProperty(DISPLAY_CHECKPOINTS, TRUE))) {
+            if (jsonObject.optString(LOCATION_TAG, null) != null) {
+                metricTree = metricTree + METRIC_PATH_SEPARATOR
+                        + (String) checkpointMap.get(jsonObject.getString(LOCATION_TAG));
+            }
+        }
+
+        Iterator jsonObjectKeys = jsonObject.keys();
+        while (jsonObjectKeys.hasNext()) {
+            String thisKey = jsonObjectKeys.next().toString();
+
+            if (jsonObject.optJSONObject(thisKey) != null) {
+                JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
+                metricMap.putAll(generateMetrics(innerJsonObject.toString(),
+                    metricTree, properties, checkpointMap));
+            } else if (jsonObject.optJSONArray(thisKey) != null) {
+                JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
+                for (int i = 0; i < innerJsonArray.length(); i++) {
+                    if ((thisKey.equals(RESULT_TAG)) || (thisKey.equals(MONITORS_TAG))
+                            || (thisKey.equals(STATS_TAG))) {
+                        metricMap.putAll(generateMetrics(
+                            innerJsonArray.getJSONObject(i).toString(),
+                            metricTree, properties, checkpointMap));
+                    } else {
+                        metricMap.putAll(generateMetrics(
+                            innerJsonArray.getJSONObject(i).toString(), metricTree 
+                            + METRIC_PATH_SEPARATOR + thisKey, properties, checkpointMap));
+                    }
+                }
+            } else {
+                if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
+                        || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
+                        || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
+                    continue;
+                }
+                String thisValue = jsonObject.getString(thisKey);
+
+                if (thisKey.equals(DESCR_TAG)) {
+                    String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
+                    metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ONE);
+                }
+
+                if (thisKey.equals(COLOR_TAG)) {
+                    String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
+                    if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
+                        metricMap.put(
+                            CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
+                            (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
+                    } else {
+                        metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ZERO);
+                    }
+
+                }
+
+                if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
+                    thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
+                }
+
+                if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
+
+                    //Handled different
+                    continue;
+                }
+
+                String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
+                metricMap.put(CloudMonitorRequestHelper.fixMetric(rawMetric),
+                    CloudMonitorRequestHelper.fixMetric(thisValue));
+            }
+        }
+
+        EpaUtils.getFeedback().verbose("BaseRule returning " + metricMap.size()
+            + " metrics for rule " + getName() + " in metric tree " + metricTree);
+        
+        return metricMap;
     }
 }

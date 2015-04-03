@@ -18,7 +18,6 @@ import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
-import com.ca.apm.swat.epaplugins.utils.JsonHelper;
 import com.ca.apm.swat.epaplugins.utils.StringFilter;
 import com.ca.apm.swat.epaplugins.utils.TextNormalizer;
 import com.wily.introscope.epagent.EpaUtils;
@@ -32,13 +31,15 @@ public class CloudMonitorRequestHelper implements AsmProperties {
     private Properties properties;
     private String nkey;
     private String user;
+    private HashMap<String, String> checkpointMap;
 
     /**
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
      * @param properties properties
      */
-    public CloudMonitorRequestHelper(CloudMonitorAccessor accessor, Properties properties) {
+    public CloudMonitorRequestHelper(CloudMonitorAccessor accessor,
+                                     Properties properties) {
         this.accessor = accessor;
         this.properties = properties;
         this.user = properties.getProperty(USER);
@@ -128,7 +129,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @throws Exception errors
      */
     private JSONArray extractJsonArray(String metricInput, String arrayName) throws Exception {
-        JSONObject entireJsonObject = new JSONObject(JsonHelper.unpadJson(metricInput));
+        JSONObject entireJsonObject = new JSONObject(metricInput);
         JSONArray thisJsonArray = new JSONArray();
 
         if (entireJsonObject.optJSONObject(RESULT_TAG) != null) {
@@ -146,7 +147,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * Compare list with comma-separated string.
      * All list entries that are not matched in the comparison string are removed from the list.
      * @param <T> a type that can be compared to a string,
-     * i.e. implements <code>equals(String s)</code>
+     *     i.e. implements <code>equals(String s)</code>
      * @param masterList master list
      * @param comparisonString comma-separated string of entries to match
      * @return reduced list matching <code>comparisonString</code>
@@ -254,8 +255,10 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             }
         }
 
+        this.checkpointMap = returnCp;
         return returnCp;
     }
+
 
     /**
      * Get the rules (monitors) from the App Synthetic Monitor API.
@@ -287,10 +290,10 @@ public class CloudMonitorRequestHelper implements AsmProperties {
                 EpaUtils.getFeedback().verbose(
                     "found rule '" + ruleJsonObject.getString(NAME_TAG)
                     + "' of type " + ruleJsonObject.getString(TYPE_TAG)
-                    + " in folder" + (ruleJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
+                    + " in folder " + (ruleJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
                         ruleJsonObject.getString(FOLDER_TAG)));
             }
-            
+
             if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
                     && (!YES.equals(ruleJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
@@ -305,14 +308,14 @@ public class CloudMonitorRequestHelper implements AsmProperties {
                 ruleJsonObject.getString(TYPE_TAG),
                 ruleJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
                     ruleJsonObject.getString(FOLDER_TAG),
-                ruleJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
-                    ruleJsonObject.getString(TAGS_TAG).split(",")));
+                    ruleJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
+                        ruleJsonObject.getString(TAGS_TAG).split(",")));
         }
 
         if (!rulesList.equals(ALL_RULES)) {
             rules = matchList(rules, rulesList);
         }
-        
+
         return rules;
     }
 
@@ -350,10 +353,11 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * Get statistics for folder and rule.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param rule gets all rules if null
-     * @return API result
+     * @return metric map
      * @throws Exception errors
      */
-    public String getStats(String folder, Rule rule) throws Exception {
+    public HashMap<String, String> getStats(String folder, Rule rule, String metricPrefix)
+            throws Exception {
         String statsRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String ruleStr = EMPTY_STRING;
@@ -367,23 +371,27 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         if (rule != null) {
             ruleStr = NAME_PARAM + rule.getName();
             folder = folder + "|" + rule.getName();
+        } else {
+            rule = RuleFactory.getAllRulesRule();
         }
 
         String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
                 + folderStr + ruleStr + START_DATE_PARAM
                 + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
         statsRequest = accessor.executeApi(STATS_CMD, statsStr);
-        return statsRequest;
+
+        return rule.generateMetrics(statsRequest, metricPrefix, properties, checkpointMap);
     }
 
     /**
      * Get PSP information for folder and rule.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param rule gets all rules if null
-     * @return API result
+     * @return metric map
      * @throws Exception errors
      */
-    public String getPsp(String folder, Rule rule) throws Exception {
+    public HashMap<String, String> getPsp(String folder, Rule rule, String metricPrefix)
+            throws Exception {
         String pspRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String ruleStr = EMPTY_STRING;
@@ -396,11 +404,13 @@ public class CloudMonitorRequestHelper implements AsmProperties {
 
         if (rule != null) {
             ruleStr = NAME_PARAM + rule.getName();
+        } else {
+            rule = RuleFactory.getAllRulesRule();
         }
 
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
             + folderStr + ruleStr);
-        return pspRequest;
+        return rule.generateMetrics(pspRequest, metricPrefix, properties, checkpointMap);
     }
 
     /**
@@ -408,10 +418,14 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param rule gets all rules if null
      * @param numRules number of rules in folder
-     * @return API result
+     * @return metric map
      * @throws Exception errors
      */
-    public String getLogs(String folder, Rule rule, int numRules) throws Exception {
+    public HashMap<String, String> getLogs(String folder,
+        Rule rule,
+        int numRules,
+        String metricPrefix) throws Exception {
+
         String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String ruleStr = EMPTY_STRING;
@@ -420,6 +434,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
             folderStr = FOLDER_PARAM + folder;
         } else {
             folder = ROOT_FOLDER;
+            rule = RuleFactory.getAllRulesRule();
         }
 
         if (rule != null) {
@@ -432,7 +447,8 @@ public class CloudMonitorRequestHelper implements AsmProperties {
         //        + "&num=" + numLogs + "&reverse=y&full=y";
 
         logRequest = accessor.executeApi(LOGS_CMD, logStr);
-        return logRequest;
+
+        return rule.generateMetrics(logRequest, metricPrefix, properties, checkpointMap);
     }
 
     /**

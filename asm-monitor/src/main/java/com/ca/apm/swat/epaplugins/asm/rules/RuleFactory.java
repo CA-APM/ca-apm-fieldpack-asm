@@ -2,6 +2,13 @@ package com.ca.apm.swat.epaplugins.asm.rules;
 
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
+/**
+ * Factory for creating {@link Rule}s with type dependent behaviour.
+ * Every implementation of Rule may generate different metrics.
+ * 
+ * @author Guenter Grossberger - CA APM SWAT Team
+ *
+ */
 public class RuleFactory implements AsmProperties {
 
     private static Rule ALL_RULES_RULE = null;
@@ -15,14 +22,14 @@ public class RuleFactory implements AsmProperties {
      * @return a new <code>Rule</code> object
      */
     public static Rule getRule(String name, String type, String folder, String[] tags) {
-        if(type == null){
+        if (type == null) {
             return null;
         }     
-        if (type.equalsIgnoreCase(SCRIPT_RULE)){
+        if (type.equalsIgnoreCase(SCRIPT_RULE)) {
             return new ScriptRule(name, folder, tags);
         }
 
-        return new HttpRule(name, type, folder, tags);
+        return new BaseRule(name, type, folder, tags);
     }
 
     /**
@@ -32,7 +39,7 @@ public class RuleFactory implements AsmProperties {
     public static Rule getAllRulesRule() {
         if (null == ALL_RULES_RULE) {
             ALL_RULES_RULE =
-                    new HttpRule(ALL_RULES, ALL_RULES, EMPTY_STRING, EMPTY_STRING_ARRAY);
+                    new BaseRule(ALL_RULES, ALL_RULES, EMPTY_STRING, EMPTY_STRING_ARRAY);
         }
         return ALL_RULES_RULE;
     }

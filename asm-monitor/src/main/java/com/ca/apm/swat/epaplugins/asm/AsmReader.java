@@ -99,19 +99,15 @@ public class AsmReader implements AsmProperties {
      * @param metricWriter interface to EPAgent, write metrics here
      */
     private void work(int epaWaitTime, Properties properties, MetricWriter metricWriter) {
-        final boolean displayCheckpoints = Boolean.valueOf(
-            Boolean.parseBoolean(properties.getProperty(DISPLAY_CHECKPOINTS, TRUE)));
 
         CloudMonitorAccessor accessor = new CloudMonitorAccessor(properties);
-        CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
-            accessor, properties);
-
+        CloudMonitorRequestHelper requestHelper =
+                new CloudMonitorRequestHelper(accessor, properties);
 
         this.keepRunning = true;
         this.numRetriesLeft = 10;
 
         String[] folders = null;
-        HashMap<String, String> checkpointMap = null;
         HashMap<String, List<Rule>> folderMap = null;
         boolean keepTrying = true;
         int initNumRetriesLeft = 10;
@@ -147,8 +143,10 @@ public class AsmReader implements AsmProperties {
                     }
                 }
 
-                checkpointMap = requestHelper.getCheckpoints();
+                requestHelper.getCheckpoints();
+
                 keepTrying = false;
+                
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                         && (initNumRetriesLeft > 0)) {
@@ -168,11 +166,8 @@ public class AsmReader implements AsmProperties {
         EpaUtils.getFeedback().info(AsmMessages.getMessage(
             AsmMessages.CONNECTED, properties.getProperty(URL)));
 
-        CloudMonitorMetricReporter metricReporter = new CloudMonitorMetricReporter(
-            metricWriter,
-            displayCheckpoints,
-            checkpointMap);
-
+        CloudMonitorMetricReporter metricReporter =
+                new CloudMonitorMetricReporter(metricWriter);
 
         // Collect folders
         for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {

@@ -18,7 +18,7 @@ import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Access the App Synthetic Monitor API.
- * 
+ *
  */
 public class CloudMonitorAccessor implements AsmProperties {
 
@@ -74,7 +74,9 @@ public class CloudMonitorAccessor implements AsmProperties {
      * @param callType API call
      * @param callParams parameters
      * @return unpadded API call result
-     * @throws Exception errors if an error occurred
+     * @throws Exception if an error occurred,
+     *     e.g. an error code like 1000 (authentication error) or
+     *     1001 (call syntax error) was returned by the API call
      */
     public String executeApi(String callType, String callParams) throws Exception {
         return executeApi(callType, callParams, true);
