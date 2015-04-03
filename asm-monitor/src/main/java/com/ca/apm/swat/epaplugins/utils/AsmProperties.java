@@ -83,8 +83,15 @@ public interface AsmProperties {
     public static final String LOG_ASM_ISSUES           = "asm.logASMIssues=";
 
     // error codes
+    public static final int    OK_ERROR_CODE            = 0;
     public static final int    AUTH_ERROR_CODE          = 1000;
     public static final int    NORM_ERROR_CODE          = 1001;
+
+    // result codes
+    public static final int    BANDWITH_EXCEEDED_RESULT_CODE    = 1060;
+    public static final int    DOMAIN_REDIRECT_RESULT_CODE      = 6001;
+    public static final int    RESPONSE_ASSERTION_RESULT_CODE   = 7001;
+    public static final int    NOT_MATCHED_RESULT_CODE          = 9501;
 
     // retries
     public static final int    INIT_RETRIES             = 10;

@@ -77,6 +77,20 @@ public class CloudMonitorAccessor implements AsmProperties {
      * @throws Exception errors if an error occurred
      */
     public String executeApi(String callType, String callParams) throws Exception {
+        return executeApi(callType, callParams, true);
+    }
+    
+    /**
+     * Execute a call against the App Synthetic Monitor API.
+     * @param callType API call
+     * @param callParams parameters
+     * @param checkError check apiResponse for errors?
+     * @return unpadded API call result
+     * @throws Exception errors if an error occurred
+     */
+    private String executeApi(String callType, String callParams, boolean checkError)
+            throws Exception {
+
         String apiResponse = "";
         if (!localTest) {
             URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType);
@@ -93,9 +107,41 @@ public class CloudMonitorAccessor implements AsmProperties {
         } else {
             return LOGGED_OUT;
         }
+        
+        apiResponse = unpadJson(apiResponse.trim());
 
-        return CloudMonitorAccessor.unpadJson(apiResponse.trim());
+        if (checkError) {
+            checkError(callType, apiResponse);
+        }
+        
+        return apiResponse;
     }
+
+    /**
+     * Check if an error code was returned by the API and log message.
+     * @param command API command
+     * @param apiResponse API response
+     */
+    private void checkError(String command, String apiResponse) {
+        JSONObject jsonObject = new JSONObject(apiResponse);
+
+        int errorCode = jsonObject.optInt(CODE_TAG, -1);
+
+        if (OK_ERROR_CODE != errorCode) {
+            String errorStr = jsonObject.optString(ERROR_TAG,
+                AsmMessages.getMessage(AsmMessages.NO_ERROR));
+            String errorInfo = jsonObject.optString(INFO_TAG,
+                AsmMessages.getMessage(AsmMessages.NO_INFO));
+
+            String errorMessage = AsmMessages.getMessage(AsmMessages.API_ERROR,
+                ASM_PRODUCT_NAME, errorCode, errorStr, errorInfo, command);
+
+            EpaUtils.getFeedback().warn(errorMessage);
+            
+            //TODO: decide if to throw Error
+        }
+    }
+
 
     /**
      * Login to the App Synthetic Monitor API.
@@ -118,10 +164,10 @@ public class CloudMonitorAccessor implements AsmProperties {
 
         String loginStr = "user=" + user + "&password=" + password + "&callback="
                 + DO_CALLBACK;
-        String loginRequest = executeApi(LOGIN_CMD, loginStr);
+        String loginRequest = executeApi(LOGIN_CMD, loginStr, false);
         JSONObject entireJsonObject = new JSONObject(loginRequest);
 
-        if (entireJsonObject.getInt(CODE_TAG) == 0) {
+        if (entireJsonObject.getInt(CODE_TAG) == OK_ERROR_CODE) {
             JSONObject resultJsonObject = entireJsonObject.optJSONObject(RESULT_TAG);
             if (resultJsonObject != null) {
                 return resultJsonObject.optString(NKEY_TAG, null);
@@ -155,7 +201,7 @@ public class CloudMonitorAccessor implements AsmProperties {
      * @param jsonWithPadding JSON string with padding
      * @return JSON string without padding
      */
-    private static String unpadJson(String jsonWithPadding) {
+    private String unpadJson(String jsonWithPadding) {
         Matcher matcher = unpad.matcher(jsonWithPadding);
 
         if (matcher.find()) {
