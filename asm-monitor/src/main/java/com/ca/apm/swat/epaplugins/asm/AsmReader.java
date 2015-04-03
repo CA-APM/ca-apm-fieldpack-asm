@@ -100,9 +100,9 @@ public class AsmReader implements AsmProperties {
      */
     private void work(int epaWaitTime, Properties properties, MetricWriter metricWriter) {
 
-        CloudMonitorAccessor accessor = new CloudMonitorAccessor(properties);
-        CloudMonitorRequestHelper requestHelper =
-                new CloudMonitorRequestHelper(accessor, properties);
+        AsmAccessor accessor = new AsmAccessor(properties);
+        AsmRequestHelper requestHelper =
+                new AsmRequestHelper(accessor, properties);
 
         this.keepRunning = true;
         this.numRetriesLeft = 10;
@@ -166,8 +166,8 @@ public class AsmReader implements AsmProperties {
         EpaUtils.getFeedback().info(AsmMessages.getMessage(
             AsmMessages.CONNECTED, properties.getProperty(URL)));
 
-        CloudMonitorMetricReporter metricReporter =
-                new CloudMonitorMetricReporter(metricWriter);
+        AsmMetricReporter metricReporter =
+                new AsmMetricReporter(metricWriter);
 
         // Collect folders
         for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {

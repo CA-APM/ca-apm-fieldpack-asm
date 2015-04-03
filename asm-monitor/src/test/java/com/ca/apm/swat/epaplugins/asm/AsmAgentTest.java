@@ -12,7 +12,7 @@ import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 
-public class APMCMAgentTest implements AsmProperties {
+public class AsmAgentTest implements AsmProperties {
 
     @Test
     public void test() {

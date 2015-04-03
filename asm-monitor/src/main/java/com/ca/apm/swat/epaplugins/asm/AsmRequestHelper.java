@@ -25,9 +25,9 @@ import com.wily.introscope.epagent.EpaUtils;
 /**
  * Interface to App Synthetic Monitor API.
  */
-public class CloudMonitorRequestHelper implements AsmProperties {
+public class AsmRequestHelper implements AsmProperties {
 
-    private CloudMonitorAccessor accessor;
+    private AsmAccessor accessor;
     private Properties properties;
     private String nkey;
     private String user;
@@ -38,7 +38,7 @@ public class CloudMonitorRequestHelper implements AsmProperties {
      * @param accessor accessor
      * @param properties properties
      */
-    public CloudMonitorRequestHelper(CloudMonitorAccessor accessor,
+    public AsmRequestHelper(AsmAccessor accessor,
                                      Properties properties) {
         this.accessor = accessor;
         this.properties = properties;

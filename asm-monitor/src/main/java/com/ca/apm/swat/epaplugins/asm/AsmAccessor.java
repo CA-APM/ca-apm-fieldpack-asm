@@ -20,7 +20,7 @@ import com.wily.introscope.epagent.EpaUtils;
  * Access the App Synthetic Monitor API.
  *
  */
-public class CloudMonitorAccessor implements AsmProperties {
+public class AsmAccessor implements AsmProperties {
 
     private boolean localTest;
     private Properties properties;
@@ -37,7 +37,7 @@ public class CloudMonitorAccessor implements AsmProperties {
      * Access the App Synthetic Monitor API.
      * @param properties properties
      */
-    public CloudMonitorAccessor(Properties properties) {
+    public AsmAccessor(Properties properties) {
         this.properties = properties;
 
         boolean useProxy = Boolean.parseBoolean(this.properties.getProperty(USE_PROXY, FALSE));
@@ -53,7 +53,7 @@ public class CloudMonitorAccessor implements AsmProperties {
             proxyUser = this.properties.getProperty(PROXY_USER, "");
 
             if (this.properties.getProperty(PROXY_PASSWORD_ENCRYPTED, FALSE).equals(TRUE)) {
-                proxyPassword = CloudMonitorAccessor.crypto.decrypt(
+                proxyPassword = AsmAccessor.crypto.decrypt(
                     this.properties.getProperty(PROXY_PASSWORD, ""));
             } else {
                 proxyPassword = this.properties.getProperty(PROXY_PASSWORD, "");
@@ -155,7 +155,7 @@ public class CloudMonitorAccessor implements AsmProperties {
         String user = this.properties.getProperty(USER);
         String password = null;
         if (this.properties.getProperty(PASSWORD_ENCRYPTED).equals(TRUE)) {
-            password = CloudMonitorAccessor.crypto.decrypt(
+            password = AsmAccessor.crypto.decrypt(
                 this.properties.getProperty(PASSWORD));
             if (null == password) {
                 throw new LoginError(AsmMessages.getMessage(AsmMessages.DECRYPT_ERROR));

@@ -22,10 +22,10 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     private HashMap<String, String> metricMap = new HashMap<String, String>();
     private boolean keepRunning = true;
     private int numRetriesLeft;
-    private CloudMonitorRequestHelper requestHelper;
+    private AsmRequestHelper requestHelper;
     private HashMap<String, List<Rule>> folderMap;
     private Properties properties;
-    private CloudMonitorMetricReporter metricReporter;
+    private AsmMetricReporter metricReporter;
     private final int epaWaitTime;
 
     /**
@@ -38,10 +38,10 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      */
     AsmReaderThread(
         String folderName,
-        CloudMonitorRequestHelper requestHelper,
+        AsmRequestHelper requestHelper,
         HashMap<String, List<Rule>> folderMap,
         Properties properties,
-        CloudMonitorMetricReporter metricReporter) {
+        AsmMetricReporter metricReporter) {
 
         this.folder = folderName;
         this.requestHelper = requestHelper;

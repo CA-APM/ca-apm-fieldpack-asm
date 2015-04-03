@@ -13,7 +13,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class CloudMonitorMetricReporter implements AsmProperties {
+public class AsmMetricReporter implements AsmProperties {
 
     private MetricWriter metricWriter;
     protected  static final String SEPARATOR = "\\.";
@@ -24,7 +24,7 @@ public class CloudMonitorMetricReporter implements AsmProperties {
      * @param displayCheckpoint display monitor info in metric path?
      * @param checkpointMap map containing all checkpoints
      */
-    public CloudMonitorMetricReporter(MetricWriter metricWriter) {
+    public AsmMetricReporter(MetricWriter metricWriter) {
         this.metricWriter = metricWriter;
     }
 

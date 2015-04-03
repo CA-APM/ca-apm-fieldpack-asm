@@ -20,7 +20,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.ca.apm.swat.epaplugins.asm.CloudMonitorRequestHelper;
+import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
 import com.wily.introscope.epagent.EpaUtils;
 
 
@@ -297,7 +297,7 @@ public class ScriptRule extends BaseRule {
         metricMap.put(metric + METRIC_NAME_SEPARATOR + ASSERTION_ERRORS,
             Integer.toString(assertionErrors));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + TEST_URL,
-            CloudMonitorRequestHelper.fixMetric(url));
+            AsmRequestHelper.fixMetric(url));
         return step;
     }
 

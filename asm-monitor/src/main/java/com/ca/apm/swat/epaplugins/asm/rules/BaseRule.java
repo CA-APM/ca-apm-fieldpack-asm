@@ -7,7 +7,7 @@ import java.util.Properties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.asm.CloudMonitorRequestHelper;
+import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
@@ -135,7 +135,7 @@ public class BaseRule implements Rule, AsmProperties {
                 if (thisKey.equals(DESCR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
-                    metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ONE);
+                    metricMap.put(AsmRequestHelper.fixMetric(rawErrorMetric), ONE);
                 }
 
                 if (thisKey.equals(COLOR_TAG)) {
@@ -143,10 +143,10 @@ public class BaseRule implements Rule, AsmProperties {
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
                     if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
                         metricMap.put(
-                            CloudMonitorRequestHelper.fixMetric(rawErrorMetric),
+                            AsmRequestHelper.fixMetric(rawErrorMetric),
                             (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
                     } else {
-                        metricMap.put(CloudMonitorRequestHelper.fixMetric(rawErrorMetric), ZERO);
+                        metricMap.put(AsmRequestHelper.fixMetric(rawErrorMetric), ZERO);
                     }
 
                 }
@@ -162,8 +162,8 @@ public class BaseRule implements Rule, AsmProperties {
                 }
 
                 String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
-                metricMap.put(CloudMonitorRequestHelper.fixMetric(rawMetric),
-                    CloudMonitorRequestHelper.fixMetric(thisValue));
+                metricMap.put(AsmRequestHelper.fixMetric(rawMetric),
+                    AsmRequestHelper.fixMetric(thisValue));
             }
         }
 

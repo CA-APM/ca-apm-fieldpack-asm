@@ -40,8 +40,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nplainLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            CloudMonitorAccessor cloudMonitorAccessor = new CloudMonitorAccessor(this.properties);
-            CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
+            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
+            AsmRequestHelper requestHelper = new AsmRequestHelper(
                 cloudMonitorAccessor, this.properties);
 
             requestHelper.connect();
@@ -65,8 +65,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nencryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            CloudMonitorAccessor cloudMonitorAccessor = new CloudMonitorAccessor(this.properties);
-            CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
+            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
+            AsmRequestHelper requestHelper = new AsmRequestHelper(
                 cloudMonitorAccessor, this.properties);
 
             requestHelper.connect();
@@ -91,8 +91,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nencryptedLogin2: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            CloudMonitorAccessor cloudMonitorAccessor = new CloudMonitorAccessor(this.properties);
-            CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
+            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
+            AsmRequestHelper requestHelper = new AsmRequestHelper(
                 cloudMonitorAccessor, this.properties);
 
             requestHelper.connect();
@@ -116,8 +116,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nwrongLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            CloudMonitorAccessor cloudMonitorAccessor = new CloudMonitorAccessor(this.properties);
-            CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
+            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
+            AsmRequestHelper requestHelper = new AsmRequestHelper(
                 cloudMonitorAccessor, this.properties);
 
             requestHelper.connect();
@@ -145,8 +145,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nwrongEncryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            CloudMonitorAccessor cloudMonitorAccessor = new CloudMonitorAccessor(this.properties);
-            CloudMonitorRequestHelper requestHelper = new CloudMonitorRequestHelper(
+            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
+            AsmRequestHelper requestHelper = new AsmRequestHelper(
                 cloudMonitorAccessor, this.properties);
 
             requestHelper.connect();
