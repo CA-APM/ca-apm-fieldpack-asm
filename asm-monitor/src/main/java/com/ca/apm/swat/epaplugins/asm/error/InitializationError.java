@@ -13,7 +13,7 @@ public class InitializationError extends Error {
 
     /**
      * Constructs a new InitializationException with the specified detail message.
-     * @param message
+     * @param message error message
      */
     public InitializationError(String message) {
         super(message);

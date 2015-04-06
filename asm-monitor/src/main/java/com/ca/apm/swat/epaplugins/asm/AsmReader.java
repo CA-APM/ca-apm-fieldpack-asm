@@ -14,7 +14,7 @@ import java.util.TreeSet;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
-import com.ca.apm.swat.epaplugins.asm.reporting.XMLMetricWriter;
+import com.ca.apm.swat.epaplugins.asm.reporting.XmlMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.rules.Rule;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -48,7 +48,7 @@ public class AsmReader implements AsmProperties {
             AsmReader thisReader = new AsmReader();
             int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
-            MetricWriter metricWriter = new XMLMetricWriter(psEpa);
+            MetricWriter metricWriter = new XmlMetricWriter(psEpa);
             thisReader.work(epaWaitTime, properties, metricWriter);
 
         } catch (Exception e) {

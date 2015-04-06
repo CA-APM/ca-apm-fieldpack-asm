@@ -37,18 +37,22 @@ public class RestClient {
      * @param proxyUser proxy user
      * @param proxyPassword proxy password
      */
-    public RestClient(boolean useProxy, String proxyHost, String proxyPort, String proxyUser, String proxyPassword) {
+    public RestClient(boolean useProxy,
+                      String proxyHost,
+                      String proxyPort,
+                      String proxyUser,
+                      String proxyPassword) {
         if (useProxy) {
             if ((null != proxyHost) && (0 != proxyHost.length())) {
                 System.setProperty(HTTP_PROXY_HOST, proxyHost);
                 System.setProperty(HTTPS_PROXY_HOST, proxyHost);
             }
-            
+
             if ((null != proxyPort) && (0 != proxyPort.length())) {
                 System.setProperty(HTTP_PROXY_PORT, proxyPort);
                 System.setProperty(HTTPS_PROXY_PORT, proxyPort);
             }
-            
+
             if ((null != proxyUser) && (0 != proxyUser.length())
                     && (null != proxyPassword) && (0 != proxyPassword.length())) {
                 Authenticator.setDefault(new ProxyAuthenticator(proxyUser, proxyPassword));

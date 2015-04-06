@@ -7,19 +7,15 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
 import com.ca.apm.swat.epaplugins.asm.rules.Rule;
 import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
-import com.ca.apm.swat.epaplugins.utils.StringFilter;
-import com.ca.apm.swat.epaplugins.utils.TextNormalizer;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**

@@ -21,7 +21,8 @@ public class AsmAgentTest implements AsmProperties {
         Properties properties = new Properties();
         properties.setProperty(DISPLAY_CHECKPOINTS, FALSE);
         try {
-            HashMap<String, String> map = RuleFactory.getAllRulesRule().generateMetrics(json, "Monitors|CA", properties, null);
+            HashMap<String, String> map = RuleFactory.getAllRulesRule()
+                    .generateMetrics(json, "Monitors|CA", properties, null);
 
             SortedSet<String> set = new TreeSet<String>();
             for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {

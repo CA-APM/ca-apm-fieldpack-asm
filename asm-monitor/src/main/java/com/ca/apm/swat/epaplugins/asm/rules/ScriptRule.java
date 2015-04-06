@@ -20,7 +20,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
 import com.wily.introscope.epagent.EpaUtils;
 
 
@@ -310,24 +309,24 @@ public class ScriptRule extends BaseRule {
         // TODO: map status values according to config
         int statusCode = 0;
         switch (responsecode) {
-        case 403 :
-            statusCode = 401;
-            break;
+          case 403 :
+              statusCode = 401;
+              break;
 
-        case 404 :
-            statusCode = 404;
-            break;
+          case 404 :
+              statusCode = 404;
+              break;
 
-        case 500 :
-            statusCode = 500;
-            break;
+          case 500 :
+              statusCode = 500;
+              break;
 
-        case 503 :
-            statusCode = 500;
-            break;
+          case 503 :
+              statusCode = 500;
+              break;
 
-        default:
-            break;
+          default:
+              break;
         }
         return statusCode;
     }
