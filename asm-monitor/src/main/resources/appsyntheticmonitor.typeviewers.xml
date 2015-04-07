@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TypeViewerSet xmlns="wily.typeviews" xmlns:its="http://www.w3.org/2005/11/its"
+	namespace="cloud.monitor" version="2.0">
+	<!-- Component Definitions - Start -->
+	<ComponentDefinition id="alert-panel">
+		<Panel columns="3" constraint="Center" layout="GridLayout" rows="1">
+			<TrafficLight
+				alert="App Synthetic Monitor:Public Stats - Uptime Current Average (%)">
+				<Title its:translate="yes">Uptime</Title>
+				<Title xml:lang="zh-TW">運作時間</Title>
+				<Title xml:lang="zh">正常运行时间</Title>
+				<Title xml:lang="ko">작동 시간</Title>
+				<Title xml:lang="ja">稼働時間</Title>
+			</TrafficLight>
+			<TrafficLight
+				alert="App Synthetic Monitor:Public Stats - Performance Current Average (ms)">
+				<Title its:translate="yes">Performance</Title>
+				<Title xml:lang="zh-TW">效能</Title>
+				<Title xml:lang="zh">性能</Title>
+				<Title xml:lang="ko">성능</Title>
+				<Title xml:lang="ja">パフォーマンス</Title>
+			</TrafficLight>
+			<TrafficLight
+				alert="App Synthetic Monitor:Public Stats - Total Errors Per Interval">
+				<Title its:translate="yes">Errors</Title>
+				<Title xml:lang="zh-TW">錯誤</Title>
+				<Title xml:lang="zh">错误</Title>
+				<Title xml:lang="ko">오류</Title>
+				<Title xml:lang="ja">エラー</Title>
+			</TrafficLight>
+		</Panel>
+	</ComponentDefinition>
+	<ComponentDefinition id="folder-table">
+		<MetricDataTable>
+			<Column content-type="LastPrefixSegment" relative-width="3">
+				<Title its:translate="yes">Folders</Title>
+				<Title xml:lang="zh-TW">資料夾</Title>
+				<Title xml:lang="zh">文件夹</Title>
+				<Title xml:lang="ko">폴더</Title>
+				<Title xml:lang="ja">フォルダ</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Uptime \(%\)"
+				sort="Descending">
+				<Title its:translate="yes">Uptime %</Title>
+				<Title xml:lang="zh-TW">運作時間 (%)</Title>
+				<Title xml:lang="zh">正常运行时间百分比</Title>
+				<Title xml:lang="ko">작동 시간 %</Title>
+				<Title xml:lang="ja">稼働時間 %</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Checks">
+				<Title its:translate="yes">Checks</Title>
+				<Title xml:lang="zh-TW">檢查</Title>
+				<Title xml:lang="zh">检查数</Title>
+				<Title xml:lang="ko">검사</Title>
+				<Title xml:lang="ja">確認</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Check Errors">
+				<Title its:translate="yes">Check Errors</Title>
+				<Title xml:lang="zh-TW">檢查錯誤</Title>
+				<Title xml:lang="zh">检查错误</Title>
+				<Title xml:lang="ko">오류 검사</Title>
+				<Title xml:lang="ja">エラーの確認</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Probes">
+				<Title its:translate="yes">Probes</Title>
+				<Title xml:lang="zh-TW">探測</Title>
+				<Title xml:lang="zh">探测器</Title>
+				<Title xml:lang="ko">프로브</Title>
+				<Title xml:lang="ja">プローブ</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Probe Errors">
+				<Title its:translate="yes">Probe Errors</Title>
+				<Title xml:lang="zh-TW">探測錯誤</Title>
+				<Title xml:lang="zh">探测器错误数</Title>
+				<Title xml:lang="ko">프로브 오류</Title>
+				<Title xml:lang="ja">プローブ エラー</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Connect Time \(ms\)">
+				<Title its:translate="yes">Connect Time (ms)</Title>
+				<Title xml:lang="zh-TW">連線時間 (毫秒)</Title>
+				<Title xml:lang="zh">连接时间(毫秒)</Title>
+				<Title xml:lang="ko">연결 시간(ms)</Title>
+				<Title xml:lang="ja">接続時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Transfer Time \(ms\)">
+				<Title its:translate="yes">Transfer Time (ms)</Title>
+				<Title xml:lang="zh-TW">傳輸時間 (毫秒)</Title>
+				<Title xml:lang="zh">传输时间 (毫秒)</Title>
+				<Title xml:lang="ko">전송 시간(ms)</Title>
+				<Title xml:lang="ja">転送時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Processing Time \(ms\)">
+				<Title its:translate="yes">Processing Time (ms)</Title>
+				<Title xml:lang="zh-TW">處理時間 (毫秒)</Title>
+				<Title xml:lang="zh">处理时间 (毫秒)</Title>
+				<Title xml:lang="ko">처리 시간(ms)</Title>
+				<Title xml:lang="ja">処理時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Total Time \(ms\)">
+				<Title its:translate="yes">Total Time (ms)</Title>
+				<Title xml:lang="zh-TW">時間總計 (毫秒)</Title>
+				<Title xml:lang="zh">总时间 (毫秒)</Title>
+				<Title xml:lang="ko">총 시간(ms)</Title>
+				<Title xml:lang="ja">合計時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Download Size \(kB\)">
+				<Title its:translate="yes">Download Size (kB)</Title>
+				<Title xml:lang="zh-TW">下載大小 (KB)</Title>
+				<Title xml:lang="zh">下载大小 (KB)</Title>
+				<Title xml:lang="ko">다운로드 크기(KB)</Title>
+				<Title xml:lang="ja">ダウンロード サイズ (キロバイト)</Title>
+			</Column>
+		</MetricDataTable>
+	</ComponentDefinition>
+	<ComponentDefinition id="monitor-table">
+		<MetricDataTable>
+			<Column content-type="LastPrefixSegment" relative-width="3">
+				<Title its:translate="yes">Monitors</Title>
+				<Title xml:lang="zh-TW">監控器</Title>
+				<Title xml:lang="zh">监视器</Title>
+				<Title xml:lang="ko">모니터</Title>
+				<Title xml:lang="ja">監視</Title>
+			</Column>
+			<Column caution-threshold="0" content-type="NumericalValue"
+				danger-threshold="2" relative-specifier=":Errors Per Interval">
+				<Title its:translate="yes">Errors Per Interval</Title>
+				<Title xml:lang="zh-TW">每一間隔的錯誤</Title>
+				<Title xml:lang="zh">每个时间间隔的错误</Title>
+				<Title xml:lang="ko">간격당 오류 수</Title>
+				<Title xml:lang="ja">間隔ごとのエラー数</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Uptime Current Average \(%\)"
+				sort="Descending">
+				<Title its:translate="yes">Current Uptime %</Title>
+				<Title xml:lang="zh-TW">目前運作時間 (%)</Title>
+				<Title xml:lang="zh">当前正常运行时间百分比</Title>
+				<Title xml:lang="ko">현재 작동 시간 %</Title>
+				<Title xml:lang="ja">現在の稼働時間 %</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Uptime Daily Average \(%\)">
+				<Title its:translate="yes">Daily Uptime %</Title>
+				<Title xml:lang="zh-TW">每日運作時間 (%)</Title>
+				<Title xml:lang="zh">每日正常运行时间百分比</Title>
+				<Title xml:lang="ko">일별 작동 시간 %</Title>
+				<Title xml:lang="ja">日単位の稼働時間 %</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Performance Current Average \(ms\)">
+				<Title its:translate="yes">Current Performance (ms)</Title>
+				<Title xml:lang="zh-TW">目前效能 (毫秒)</Title>
+				<Title xml:lang="zh">当前性能 (毫秒)</Title>
+				<Title xml:lang="ko">현재 성능(ms)</Title>
+				<Title xml:lang="ja">現在のパフォーマンス (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Performance Daily Average \(ms\)">
+				<Title its:translate="yes">Daily Performance (ms)</Title>
+				<Title xml:lang="zh-TW">每日效能 (毫秒)</Title>
+				<Title xml:lang="zh">每日性能 (毫秒)</Title>
+				<Title xml:lang="ko">일별 성능(ms)</Title>
+				<Title xml:lang="ja">日単位のパフォーマンス (ミリ秒)</Title>
+			</Column>
+			<Column caution-threshold="1" content-type="NumericalValue"
+				danger-threshold="2" relative-specifier=":Performance Status">
+				<Title its:translate="yes">Performance Status</Title>
+				<Title xml:lang="zh-TW">效能狀態</Title>
+				<Title xml:lang="zh">性能状态</Title>
+				<Title xml:lang="ko">성능 상태</Title>
+				<Title xml:lang="ja">パフォーマンス ステータス</Title>
+			</Column>
+		</MetricDataTable>
+	</ComponentDefinition>
+	<ComponentDefinition id="monitor-graphs">
+		<Panel columns="2" layout="GridLayout" rows="3">
+			<TrafficLight caution-threshold="2" danger-threshold="3"
+				relative-specifier=":Performance Status">
+				<Title its:translate="yes">Performance Status</Title>
+				<Title xml:lang="zh-TW">效能狀態</Title>
+				<Title xml:lang="zh">性能状态</Title>
+				<Title xml:lang="ko">성능 상태</Title>
+				<Title xml:lang="ja">パフォーマンス ステータス</Title>
+			</TrafficLight>
+			<Graph relative-specifier=":Errors Per Interval">
+				<Title its:translate="yes">Errors</Title>
+				<Title xml:lang="zh-TW">錯誤</Title>
+				<Title xml:lang="zh">错误</Title>
+				<Title xml:lang="ko">오류</Title>
+				<Title xml:lang="ja">エラー</Title>
+			</Graph>
+			<Graph relative-specifier=":Uptime Current Average \(%\)">
+				<Title its:translate="yes">Current Uptime %</Title>
+				<Title xml:lang="zh-TW">目前運作時間 (%)</Title>
+				<Title xml:lang="zh">当前正常运行时间百分比</Title>
+				<Title xml:lang="ko">현재 작동 시간 %</Title>
+				<Title xml:lang="ja">現在の稼働時間 %</Title>
+			</Graph>
+			<Graph relative-specifier=":Uptime Daily Average \(%\)">
+				<Title its:translate="yes">Daily Uptime %</Title>
+				<Title xml:lang="zh-TW">每日運作時間 (%)</Title>
+				<Title xml:lang="zh">每日正常运行时间百分比</Title>
+				<Title xml:lang="ko">일별 작동 시간 %</Title>
+				<Title xml:lang="ja">日単位の稼働時間 %</Title>
+			</Graph>
+			<Graph relative-specifier=":Performance Current Average \(ms\)">
+				<Title its:translate="yes">Current Performance (ms)</Title>
+				<Title xml:lang="zh-TW">目前效能 (毫秒)</Title>
+				<Title xml:lang="zh">当前性能 (毫秒)</Title>
+				<Title xml:lang="ko">현재 성능(ms)</Title>
+				<Title xml:lang="ja">現在のパフォーマンス (ミリ秒)</Title>
+			</Graph>
+			<Graph relative-specifier=":Performance Daily Average \(ms\)">
+				<Title its:translate="yes">Daily Performance (ms)</Title>
+				<Title xml:lang="zh-TW">每日效能 (毫秒)</Title>
+				<Title xml:lang="zh">每日性能 (毫秒)</Title>
+				<Title xml:lang="ko">일별 성능(ms)</Title>
+				<Title xml:lang="ja">日単位のパフォーマンス (ミリ秒)</Title>
+			</Graph>
+		</Panel>
+	</ComponentDefinition>
+	<ComponentDefinition id="checkpoint-table">
+		<MetricDataTable>
+			<Column content-type="LastPrefixSegment" relative-width="3">
+				<Title its:translate="yes">Checkpoint</Title>
+				<Title xml:lang="zh-TW">檢查點</Title>
+				<Title xml:lang="zh">检查点</Title>
+				<Title xml:lang="ko">검사점</Title>
+				<Title xml:lang="ja">チェックポイント</Title>
+			</Column>
+			<Column content-type="LastPrefixSegment" relative-width="3"
+				segment-offset="1">
+				<Title its:translate="yes">Country</Title>
+				<Title xml:lang="zh-TW">國家/地區</Title>
+				<Title xml:lang="zh">国家/地区</Title>
+				<Title xml:lang="ko">국가</Title>
+				<Title xml:lang="ja">国</Title>
+			</Column>
+			<Column content-type="LastPrefixSegment" relative-width="3"
+				segment-offset="2">
+				<Title its:translate="yes">Region</Title>
+				<Title xml:lang="zh-TW">區域</Title>
+				<Title xml:lang="zh">区域</Title>
+				<Title xml:lang="ko">영역</Title>
+				<Title xml:lang="ja">領域</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Total Time \(ms\)"
+				sort="Descending">
+				<Title its:translate="yes">Total Time (ms)</Title>
+				<Title xml:lang="zh-TW">時間總計 (毫秒)</Title>
+				<Title xml:lang="zh">总时间 (毫秒)</Title>
+				<Title xml:lang="ko">총 시간(ms)</Title>
+				<Title xml:lang="ja">合計時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Resolve Time \(ms\)">
+				<Title its:translate="yes">Resolve Time (ms)</Title>
+				<Title xml:lang="zh-TW">解析時間 (毫秒)</Title>
+				<Title xml:lang="zh">解析时间 (毫秒)</Title>
+				<Title xml:lang="ko">해결 시간(ms)</Title>
+				<Title xml:lang="ja">解決時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Connect Time \(ms\)">
+				<Title its:translate="yes">Connect Time (ms)</Title>
+				<Title xml:lang="zh-TW">連線時間 (毫秒)</Title>
+				<Title xml:lang="zh">连接时间(毫秒)</Title>
+				<Title xml:lang="ko">연결 시간(ms)</Title>
+				<Title xml:lang="ja">接続時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Transfer Time \(ms\)">
+				<Title its:translate="yes">Transfer Time (ms)</Title>
+				<Title xml:lang="zh-TW">傳輸時間 (毫秒)</Title>
+				<Title xml:lang="zh">传输时间 (毫秒)</Title>
+				<Title xml:lang="ko">전송 시간(ms)</Title>
+				<Title xml:lang="ja">転送時間 (ミリ秒)</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier=":Processing Time \(ms\)">
+				<Title its:translate="yes">Processing Time (ms)</Title>
+				<Title xml:lang="zh-TW">處理時間 (毫秒)</Title>
+				<Title xml:lang="zh">处理时间 (毫秒)</Title>
+				<Title xml:lang="ko">처리 시간(ms)</Title>
+				<Title xml:lang="ja">処理時間 (ミリ秒)</Title>
+			</Column>
+		</MetricDataTable>
+	</ComponentDefinition>
+	<ComponentDefinition id="checkpoint-graphs">
+		<Panel layout="BorderLayout">
+			<Panel constraint="North" layout="BorderLayout">
+				<Panel columns="1" constraint="Center" layout="GridLayout"
+					rows="2">
+					<SelectedNodeLabel justify="Center"
+						node-relative-index="3">
+						<Title its:translate="yes">Monitor: </Title>
+						<Title xml:lang="zh-TW">監控器：</Title>
+						<Title xml:lang="zh">监视器:</Title>
+						<Title xml:lang="ko">모니터:</Title>
+						<Title xml:lang="ja">監視:</Title>
+					</SelectedNodeLabel>
+					<SelectedNodeLabel justify="Center">
+						<Title its:translate="yes">Location: </Title>
+						<Title xml:lang="zh-TW">位置：</Title>
+						<Title xml:lang="zh">位置:</Title>
+						<Title xml:lang="ko">위치:</Title>
+						<Title xml:lang="ja">場所:</Title>
+					</SelectedNodeLabel>
+				</Panel>
+			</Panel>
+			<Graph relative-specifier=":.*Time \(ms\)" sort="Descending">
+				<Title its:translate="yes">Performance (ms)</Title>
+				<Title xml:lang="zh-TW">效能 (毫秒)</Title>
+				<Title xml:lang="zh">性能 (毫秒)</Title>
+				<Title xml:lang="ko">성능(ms)</Title>
+				<Title xml:lang="ja">パフォーマンス (ミリ秒)</Title>
+			</Graph>
+		</Panel>
+	</ComponentDefinition>
+	<ComponentDefinition id="step-table">
+		<MetricDataTable>
+			<Column content-type="LastPrefixSegment" relative-width="3">
+				<Title its:translate="yes">Steps</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Status Message Value">
+				<Title its:translate="yes">Status Message Value</Title>
+			</Column>
+			<Column content-type="StringValue" relative-specifier="\|([^\|]*):Status Message">
+				<Title its:translate="yes">Status Message</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Response Code">
+				<Title its:translate="yes">Response Code</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Assertion Errors"
+				sort="Descending">
+				<Title its:translate="yes">Assertion Errors</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Assertion Failures">
+				<Title its:translate="yes">Assertion Failures</Title>
+			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Error Count">
+				<Title its:translate="yes">Error Count</Title>
+			</Column>
+			<Column content-type="StringValue" relative-specifier="\|([^\|]*):URL">
+				<Title its:translate="yes">URL</Title>
+			</Column>
+		</MetricDataTable>
+	</ComponentDefinition>
+	<ComponentDefinition id="step-graphs">
+		<SplitPane split-ratio="0.05">
+			<Panel columns="1" layout="GridLayout" rows="2">
+				<LiveMetricValueLabel relative-metric=":URL">
+					<Title>URL: </Title>
+				</LiveMetricValueLabel>
+				<LiveMetricValueLabel relative-metric=":Status Message">
+					<Title>Status Message: </Title>
+				</LiveMetricValueLabel>
+			</Panel>
+			<Panel columns="2" layout="GridLayout" rows="3">
+				<TrafficLight caution-threshold="300" danger-threshold="400"
+					relative-specifier=":Status Message Value">
+					<Title its:translate="yes">Status</Title>
+				</TrafficLight>
+				<Graph relative-specifier=":Error Count">
+					<Title its:translate="yes">Error Count</Title>
+				</Graph>
+				<Graph relative-specifier=":Status Message Value">
+					<Title its:translate="yes">Status Message Value</Title>
+				</Graph>
+				<Graph relative-specifier=":Assertion Errors">
+					<Title its:translate="yes">Errors</Title>
+				</Graph>
+				<Graph relative-specifier=":Response Code">
+					<Title its:translate="yes">Response Code</Title>
+				</Graph>
+				<Graph relative-specifier=":Assertion Failures">
+					<Title its:translate="yes">Failures</Title>
+				</Graph>
+			</Panel>
+		</SplitPane>
+	</ComponentDefinition>
+	<!-- Component Definitions - End -->
+	<TypeViewer id="agent_node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-type="com.wily.introscope.spec.server.types.AgentItemType.kAgentItemType"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<SplitPane split-ratio="0.2">
+			<Component id="alert-panel" />
+			<Component id="folder-table" specifier-prepend="App Synthetic Monitor" />
+		</SplitPane>
+	</TypeViewer>
+	<TypeViewer id="agent_node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-type="com.wily.introscope.spec.server.types.AgentItemType.kAgentItemType"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<SplitPane split-ratio="0.2">
+			<Component id="alert-panel" />
+			<Component id="folder-table" specifier-prepend="App Synthetic Monitor" />
+		</SplitPane>
+	</TypeViewer>
+	<!-- App Synthetic Monitor node -->
+	<TypeViewer id="apmcm-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor" tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<SplitPane split-ratio="0.2">
+			<Component id="alert-panel" />
+			<Component id="folder-table" />
+		</SplitPane>
+	</TypeViewer>
+	<!-- Folder node -->
+	<TypeViewer id="folder-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="monitor-table" specifier-prepend="\|([^\|]*)" />
+	</TypeViewer>
+	<!-- Monitor node -->
+	<TypeViewer id="monitor-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<SplitPane split-ratio="0.4">
+			<Component id="checkpoint-table" show-bottom-graph="false"
+				specifier-prepend="\|([^\|]*)\|([^\|]*)\|([^\|]*)" />
+			<Component id="monitor-graphs" />
+		</SplitPane>
+	</TypeViewer>
+	<!-- Region node -->
+	<TypeViewer id="region-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="checkpoint-table" specifier-prepend="\|([^\|]*)\|([^\|]*)" />
+	</TypeViewer>
+	<!-- Country node -->
+	<TypeViewer id="country-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="checkpoint-table" specifier-prepend="\|([^\|]*)" />
+	</TypeViewer>
+	<!-- Checkpoint node -->
+	<TypeViewer id="checkpoint-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="checkpoint-graphs" />
+	</TypeViewer>
+	<!-- Script node -->
+	<TypeViewer id="script-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Status Monitoring\|([^\|]*)\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="step-table" />
+	</TypeViewer>
+	<!-- step node -->
+	<TypeViewer id="step-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Status Monitoring\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+		tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="step-graphs" />
+	</TypeViewer>
+</TypeViewerSet>
