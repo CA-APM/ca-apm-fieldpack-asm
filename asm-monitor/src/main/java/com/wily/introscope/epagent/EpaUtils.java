@@ -60,7 +60,7 @@ public class EpaUtils {
                 pattern.matcher(metricKeyNormalized).replaceAll(AsmProperties.EMPTY_STRING);
 
         return fixedMetric.replace("\\", "-")
-                .replace("/", "-")
+                //.replace("/", "-")
                 .replace(",", "_")
                 .replace(";", "-")
                 .replace("&", "and");

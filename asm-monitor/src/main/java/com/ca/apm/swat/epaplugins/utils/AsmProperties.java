@@ -20,6 +20,7 @@ public interface AsmProperties {
     public static final String DATE_FORMAT              = "yyyy-MM-dd";
     public static final String UTF8                     = "UTF-8";
     public static final String DEFAULT_DELIMITER        = ",";
+    public static final String BLANK                    = " ";
 
     public static final String ASM_PRODUCT_NAME         = "App Synthetic Monitor";
     public static final String ASM_PRODUCT_NAME_SHORT   = "ASM";

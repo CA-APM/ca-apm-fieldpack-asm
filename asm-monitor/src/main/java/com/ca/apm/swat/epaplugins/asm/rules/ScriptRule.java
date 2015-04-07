@@ -19,6 +19,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.wily.introscope.epagent.EpaUtils;
 
 
@@ -38,7 +39,7 @@ public class ScriptRule extends BaseRule {
 
         // build chain of responsibility
         Handler jmeterHandler = new JMeterScriptHandler();
-        // setSuccessor(jmeterHandler);
+        Formatter format = Formatter.getInstance();
         Handler decoder = new InflatingBase64Decoder();
         decoder.setSuccessor(jmeterHandler);
         setSuccessor(decoder);

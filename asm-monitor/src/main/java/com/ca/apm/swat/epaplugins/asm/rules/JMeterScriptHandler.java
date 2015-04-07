@@ -1,7 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm.rules;
 
 import java.io.StringReader;
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -14,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 
@@ -150,11 +150,11 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 }
             }
         }
+        Formatter format = Formatter.getInstance();
+        
         url = EpaUtils.fixMetric(url);
-        // String metric = metricTree + METRIC_PATH_SEPARATOR + STEP + step + " " + url;
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        nf.setMinimumIntegerDigits(3);
-        String metric = metricTree + METRIC_PATH_SEPARATOR + step + " " + url;
+        String metric = metricTree + METRIC_PATH_SEPARATOR  + format.formatStep(step, url);
+
         //Collect results
         String statusMessage = null;
         int statusCode = 1;
@@ -175,7 +175,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         }
         if (!assertionFailed) {
             statusMessage = responsecode + " - " + responsemessage;
-            statusCode = mapResponseToStatusCode(responsecode);
+            statusCode = format.mapResponseToStatusCode(responsecode);
         }
 
         // report metrics
@@ -195,37 +195,6 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         metricMap.put(metric + METRIC_NAME_SEPARATOR + TEST_URL,
             EpaUtils.fixMetric(url));
         return metricMap;
-    }
-
-    /**
-     * Map status values.
-     * @param responsecode input value
-     * @return mapped output status code
-     */
-    private int mapResponseToStatusCode(int responsecode) {
-        // TODO: map status values according to configuration
-        int statusCode = 0;
-        switch (responsecode) {
-          case 403 :
-              statusCode = 401;
-              break;
-
-          case 404 :
-              statusCode = 404;
-              break;
-
-          case 500 :
-              statusCode = 500;
-              break;
-
-          case 503 :
-              statusCode = 500;
-              break;
-
-          default:
-              break;
-        }
-        return statusCode;
     }
 
 }
