@@ -169,7 +169,8 @@ public class AsmReader implements AsmProperties {
         AsmMetricReporter metricReporter =
                 new AsmMetricReporter(metricWriter);
 
-        // Collect folders
+        // TODO: have a thread pool with a fixed number of threads that pick folders from a queue
+        // start a thread per folder
         for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
             AsmReaderThread rt = new AsmReaderThread(
                 it.next(),

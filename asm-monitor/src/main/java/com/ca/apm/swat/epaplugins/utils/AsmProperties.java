@@ -71,10 +71,10 @@ public interface AsmProperties {
     public static final String RESULT_GROUPS            = "asm.resultsGroups";
     public static final String ALL_RULES                = "all_rules";
     public static final String ALL_TAGS                 = "all_tags";
-    public static final String BY_FOLDER                = "by_folder";
-    public static final String BY_STATION               = "by_station";
-    public static final String MIXED                    = "mixed";
-    public static final String NO_GROUPS                = "no_groups";
+    public static final String GROUP_BY_FOLDER          = "by_folder";
+    public static final String GROUP_BY_STATION         = "by_station";
+    public static final String GROUP_MIXED              = "mixed";
+    public static final String GROUP_NONE               = "no_groups";
     public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
     public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
     public static final String HTTP_CODE_TRANSLATION    = "asm.HTTPCodeTrans";
@@ -83,15 +83,17 @@ public interface AsmProperties {
     public static final String LOG_ASM_ISSUES           = "asm.logASMIssues=";
 
     // error codes
-    public static final int    OK_ERROR_CODE            = 0;
-    public static final int    AUTH_ERROR_CODE          = 1000;
-    public static final int    NORM_ERROR_CODE          = 1001;
+    public static final int    ERROR_OK                 = 0;
+    public static final int    ERROR_AUTHORIZATION      = 1000;
+    public static final int    ERROR_NORM               = 1001;
+    public static final int    ERROR_SESSION_EXPIRED    = 1008;
 
     // result codes
-    public static final int    BANDWITH_EXCEEDED_RESULT_CODE    = 1060;
-    public static final int    DOMAIN_REDIRECT_RESULT_CODE      = 6001;
-    public static final int    RESPONSE_ASSERTION_RESULT_CODE   = 7001;
-    public static final int    NOT_MATCHED_RESULT_CODE          = 9501;
+    public static final int    RESULT_BANDWITH_EXCEEDED     = 1060;
+    public static final int    RESULT_DOMAIN_REDIRECT       = 6001;
+    public static final int    RESULT_CONNECTION_TERMINATED = 6007;
+    public static final int    RESULT_RESPONSE_ASSERTION    = 7001;
+    public static final int    RESULT_NOT_MATCHED           = 9501;
 
     // retries
     public static final int    INIT_RETRIES             = 10;

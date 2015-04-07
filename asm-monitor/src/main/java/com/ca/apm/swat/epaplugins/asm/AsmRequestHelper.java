@@ -350,6 +350,9 @@ public class AsmRequestHelper implements AsmProperties {
                 + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
         statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
+        EpaUtils.getFeedback().verbose("getStats: folder = " + folder
+            + ", rule = " + rule.getName() + " of type " + rule.getType());
+
         return rule.generateMetrics(statsRequest, metricPrefix, properties, checkpointMap);
     }
 
@@ -380,6 +383,10 @@ public class AsmRequestHelper implements AsmProperties {
 
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
             + folderStr + ruleStr);
+
+        EpaUtils.getFeedback().verbose("getPsp: folder = " + folder
+            + ", rule = " + rule.getName() + " of type " + rule.getType());
+        
         return rule.generateMetrics(pspRequest, metricPrefix, properties, checkpointMap);
     }
 
@@ -417,6 +424,9 @@ public class AsmRequestHelper implements AsmProperties {
         //        + "&num=" + numLogs + "&reverse=y&full=y";
 
         logRequest = accessor.executeApi(LOGS_CMD, logStr);
+
+        EpaUtils.getFeedback().verbose("getLogs: folder = " + folder
+            + ", rule = " + rule.getName() + " of type " + rule.getType());
 
         return rule.generateMetrics(logRequest, metricPrefix, properties, checkpointMap);
     }

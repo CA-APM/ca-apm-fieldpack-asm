@@ -70,6 +70,10 @@ public class ScriptRule extends BaseRule {
             EpaUtils.getFeedback().error("rule " + getName() + ", metric tree  =" + metricTree);
             throw e;
         }
+
+        EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
+            + " metrics for rule " + getName() + " in metric tree " + metricTree);
+
         return metricMap;
     }
 

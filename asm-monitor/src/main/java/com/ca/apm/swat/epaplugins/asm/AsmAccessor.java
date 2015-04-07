@@ -129,7 +129,7 @@ public class AsmAccessor implements AsmProperties {
 
         int errorCode = jsonObject.optInt(CODE_TAG, -1);
 
-        if (OK_ERROR_CODE != errorCode) {
+        if (ERROR_OK != errorCode) {
             String errorStr = jsonObject.optString(ERROR_TAG,
                 AsmMessages.getMessage(AsmMessages.NO_ERROR));
             String errorInfo = jsonObject.optString(INFO_TAG,
@@ -169,7 +169,7 @@ public class AsmAccessor implements AsmProperties {
         String loginRequest = executeApi(LOGIN_CMD, loginStr, false);
         JSONObject entireJsonObject = new JSONObject(loginRequest);
 
-        if (entireJsonObject.getInt(CODE_TAG) == OK_ERROR_CODE) {
+        if (entireJsonObject.getInt(CODE_TAG) == ERROR_OK) {
             JSONObject resultJsonObject = entireJsonObject.optJSONObject(RESULT_TAG);
             if (resultJsonObject != null) {
                 return resultJsonObject.optString(NKEY_TAG, null);
@@ -187,7 +187,7 @@ public class AsmAccessor implements AsmProperties {
         String errorMessage = AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
             errorStr, errorCode, errorInfo);
 
-        if (errorCode == AUTH_ERROR_CODE) {
+        if (errorCode == ERROR_AUTHORIZATION) {
             EpaUtils.getFeedback().error(errorMessage);
             throw new LoginError(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
                 this.properties.getProperty(URL),

@@ -149,7 +149,8 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             // remove trailing '|'
             folderPrefix = MONITOR_METRIC_PREFIX.substring(0, MONITOR_METRIC_PREFIX.length() - 1);
         }
-
+        
+        // get stats for folder
         if (TRUE.equals(properties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderRules.size(), folder));
@@ -160,6 +161,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA, folder));
         }
 
+        // get stats for all rules
         if ((folderRules.get(0).equals(allRulesRule))
                 && (!folder.equals(EMPTY_STRING))) {
             
@@ -171,13 +173,18 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 resultMetricMap.putAll(
                     requestHelper.getLogs(folder, null, folderRules.size() - 1, folderPrefix));
             }
-            //TODO RULE or FOLDER???
+
+            //TODO are stats different for RULE and FOLDER??? we (might) already have folder data
             if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
                 for (Iterator<Rule> it = folderRules.iterator(); it.hasNext(); ) {
                     rule = it.next();
                     if (rule.equals(allRulesRule)) {
                         continue;
                     }
+//                    EpaUtils.getFeedback().verbose(
+//                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, 1,
+//                            folderPrefix + METRIC_PATH_SEPARATOR + rule.getName()));
+
                     resultMetricMap.putAll(requestHelper.getStats(folder, rule, folderPrefix));
                 }
             }
@@ -191,6 +198,10 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     resultMetricMap.putAll(requestHelper.getPsp(folder, rule, folderPrefix));
                 }
                 if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
+//                    EpaUtils.getFeedback().verbose(
+//                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, -1,
+//                            folderPrefix + METRIC_PATH_SEPARATOR + rule.getName()));
+
                     resultMetricMap.putAll(requestHelper.getStats(folder, rule, folderPrefix));
                 }
                 if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
@@ -198,6 +209,9 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 }
             }
         }
+
+        EpaUtils.getFeedback().verbose("getFolderMetrics finished for folder " + folder
+            + ", returning " + resultMetricMap.size() + " metrics");
 
         return resultMetricMap;
     }

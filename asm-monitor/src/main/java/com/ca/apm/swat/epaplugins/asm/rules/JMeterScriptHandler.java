@@ -1,6 +1,7 @@
 package com.ca.apm.swat.epaplugins.asm.rules;
 
 import java.io.StringReader;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -39,8 +40,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         HashMap<String, String> metricMap = new HashMap<String, String>();
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose("JMeterScriptHandler - xmlString = " + xmlString);
+        if (EpaUtils.getFeedback().isDebugEnabled()) {
+            EpaUtils.getFeedback().debug("JMeterScriptHandler - xmlString = " + xmlString);
         }
 
         if (!xmlString.startsWith(XML_PREFIX)) {
@@ -62,8 +63,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             int step = 1; // start from 1, business not engineering
             if (testResults.getLength() > 0) {
 
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("JMeterScriptHandler: "
+                if (EpaUtils.getFeedback().isDebugEnabled()) {
+                    EpaUtils.getFeedback().debug("JMeterScriptHandler: "
                             + testResults.toString());
                 }
                 
@@ -105,8 +106,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         int assertionFailures = 0;
         int assertionErrors = 0;
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose("reportJMeterStep " + step + ": "
+        if (EpaUtils.getFeedback().isDebugEnabled()) {
+            EpaUtils.getFeedback().debug("reportJMeterStep " + step + ": "
                     + stepNode.toString());
         }
 
@@ -149,9 +150,11 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 }
             }
         }
-        url = url.replace(":", "-");
-        url = url.replace("|", "-");
-        String metric = metricTree + METRIC_PATH_SEPARATOR + STEP + step + " " + url;
+        url = EpaUtils.fixMetric(url);
+        // String metric = metricTree + METRIC_PATH_SEPARATOR + STEP + step + " " + url;
+        NumberFormat nf = NumberFormat.getIntegerInstance();
+        nf.setMinimumIntegerDigits(3);
+        String metric = metricTree + METRIC_PATH_SEPARATOR + step + " " + url;
         //Collect results
         String statusMessage = null;
         int statusCode = 1;
