@@ -29,14 +29,13 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     private final int epaWaitTime;
 
     /**
-     * Main thread for App Synthetic Monitor EPA plugin.
+     * Worker thread for App Synthetic Monitor EPA plugin.
      * @param folderName name of the folder to monitor
      * @param requestHelper the request helper
      * @param folderMap the folder map containing all folders and monitors (rules)
-     * @param properties the properties
      * @param metricReporter the metric reporter
      */
-    AsmReaderThread(
+    public AsmReaderThread(
         String folderName,
         AsmRequestHelper requestHelper,
         HashMap<String, List<Rule>> folderMap,

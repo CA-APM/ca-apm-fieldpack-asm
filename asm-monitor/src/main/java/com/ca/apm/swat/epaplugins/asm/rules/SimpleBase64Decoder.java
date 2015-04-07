@@ -3,7 +3,6 @@ package com.ca.apm.swat.epaplugins.asm.rules;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.zip.Inflater;
 
 import org.apache.commons.codec.binary.Base64;
@@ -26,14 +25,9 @@ public class SimpleBase64Decoder implements Handler {
      * 
      * @param encodedString Base64 encoded string
      * @param metricTree metric tree prefix
-     * @param properties plugin properties that control output format and filtering
-     * @param checkpointMap map containing all checkpoints of App Synthetic Monitor
      * @return metricMap map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String encodedString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap) {
+    public HashMap<String, String> generateMetrics(String encodedString, String metricTree) {
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {
@@ -59,8 +53,7 @@ public class SimpleBase64Decoder implements Handler {
                 }
 
                 // call next handler in chain
-                return successor.generateMetrics(decodedString,
-                    metricTree, properties, checkpointMap);
+                return successor.generateMetrics(decodedString, metricTree);
             } else {
                 EpaUtils.getFeedback().warn("SimpleBase64Decoder decoded == null!");
             }

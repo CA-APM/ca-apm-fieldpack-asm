@@ -24,14 +24,9 @@ public class Inflater implements Handler {
      * 
      * @param compressedString compressedString
      * @param metricTree metric tree prefix
-     * @param properties plugin properties that control output format and filtering
-     * @param checkpointMap map containing all checkpoints of App Synthetic Monitor
      * @return metricMap map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String compressedString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap) {
+    public HashMap<String, String> generateMetrics(String compressedString, String metricTree) {
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {
@@ -42,8 +37,7 @@ public class Inflater implements Handler {
                     String decompressedString;
                     decompressedString = new String(bytesDecompressed, 0,
                         bytesDecompressed.length, AsmProperties.UTF8);
-                    return successor.generateMetrics(decompressedString,
-                        metricTree, properties, checkpointMap);
+                    return successor.generateMetrics(decompressedString, metricTree);
                 } else {
                     EpaUtils.getFeedback().error("bytesDecompressed is null!");
                 }

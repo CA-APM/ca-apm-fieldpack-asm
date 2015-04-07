@@ -35,10 +35,9 @@ public class AsmAccessor implements AsmProperties {
 
     /**
      * Access the App Synthetic Monitor API.
-     * @param properties properties
      */
-    public AsmAccessor(Properties properties) {
-        this.properties = properties;
+    public AsmAccessor() {
+        this.properties = AsmReader.getProperties();
 
         boolean useProxy = Boolean.parseBoolean(this.properties.getProperty(USE_PROXY, FALSE));
 

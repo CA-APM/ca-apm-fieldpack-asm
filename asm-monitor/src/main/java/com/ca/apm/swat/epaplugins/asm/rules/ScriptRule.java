@@ -46,22 +46,18 @@ public class ScriptRule extends BaseRule {
     }
 
     @Override
-    public HashMap<String, String> generateMetrics(String jsonString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap) {
+    public HashMap<String, String> generateMetrics(String jsonString, String metricTree) {
 
         HashMap<String, String> metricMap = null;
 
         try {
-            metricMap = super.generateMetrics(jsonString, metricTree, properties, checkpointMap);
+            metricMap = super.generateMetrics(jsonString, metricTree);
 
             // remove MONITOR_METRIC_PREFIX from metric tree for step metrics
             String statusMetricTree = STATUS_METRIC_PREFIX
                     + metricTree.substring(MONITOR_METRIC_PREFIX.length())
                     + METRIC_PATH_SEPARATOR + getName();
-            metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree, properties,
-                checkpointMap));
+            metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree));
 
             EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
                 + " metrics from super() for rule " + getName() + " in metric tree " + metricTree);
@@ -85,11 +81,7 @@ public class ScriptRule extends BaseRule {
      * @return metric map
      * @throws JSONException errors
      */
-//    protected HashMap<String, String> analyzeContentResults(String jsonString, String folder)
-    protected HashMap<String, String> analyzeContentResults(String jsonString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap) 
+    protected HashMap<String, String> analyzeContentResults(String jsonString, String metricTree)
                 throws JSONException {
 
         HashMap<String, String> metricMap = new HashMap<String, String>();
@@ -105,14 +97,13 @@ public class ScriptRule extends BaseRule {
 
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
-                metricMap.putAll(analyzeContentResults(innerJsonObject.toString(),
-                    metricTree, properties, checkpointMap));
+                metricMap.putAll(analyzeContentResults(innerJsonObject.toString(), metricTree));
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
                 for (int i = 0; i < innerJsonArray.length(); i++) {
                     metricMap.putAll(
                         analyzeContentResults(innerJsonArray.getJSONObject(i).toString(),
-                            metricTree, properties, checkpointMap));
+                            metricTree));
                 }
             } else {
                 if ((thisKey.equals(COLOR_TAG)) || (thisKey.equals(ELAPSED_TAG))
@@ -153,8 +144,7 @@ public class ScriptRule extends BaseRule {
                                     }
                                      */
                                     metricMap.putAll(
-                                        successor.generateMetrics(thisValue, metricTree,
-                                            properties, checkpointMap));
+                                        successor.generateMetrics(thisValue, metricTree));
 
                                 } else {
                                     if (returnValue.startsWith(HAR_OR_LOG_TAG)) {

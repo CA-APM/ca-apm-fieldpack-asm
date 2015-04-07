@@ -30,6 +30,9 @@ public class AsmReader implements AsmProperties {
     private boolean keepRunning;
     private int numRetriesLeft;
 
+    private static Properties properties;
+    private static AsmReader instance;
+    
     /**
      * Called by EPAgent.
      * @param args arguments
@@ -38,7 +41,7 @@ public class AsmReader implements AsmProperties {
      */
     public static void main(String[] args, PrintStream psEpa) throws Exception {
         try {
-            Properties properties = getPropertiesFromFile((args.length != 0) ? args[0] :
+            Properties properties = readPropertiesFromFile((args.length != 0) ? args[0] :
                 PROPERTY_FILE_NAME);
 
             String locale = properties.getProperty(LOCALE, DEFAULT_LOCALE);
@@ -49,7 +52,7 @@ public class AsmReader implements AsmProperties {
             int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
             MetricWriter metricWriter = new XmlMetricWriter(psEpa);
-            thisReader.work(epaWaitTime, properties, metricWriter);
+            thisReader.work(epaWaitTime, metricWriter);
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
@@ -70,14 +73,14 @@ public class AsmReader implements AsmProperties {
     public static void main(String[] args) {
 
         try {
-            Properties properties = getPropertiesFromFile(args.length != 0 ? args[0] :
+            Properties properties = readPropertiesFromFile(args.length != 0 ? args[0] :
                 PROPERTY_FILE_NAME);
 
-            AsmReader thisReader = new AsmReader();
+            AsmReader reader = AsmReader.getInstance();
             int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
             MetricWriter metricWriter = new TextMetricWriter();
-            thisReader.work(epaWaitTime, properties, metricWriter);
+            reader.work(epaWaitTime, metricWriter);
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
@@ -91,18 +94,44 @@ public class AsmReader implements AsmProperties {
     }
 
     /**
-     * Main method of ASMReader.
+     * Get the single instance. Call setProperties() first!
+     * @return the one and only Formatter instance
+     */
+    public static AsmReader getInstance() {
+        if (null == instance) {
+            instance = new AsmReader();
+        }
+        return instance;
+    }
+
+    /**
+     * Get the global properties.
+     * @return the properties
+     */
+    public static Properties getProperties() {
+        return properties;
+    }
+
+    /**
+     * Set the global properties.
+     * @param properties the properties
+     */
+    protected static void setProperties(Properties properties) {
+        AsmReader.properties = properties;
+    }
+
+    /**
+     * Main method of AsmReader.
      * Connects to ASM API and gets all folder, monitor and checkpoint information.
      * Then starts a thread per folder to collect the monitor metrics.
      * @param epaWaitTime sleep time in main loop
      * @param properties properties read from config file
      * @param metricWriter interface to EPAgent, write metrics here
      */
-    private void work(int epaWaitTime, Properties properties, MetricWriter metricWriter) {
+    private void work(int epaWaitTime, MetricWriter metricWriter) {
 
-        AsmAccessor accessor = new AsmAccessor(properties);
-        AsmRequestHelper requestHelper =
-                new AsmRequestHelper(accessor, properties);
+        AsmAccessor accessor = new AsmAccessor();
+        AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
 
         this.keepRunning = true;
         this.numRetriesLeft = 10;
@@ -240,7 +269,7 @@ public class AsmReader implements AsmProperties {
      * @return the properties read
      * @throws IOException error reading the file
      */
-    public static Properties getPropertiesFromFile(String filename) throws IOException {
+    public static Properties readPropertiesFromFile(String filename) throws IOException {
         FileInputStream inStream = new FileInputStream(new File(filename));
 
         Properties properties = new Properties();
@@ -253,6 +282,7 @@ public class AsmReader implements AsmProperties {
             throw e;
         }
         inStream.close();
+        AsmReader.setProperties(properties);
 
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(AsmMessages.getMessage(

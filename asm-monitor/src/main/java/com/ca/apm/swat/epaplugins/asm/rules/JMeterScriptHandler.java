@@ -29,14 +29,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * Generate metrics from API call result. 
      * @param xmlString JMeter script data
      * @param metricTree metric tree prefix
-     * @param properties plugin properties that control output format and filtering
-     * @param checkpointMap map containing all checkpoints of App Synthetic Monitor
      * @return map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String xmlString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap) {
+    public HashMap<String, String> generateMetrics(String xmlString, String metricTree) {
 
         HashMap<String, String> metricMap = new HashMap<String, String>();
 
@@ -77,7 +72,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
                     Node stepNode = stepNodes.item(i);
                     if (stepNode.getNodeType() == Node.ELEMENT_NODE) {
-                        metricMap.putAll(reportJMeterStep(metricTree, step, stepNode, properties));
+                        metricMap.putAll(reportJMeterStep(metricTree, step, stepNode));
                         ++step;
                     }
                 }
@@ -101,8 +96,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      */
     private HashMap<String, String> reportJMeterStep(String metricTree,
         int step,
-        Node stepNode,
-        Properties properties) {
+        Node stepNode) {
         int assertionFailures = 0;
         int assertionErrors = 0;
 

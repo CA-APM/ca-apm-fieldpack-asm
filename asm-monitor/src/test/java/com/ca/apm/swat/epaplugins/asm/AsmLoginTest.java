@@ -19,12 +19,19 @@ public class AsmLoginTest implements AsmProperties {
      */
     @Before
     public void setup() {
-        this.properties = new Properties();
-        this.properties.setProperty(USER, "bryan.jasper@ca.com");
-        this.properties.setProperty(URL, "https://api.cloudmonitor.ca.com/1.6");
-        this.properties.setProperty(NUM_LOGS, "5");
-        this.properties.setProperty(WAIT_TIME, "5000");
-        this.properties.setProperty(LOCAL_TEST, FALSE);
+        String propertyFileName = "target/test-classes/AppSyntheticMonitor.properties";
+
+        try {
+            this.properties = AsmReader.readPropertiesFromFile(propertyFileName);
+            this.properties.setProperty(USER, "bryan.jasper@ca.com");
+            this.properties.setProperty(URL, "https://api.cloudmonitor.ca.com/1.6");
+            this.properties.setProperty(NUM_LOGS, "5");
+            this.properties.setProperty(WAIT_TIME, "5000");
+            this.properties.setProperty(LOCAL_TEST, FALSE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
     }
 
     /**
@@ -40,9 +47,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nplainLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
-            AsmRequestHelper requestHelper = new AsmRequestHelper(
-                cloudMonitorAccessor, this.properties);
+            AsmAccessor accessor = new AsmAccessor();
+            AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
 
             requestHelper.connect();
 
@@ -65,9 +71,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nencryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
-            AsmRequestHelper requestHelper = new AsmRequestHelper(
-                cloudMonitorAccessor, this.properties);
+            AsmAccessor accessor = new AsmAccessor();
+            AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
 
             requestHelper.connect();
 
@@ -91,9 +96,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nencryptedLogin2: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
-            AsmRequestHelper requestHelper = new AsmRequestHelper(
-                cloudMonitorAccessor, this.properties);
+            AsmAccessor accessor = new AsmAccessor();
+            AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
 
             requestHelper.connect();
 
@@ -116,9 +120,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nwrongLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
-            AsmRequestHelper requestHelper = new AsmRequestHelper(
-                cloudMonitorAccessor, this.properties);
+            AsmAccessor accessor = new AsmAccessor();
+            AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
 
             requestHelper.connect();
 
@@ -145,9 +148,8 @@ public class AsmLoginTest implements AsmProperties {
             System.out.println("\nwrongEncryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
                 + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
-            AsmAccessor cloudMonitorAccessor = new AsmAccessor(this.properties);
-            AsmRequestHelper requestHelper = new AsmRequestHelper(
-                cloudMonitorAccessor, this.properties);
+            AsmAccessor accessor = new AsmAccessor();
+            AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
 
             requestHelper.connect();
 

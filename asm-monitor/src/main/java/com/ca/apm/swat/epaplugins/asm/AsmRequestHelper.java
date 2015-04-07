@@ -24,22 +24,29 @@ import com.wily.introscope.epagent.EpaUtils;
 public class AsmRequestHelper implements AsmProperties {
 
     private AsmAccessor accessor;
-    private Properties properties;
     private String nkey;
     private String user;
-    private HashMap<String, String> checkpointMap;
-
+    private Properties properties;
+    private static HashMap<String, String> checkpointMap;
+    
     /**
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
-     * @param properties properties
      */
-    public AsmRequestHelper(AsmAccessor accessor,
-                                     Properties properties) {
+    public AsmRequestHelper(AsmAccessor accessor) {
         this.accessor = accessor;
-        this.properties = properties;
+        this.properties = AsmReader.getProperties();
         this.user = properties.getProperty(USER);
     }
+
+    /**
+     * Get the global checkpoint map.
+     * @return the checkpoint map
+     */
+    public static HashMap<String, String> getCheckpointMap() {
+        return checkpointMap;
+    }
+
 
     /**
      * Connect to App Synthetic Monitor API.
@@ -225,7 +232,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
         }
 
-        this.checkpointMap = returnCp;
+        AsmRequestHelper.checkpointMap = returnCp;
         return returnCp;
     }
 
@@ -353,7 +360,7 @@ public class AsmRequestHelper implements AsmProperties {
         EpaUtils.getFeedback().verbose("getStats: folder = " + folder
             + ", rule = " + rule.getName() + " of type " + rule.getType());
 
-        return rule.generateMetrics(statsRequest, metricPrefix, properties, checkpointMap);
+        return rule.generateMetrics(statsRequest, metricPrefix);
     }
 
     /**
@@ -387,7 +394,7 @@ public class AsmRequestHelper implements AsmProperties {
         EpaUtils.getFeedback().verbose("getPsp: folder = " + folder
             + ", rule = " + rule.getName() + " of type " + rule.getType());
         
-        return rule.generateMetrics(pspRequest, metricPrefix, properties, checkpointMap);
+        return rule.generateMetrics(pspRequest, metricPrefix);
     }
 
     /**
@@ -428,7 +435,7 @@ public class AsmRequestHelper implements AsmProperties {
         EpaUtils.getFeedback().verbose("getLogs: folder = " + folder
             + ", rule = " + rule.getName() + " of type " + rule.getType());
 
-        return rule.generateMetrics(logRequest, metricPrefix, properties, checkpointMap);
+        return rule.generateMetrics(logRequest, metricPrefix);
     }
 
     /**

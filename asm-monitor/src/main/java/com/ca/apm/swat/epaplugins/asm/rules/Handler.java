@@ -26,8 +26,5 @@ public interface Handler {
      * @param checkpointMap map containing all checkpoints of App Synthetic Monitor
      * @return map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String jsonString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap);    
+    public HashMap<String, String> generateMetrics(String jsonString, String metricTree);
 }

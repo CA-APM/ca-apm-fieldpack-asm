@@ -7,6 +7,8 @@ import java.util.Properties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.asm.AsmReader;
+import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
@@ -84,9 +86,7 @@ public class BaseRule implements Rule, AsmProperties {
      */
     public HashMap<String, String> generateMetrics(
         String jsonString,
-        String metricTree,
-        Properties properties,
-        HashMap<String, String> checkpointMap) {
+        String metricTree) {
 
         HashMap<String, String> metricMap = new HashMap<String, String>();
 
@@ -96,10 +96,11 @@ public class BaseRule implements Rule, AsmProperties {
             metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(NAME_TAG);
         }
 
-        if (TRUE.equals(properties.getProperty(DISPLAY_CHECKPOINTS, TRUE))) {
+        if (TRUE.equals(AsmReader.getProperties().getProperty(DISPLAY_CHECKPOINTS, TRUE))) {
             if (jsonObject.optString(LOCATION_TAG, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
-                        + (String) checkpointMap.get(jsonObject.getString(LOCATION_TAG));
+                        + AsmRequestHelper.getCheckpointMap().get(
+                            jsonObject.getString(LOCATION_TAG));
             }
         }
 
@@ -109,20 +110,18 @@ public class BaseRule implements Rule, AsmProperties {
 
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
-                metricMap.putAll(generateMetrics(innerJsonObject.toString(),
-                    metricTree, properties, checkpointMap));
+                metricMap.putAll(generateMetrics(innerJsonObject.toString(), metricTree));
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
                 for (int i = 0; i < innerJsonArray.length(); i++) {
                     if ((thisKey.equals(RESULT_TAG)) || (thisKey.equals(MONITORS_TAG))
                             || (thisKey.equals(STATS_TAG))) {
                         metricMap.putAll(generateMetrics(
-                            innerJsonArray.getJSONObject(i).toString(),
-                            metricTree, properties, checkpointMap));
+                            innerJsonArray.getJSONObject(i).toString(), metricTree));
                     } else {
                         metricMap.putAll(generateMetrics(
-                            innerJsonArray.getJSONObject(i).toString(), metricTree 
-                            + METRIC_PATH_SEPARATOR + thisKey, properties, checkpointMap));
+                            innerJsonArray.getJSONObject(i).toString(),
+                            metricTree + METRIC_PATH_SEPARATOR + thisKey));
                     }
                 }
             } else {
