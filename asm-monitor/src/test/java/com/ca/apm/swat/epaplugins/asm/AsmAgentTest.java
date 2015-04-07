@@ -40,5 +40,4 @@ public class AsmAgentTest implements AsmProperties {
             e.printStackTrace();
         }
     }
-
 }

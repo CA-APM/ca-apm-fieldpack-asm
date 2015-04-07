@@ -23,6 +23,8 @@ public class BaseRule implements Rule, AsmProperties {
     private String[] tags = null;
     private String type = null;
 
+    protected Handler successor = null;
+
     /**
      * Rule base class.
      * @param name name of the rule
@@ -170,5 +172,13 @@ public class BaseRule implements Rule, AsmProperties {
             + " metrics for rule " + getName() + " in metric tree " + metricTree);
         
         return metricMap;
+    }
+
+    public void setSuccessor(Handler successor) {
+        this.successor = successor;
+    }
+    
+    protected Handler getSuccessor() {
+        return this.successor;
     }
 }

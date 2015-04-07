@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.zip.Inflater;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,6 +35,13 @@ public class ScriptRule extends BaseRule {
 
     protected ScriptRule(String name, String folder, String[] tags) {
         super(name, SCRIPT_RULE, folder, tags);
+
+        // build chain of responsibility
+        Handler jmeterHandler = new JMeterScriptHandler();
+        // setSuccessor(jmeterHandler);
+        Handler decoder = new InflatingBase64Decoder();
+        decoder.setSuccessor(jmeterHandler);
+        setSuccessor(decoder);
     }
 
     @Override
@@ -50,8 +56,11 @@ public class ScriptRule extends BaseRule {
             metricMap = super.generateMetrics(jsonString, metricTree, properties, checkpointMap);
 
             // remove MONITOR_METRIC_PREFIX from metric tree for step metrics
-            String statusMetricTree = metricTree.substring(MONITOR_METRIC_PREFIX.length());
-            metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree));
+            String statusMetricTree = STATUS_METRIC_PREFIX
+                    + metricTree.substring(MONITOR_METRIC_PREFIX.length())
+                    + METRIC_PATH_SEPARATOR + getName();
+            metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree, properties,
+                checkpointMap));
 
             EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
                 + " metrics from super() for rule " + getName() + " in metric tree " + metricTree);
@@ -71,8 +80,12 @@ public class ScriptRule extends BaseRule {
      * @return metric map
      * @throws JSONException errors
      */
-    protected HashMap<String, String> analyzeContentResults(String jsonString, String folder)
-            throws JSONException {
+//    protected HashMap<String, String> analyzeContentResults(String jsonString, String folder)
+    protected HashMap<String, String> analyzeContentResults(String jsonString,
+        String metricTree,
+        Properties properties,
+        HashMap<String, String> checkpointMap) 
+                throws JSONException {
 
         HashMap<String, String> metricMap = new HashMap<String, String>();
         JSONObject jsonObject = new JSONObject(jsonString);
@@ -87,12 +100,14 @@ public class ScriptRule extends BaseRule {
 
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
-                metricMap.putAll(analyzeContentResults(innerJsonObject.toString(), folder));
+                metricMap.putAll(analyzeContentResults(innerJsonObject.toString(),
+                    metricTree, properties, checkpointMap));
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
                 for (int i = 0; i < innerJsonArray.length(); i++) {
                     metricMap.putAll(
-                        analyzeContentResults(innerJsonArray.getJSONObject(i).toString(), folder));
+                        analyzeContentResults(innerJsonArray.getJSONObject(i).toString(),
+                            metricTree, properties, checkpointMap));
                 }
             } else {
                 if ((thisKey.equals(COLOR_TAG)) || (thisKey.equals(ELAPSED_TAG))
@@ -107,16 +122,35 @@ public class ScriptRule extends BaseRule {
                 // chain of responsibility discover, decode, handle
                 if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
                     try {
-                        String originalString = thisValue;
-                        byte[] decoded = Base64.decodeBase64(originalString);
+
+                        byte[] decoded = Base64.decodeBase64(thisValue);
                         if (decoded != null) {
                             byte[] bytesDecompressed = decompress(decoded);
                             if (bytesDecompressed != null) {
                                 String returnValue = new String(bytesDecompressed, 0,
                                     bytesDecompressed.length, UTF8);
+
+                                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                                    EpaUtils.getFeedback().verbose(
+                                        "calling JMeterScriptHandler directly");
+                                }
                                 if (returnValue.startsWith(XML_PREFIX)) {
+                                    /*
+                                    Handler jmeterHandler = new JMeterScriptHandler();
+                                    setSuccessor(jmeterHandler);
                                     metricMap.putAll(
-                                        analyzeXml(returnValue, folder, name));
+                                        successor.generateMetrics(returnValue,
+                                            metricTree, properties, checkpointMap));
+
+                                    if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                                        EpaUtils.getFeedback().verbose(
+                                            "calling JMeterScriptHandler via handlers");
+                                    }
+                                     */
+                                    metricMap.putAll(
+                                        successor.generateMetrics(thisValue, metricTree,
+                                            properties, checkpointMap));
+
                                 } else {
                                     if (returnValue.startsWith(HAR_OR_LOG_TAG)) {
                                         // Do nothing - already have seen it.
@@ -126,6 +160,12 @@ public class ScriptRule extends BaseRule {
                                 continue;
                             }
                         }
+
+                        /*
+                        metricMap.putAll(
+                            successor.generateMetrics(thisValue,
+                                metricTree, properties, checkpointMap));
+                         */
                     } catch (Exception uee) {
                         uee.printStackTrace();
                         //Don't throw. Some formats are not yet supported
@@ -144,7 +184,7 @@ public class ScriptRule extends BaseRule {
      */
     public byte[] decompress(byte[] data) {
         try {
-            Inflater inflater = new Inflater();
+            java.util.zip.Inflater inflater = new java.util.zip.Inflater();
             inflater.setInput(data);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
@@ -309,24 +349,24 @@ public class ScriptRule extends BaseRule {
         // TODO: map status values according to config
         int statusCode = 0;
         switch (responsecode) {
-          case 403 :
-              statusCode = 401;
-              break;
+        case 403 :
+            statusCode = 401;
+            break;
 
-          case 404 :
-              statusCode = 404;
-              break;
+        case 404 :
+            statusCode = 404;
+            break;
 
-          case 500 :
-              statusCode = 500;
-              break;
+        case 500 :
+            statusCode = 500;
+            break;
 
-          case 503 :
-              statusCode = 500;
-              break;
+        case 503 :
+            statusCode = 500;
+            break;
 
-          default:
-              break;
+        default:
+            break;
         }
         return statusCode;
     }
