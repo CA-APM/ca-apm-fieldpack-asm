@@ -1,16 +1,1 @@
-doCallback({"version":"8.2.10b",
-		"code":0,"info":"account credits",
-		"elapsed":"14.8251",
-		"result":{"credits":[
-	{"type":"sms",
-		"amount":"2500.00",
-		"credit_limit":"0.00",
-		"available":"2500.00"},
-	{"type":"api",
-		"amount":"41422.00",
-		"credit_limit":"0.00",
-		"available":"41422.00"},
-	{"type":"check",
-		"amount":"24650.00",
-		"credit_limit":"0.00",
-		"available":"24650.00"}]}})
+doCallback({"version":"8.2.10b","code":0,"info":"account credits","elapsed":"18.8789","result":{"credits":[{"type":"sms","amount":"2500.00","credit_limit":"0.00","available":"2500.00"},{"type":"api","amount":"39338.00","credit_limit":"0.00","available":"39338.00"},{"type":"check","amount":"24650.00","credit_limit":"0.00","available":"24650.00"}]}})

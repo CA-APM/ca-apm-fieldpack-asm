@@ -32,10 +32,10 @@ public class AsmAgentTest implements AsmProperties {
                 set.add(key.concat(" = ").concat(map.get(key)));
             }
 
-            for (Iterator<String> it = set.iterator(); it.hasNext();) {
-                String value = it.next();
-                System.out.println(value);
-            }
+//            for (Iterator<String> it = set.iterator(); it.hasNext();) {
+//                String value = it.next();
+//                System.out.println(value);
+//            }
 
         } catch (Exception e) {
             // TODO Auto-generated catch block

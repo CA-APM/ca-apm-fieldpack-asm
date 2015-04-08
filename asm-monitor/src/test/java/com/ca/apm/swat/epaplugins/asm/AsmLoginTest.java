@@ -37,15 +37,16 @@ public class AsmLoginTest implements AsmProperties {
     /**
      * Try to login with plain password.
      */
-    @Test
+    // skip test because we dont want a plain password here
+    //@Test
     public void plainLogin() {
 
         try {
-            this.properties.setProperty(PASSWORD, "CAdemo123!");
+            this.properties.setProperty(PASSWORD, "insert password here");
             this.properties.setProperty(PASSWORD_ENCRYPTED, FALSE);
 
-            System.out.println("\nplainLogin: pw=" + this.properties.getProperty(PASSWORD)
-                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
+//            System.out.println("\nplainLogin: pw=" + this.properties.getProperty(PASSWORD)
+//                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
             AsmAccessor accessor = new AsmAccessor();
             AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
@@ -68,8 +69,8 @@ public class AsmLoginTest implements AsmProperties {
             this.properties.setProperty(PASSWORD, "sFc9hz82waUtIqjHvinc6Q==");
             this.properties.setProperty(PASSWORD_ENCRYPTED, TRUE);
 
-            System.out.println("\nencryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
-                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
+//            System.out.println("\nencryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
+//                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
             AsmAccessor accessor = new AsmAccessor();
             AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
@@ -93,8 +94,8 @@ public class AsmLoginTest implements AsmProperties {
             this.properties.setProperty(PASSWORD, "sFc9hz82waUtIqjHvinc6Q==");
             this.properties.setProperty(PASSWORD_ENCRYPTED, TRUE);
 
-            System.out.println("\nencryptedLogin2: pw=" + this.properties.getProperty(PASSWORD)
-                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
+//            System.out.println("\nencryptedLogin2: pw=" + this.properties.getProperty(PASSWORD)
+//                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
             AsmAccessor accessor = new AsmAccessor();
             AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
@@ -117,8 +118,8 @@ public class AsmLoginTest implements AsmProperties {
             this.properties.setProperty(PASSWORD, "wrong password");
             this.properties.setProperty(PASSWORD_ENCRYPTED, FALSE);
 
-            System.out.println("\nwrongLogin: pw=" + this.properties.getProperty(PASSWORD)
-                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
+//            System.out.println("\nwrongLogin: pw=" + this.properties.getProperty(PASSWORD)
+//                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
             AsmAccessor accessor = new AsmAccessor();
             AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
@@ -145,8 +146,8 @@ public class AsmLoginTest implements AsmProperties {
             this.properties.setProperty(PASSWORD, "sFc1234ggaUtIqjHvinc6Q==");
             this.properties.setProperty(PASSWORD_ENCRYPTED, TRUE);
 
-            System.out.println("\nwrongEncryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
-                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
+//            System.out.println("\nwrongEncryptedLogin: pw=" + this.properties.getProperty(PASSWORD)
+//                + ", enc=" + this.properties.getProperty(PASSWORD_ENCRYPTED));
 
             AsmAccessor accessor = new AsmAccessor();
             AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
