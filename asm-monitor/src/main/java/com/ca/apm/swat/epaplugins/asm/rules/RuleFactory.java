@@ -25,7 +25,9 @@ public class RuleFactory implements AsmProperties {
         if (type == null) {
             return null;
         }     
-        if (type.equalsIgnoreCase(SCRIPT_RULE)) {
+        if (type.equalsIgnoreCase(SCRIPT_RULE)
+                /*|| type.equalsIgnoreCase(RBM_RULE)
+                || type.equalsIgnoreCase(BROWSER_RULE)*/) {
             return new ScriptRule(name, folder, tags);
         }
 

@@ -23,7 +23,7 @@ import com.wily.introscope.epagent.EpaUtils;
  */
 public class AsmRequestHelper implements AsmProperties {
 
-    private AsmAccessor accessor;
+    private Accessor accessor;
     private String nkey;
     private String user;
     private Properties properties;
@@ -33,7 +33,7 @@ public class AsmRequestHelper implements AsmProperties {
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
      */
-    public AsmRequestHelper(AsmAccessor accessor) {
+    public AsmRequestHelper(Accessor accessor) {
         this.accessor = accessor;
         this.properties = AsmReader.getProperties();
         this.user = properties.getProperty(USER);

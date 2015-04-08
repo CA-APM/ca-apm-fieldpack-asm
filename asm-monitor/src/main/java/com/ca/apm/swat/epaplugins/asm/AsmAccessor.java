@@ -20,7 +20,7 @@ import com.wily.introscope.epagent.EpaUtils;
  * Access the App Synthetic Monitor API.
  *
  */
-public class AsmAccessor implements AsmProperties {
+public class AsmAccessor implements AsmProperties, Accessor {
 
     private boolean localTest;
     private Properties properties;
@@ -68,14 +68,8 @@ public class AsmAccessor implements AsmProperties {
         }
     }
 
-    /**
-     * Execute a call against the App Synthetic Monitor API.
-     * @param callType API call
-     * @param callParams parameters
-     * @return unpadded API call result
-     * @throws Exception if an error occurred,
-     *     e.g. an error code like 1000 (authentication error) or
-     *     1001 (call syntax error) was returned by the API call
+    /* (non-Javadoc)
+     * @see com.ca.apm.swat.epaplugins.asm.Accessor#executeApi(java.lang.String, java.lang.String)
      */
     public String executeApi(String callType, String callParams) throws Exception {
         return executeApi(callType, callParams, true);
