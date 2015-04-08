@@ -2,7 +2,6 @@ package com.ca.apm.swat.epaplugins.asm.rules;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

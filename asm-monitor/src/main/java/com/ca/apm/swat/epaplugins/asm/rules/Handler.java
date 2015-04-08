@@ -1,7 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm.rules;
 
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * Handler interface for generating metrics from a JSON string.

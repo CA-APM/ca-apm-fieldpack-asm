@@ -1,8 +1,14 @@
 package com.ca.apm.swat.epaplugins.asm;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.ca.apm.swat.epaplugins.asm.error.LoginError;
 
-public interface Accessor {
+public abstract class Accessor {
+
+    public static final String JSON_REGEX = "doCallback\\((.*)\\)([\n]*)";
+    private static final Pattern unpad = Pattern.compile(JSON_REGEX);
 
     /**
      * Execute a call against the App Synthetic Monitor API.
@@ -24,4 +30,17 @@ public interface Accessor {
      */
     public abstract String login() throws LoginError, Exception;
 
+    /**
+     * Remove padding from JSON string. 
+     * @param jsonWithPadding JSON string with padding
+     * @return JSON string without padding
+     */
+    protected static String unpadJson(String jsonWithPadding) {
+        Matcher matcher = unpad.matcher(jsonWithPadding);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
 }

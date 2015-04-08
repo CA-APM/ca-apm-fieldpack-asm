@@ -18,7 +18,6 @@ public interface AsmProperties {
     public static final String NO                       = "n";
     public static final String NO_TYPE                  = "no type";
     public static final String DATE_FORMAT              = "yyyy-MM-dd";
-    public static final String UTF8                     = "UTF-8";
     public static final String DEFAULT_DELIMITER        = ",";
     public static final String BLANK                    = " ";
 
@@ -31,6 +30,7 @@ public interface AsmProperties {
 
     public static final String LOCALE                   = "asm.locale";
     public static final String DEFAULT_LOCALE           = "en_US";
+    public static final String ENCODING                 = "asm.encoding";
     public static final String WAIT_TIME                = "asm.waittime";
     public static final String DISPLAY_CHECKPOINTS      = "asm.displaycheckpoints";
 
@@ -107,7 +107,6 @@ public interface AsmProperties {
             + "ProtocolException|SocketException|SocketTimeoutException|UnknownHostException).*";
 
     // JSON constants
-    public static final String JSON_REGEX               = "doCallback\\((.*)\\)([\n]*)";
     public static final String JSON_PATTERN             = "\\p{InCombiningDiacriticalMarks}+";
     
     // Crypto constants

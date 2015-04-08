@@ -3,7 +3,6 @@ package com.ca.apm.swat.epaplugins.asm.rules;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.zip.Inflater;
 
 import org.apache.commons.codec.binary.Base64;
@@ -46,7 +45,7 @@ public class InflatingBase64Decoder implements Handler {
                     String decodedString;
                     try {
                         decodedString = new String(bytesDecompressed, 0,
-                            bytesDecompressed.length, AsmProperties.UTF8);
+                            bytesDecompressed.length, EpaUtils.getEncoding());
                     } catch (UnsupportedEncodingException e) {
                         // should not happen: UTF8 should be supported
                         String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR,

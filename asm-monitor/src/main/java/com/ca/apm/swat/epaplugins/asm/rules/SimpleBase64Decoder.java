@@ -41,7 +41,7 @@ public class SimpleBase64Decoder implements Handler {
                 String decodedString;
                 try {
                     decodedString = new String(decoded, 0,
-                        decoded.length, AsmProperties.UTF8);
+                        decoded.length, EpaUtils.getEncoding());
                 } catch (UnsupportedEncodingException e) {
                     // should not happen: UTF8 should be supported
                     String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR,

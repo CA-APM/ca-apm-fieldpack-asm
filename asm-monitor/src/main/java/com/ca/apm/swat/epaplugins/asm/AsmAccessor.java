@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
@@ -20,7 +18,7 @@ import com.wily.introscope.epagent.EpaUtils;
  * Access the App Synthetic Monitor API.
  *
  */
-public class AsmAccessor implements AsmProperties, Accessor {
+public class AsmAccessor extends Accessor implements AsmProperties {
 
     private boolean localTest;
     private Properties properties;
@@ -30,8 +28,6 @@ public class AsmAccessor implements AsmProperties, Accessor {
 
     public static final String FAILED = "Failed";
     public static final String LOGGED_OUT = "Logged Out.";
-
-    private static final Pattern unpad = Pattern.compile(JSON_REGEX);
 
     /**
      * Access the App Synthetic Monitor API.
@@ -103,7 +99,7 @@ public class AsmAccessor implements AsmProperties, Accessor {
             return LOGGED_OUT;
         }
         
-        apiResponse = unpadJson(apiResponse.trim());
+        apiResponse = Accessor.unpadJson(apiResponse.trim());
 
         if (checkError) {
             checkError(callType, apiResponse);
@@ -190,19 +186,4 @@ public class AsmAccessor implements AsmProperties, Accessor {
         }
         throw new LoginError(errorMessage);
     }
-
-    /**
-     * Remove padding from JSON string. 
-     * @param jsonWithPadding JSON string with padding
-     * @return JSON string without padding
-     */
-    private String unpadJson(String jsonWithPadding) {
-        Matcher matcher = unpad.matcher(jsonWithPadding);
-
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
-
 }

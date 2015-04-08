@@ -1,7 +1,9 @@
 package com.wily.introscope.epagent;
 
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
+import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -64,5 +66,14 @@ public class EpaUtils {
                 .replace(",", "_")
                 .replace(";", "-")
                 .replace("&", "and");
+    }
+
+    /**
+     * Returns the name of the encoding (e.g. UTF_8) to use.
+     * @return naem of the encdoing (default: UTF_8)
+     */
+    public static String getEncoding() {
+        return AsmReader.getProperties().getProperty(AsmProperties.ENCODING,
+            StandardCharsets.UTF_8.name());
     }
 }

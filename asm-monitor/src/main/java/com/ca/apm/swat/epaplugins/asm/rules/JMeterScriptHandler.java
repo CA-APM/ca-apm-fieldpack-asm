@@ -2,7 +2,6 @@ package com.ca.apm.swat.epaplugins.asm.rules;
 
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

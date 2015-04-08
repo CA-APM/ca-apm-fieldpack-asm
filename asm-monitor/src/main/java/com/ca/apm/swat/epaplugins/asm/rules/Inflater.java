@@ -3,8 +3,6 @@ package com.ca.apm.swat.epaplugins.asm.rules;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Properties;
-//import java.util.zip.Inflater;
 
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -32,11 +30,11 @@ public class Inflater implements Handler {
         if (null != successor) {
             byte[] bytesDecompressed = null;
             try {
-                bytesDecompressed = decompress(compressedString.getBytes(AsmProperties.UTF8));
+                bytesDecompressed = decompress(compressedString.getBytes(EpaUtils.getEncoding()));
                 if (bytesDecompressed != null) {
                     String decompressedString;
                     decompressedString = new String(bytesDecompressed, 0,
-                        bytesDecompressed.length, AsmProperties.UTF8);
+                        bytesDecompressed.length, EpaUtils.getEncoding());
                     return successor.generateMetrics(decompressedString, metricTree);
                 } else {
                     EpaUtils.getFeedback().error("bytesDecompressed is null!");
