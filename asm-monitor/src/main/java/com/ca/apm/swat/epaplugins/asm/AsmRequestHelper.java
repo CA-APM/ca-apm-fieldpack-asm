@@ -11,8 +11,8 @@ import java.util.Properties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.asm.rules.Rule;
-import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
+import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
+import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -27,7 +27,7 @@ public class AsmRequestHelper implements AsmProperties {
     private String nkey;
     private String user;
     private Properties properties;
-    private static HashMap<String, String> checkpointMap;
+    private static HashMap<String, String> stationMap;
     
     /**
      * Create new CloudMonitorRequestHelper.
@@ -40,11 +40,11 @@ public class AsmRequestHelper implements AsmProperties {
     }
 
     /**
-     * Get the global checkpoint map.
-     * @return the checkpoint map
+     * Get the global monitoring station map.
+     * @return the monitoring station map
      */
-    public static HashMap<String, String> getCheckpointMap() {
-        return checkpointMap;
+    public static HashMap<String, String> getMonitoringStationMap() {
+        return stationMap;
     }
 
 
@@ -204,14 +204,14 @@ public class AsmRequestHelper implements AsmProperties {
     }
 
     /**
-     * Get the checkpoints from the App Synthetic Monitor API.
-     * @return map of checkpoints
+     * Get the monitoring stations from the App Synthetic Monitor API.
+     * @return map of monitoring stations
      * @throws Exception errors
      */
-    public HashMap<String, String> getCheckpoints() throws Exception {
+    public HashMap<String, String> getMonitoringStations() throws Exception {
         HashMap<String, String> returnCp = new HashMap<String, String>();
 
-        String cpRequest = accessor.executeApi(CHECKPOINTS_CMD, getCommandString());
+        String cpRequest = accessor.executeApi(STATIONS_GET_CMD, getCommandString());
 
         JSONArray cpJsonArray = extractJsonArray(cpRequest, CHECKPOINTS_TAG);
 
@@ -232,20 +232,20 @@ public class AsmRequestHelper implements AsmProperties {
             }
         }
 
-        AsmRequestHelper.checkpointMap = returnCp;
+        AsmRequestHelper.stationMap = returnCp;
         return returnCp;
     }
 
 
     /**
-     * Get the rules (monitors) from the App Synthetic Monitor API.
+     * Get the monitors (monitors) from the App Synthetic Monitor API.
      * @param folder list of folders
-     * @param rulesList list of rules
-     * @return list of rules/monitors
+     * @param monitorsList list of monitors
+     * @return list of monitors/monitors
      * @throws Exception errors
      */
-    private List<Rule> getRules(String folder, String rulesList) throws Exception {
-        List<Rule> rules = new ArrayList<Rule>();
+    private List<Monitor> getMonitors(String folder, String monitorsList) throws Exception {
+        List<Monitor> monitors = new ArrayList<Monitor>();
         String folderStr = EMPTY_STRING;
         if (folder.equals(ROOT_FOLDER)) {
             folder = EMPTY_STRING; // for later comparison
@@ -253,91 +253,91 @@ public class AsmRequestHelper implements AsmProperties {
             folderStr = FOLDER_PARAM + folder;
         }
 
-        String ruleRequest = accessor.executeApi(RULE_CMD, getCommandString() + folderStr);
+        String monitorRequest = accessor.executeApi(MONITOR_GET_CMD, getCommandString() + folderStr);
 
-        JSONArray ruleJsonArray = extractJsonArray(ruleRequest, RULES_TAG);
+        JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
 
-        for (int i = 0; i < ruleJsonArray.length(); i++) {
-            JSONObject ruleJsonObject = ruleJsonArray.getJSONObject(i);
-            if (!ruleJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
+        for (int i = 0; i < monitorJsonArray.length(); i++) {
+            JSONObject monitorJsonObject = monitorJsonArray.getJSONObject(i);
+            if (!monitorJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
                 continue;
             }
 
             if (EpaUtils.getFeedback().isVerboseEnabled()) {
                 EpaUtils.getFeedback().verbose(
-                    "found rule '" + ruleJsonObject.getString(NAME_TAG)
-                    + "' of type " + ruleJsonObject.getString(TYPE_TAG)
-                    + " in folder " + (ruleJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
-                        ruleJsonObject.getString(FOLDER_TAG)));
+                    "found monitor '" + monitorJsonObject.getString(NAME_TAG)
+                    + "' of type " + monitorJsonObject.getString(TYPE_TAG)
+                    + " in folder " + (monitorJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
+                        monitorJsonObject.getString(FOLDER_TAG)));
             }
 
             if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
-                    && (!YES.equals(ruleJsonObject.optString(ACTIVE_TAG, NO)))) {
+                    && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_MONITOR,
-                        ruleJsonObject.getString(NAME_TAG),
+                        monitorJsonObject.getString(NAME_TAG),
                         folder.length() > 0 ? folder : ROOT_FOLDER));
                 }
                 continue;
             }
-            rules.add(RuleFactory.getRule(
-                ruleJsonObject.getString(NAME_TAG),
-                ruleJsonObject.getString(TYPE_TAG),
-                ruleJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
-                    ruleJsonObject.getString(FOLDER_TAG),
-                    ruleJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
-                        ruleJsonObject.getString(TAGS_TAG).split(",")));
+            monitors.add(MonitorFactory.getMonitor(
+                monitorJsonObject.getString(NAME_TAG),
+                monitorJsonObject.getString(TYPE_TAG),
+                monitorJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
+                    monitorJsonObject.getString(FOLDER_TAG),
+                    monitorJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
+                        monitorJsonObject.getString(TAGS_TAG).split(",")));
         }
 
-        if (!rulesList.equals(ALL_RULES)) {
-            rules = matchList(rules, rulesList);
+        if (!monitorsList.equals(ALL_MONITORS)) {
+            monitors = matchList(monitors, monitorsList);
         }
 
-        return rules;
+        return monitors;
     }
 
     /**
-     * Get the folders and rules (monitors) from the App Synthetic Monitor API.
+     * Get the folders and monitors (monitors) from the App Synthetic Monitor API.
      * Properties like asm.skipInactiveMonitors are taken into account.
      * @param folders list of folders
-     * @return map of folders and rules
+     * @return map of folders and monitors
      * @throws Exception errors
      */
-    public HashMap<String, List<Rule>> getFoldersAndRules(String[] folders) throws Exception {
-        HashMap<String, List<Rule>> foldersAndRules = new HashMap<String, List<Rule>>();
+    public HashMap<String, List<Monitor>> getMonitors(String[] folders) throws Exception {
+        HashMap<String, List<Monitor>> foldersAndMonitors = new HashMap<String, List<Monitor>>();
 
 
         for (int i = 0; i < folders.length; i++) {
-            String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i], ALL_RULES);
-            List<Rule> rules;
-            if (((folderProp.length() == 0) || (folderProp.equals(ALL_RULES)))
-                    // if we skip inactive monitors we can't use ALL_RULES
+            String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i], ALL_MONITORS);
+            List<Monitor> monitors;
+            if (((folderProp.length() == 0) || (folderProp.equals(ALL_MONITORS)))
+                    // if we skip inactive monitors we can't use ALL_MONITORS
                     && (!TRUE.equals(properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))) {
-                rules = getRules(folders[i], ALL_RULES);
-                rules.add(0, RuleFactory.getAllRulesRule());
+                monitors = getMonitors(folders[i], ALL_MONITORS);
+                monitors.add(0, MonitorFactory.getAllMonitorsMonitor());
             } else {
-                rules = getRules(folders[i], folderProp);
+                monitors = getMonitors(folders[i], folderProp);
             }
-            // must be at least one rule != ALL_RULES
-            if (((rules.size() > 0) && !rules.get(0).equals(ALL_RULES)) || (rules.size() > 1))  {
-                foldersAndRules.put(folders[i], rules);
+            // must be at least one monitor != ALL_MONITORS
+            if (((monitors.size() > 0) && !monitors.get(0).equals(ALL_MONITORS)) || (monitors.size() > 1))  {
+                foldersAndMonitors.put(folders[i], monitors);
             }
         }
-        return foldersAndRules;
+        return foldersAndMonitors;
     }
 
     /**
-     * Get statistics for folder and rule.
+     * Get statistics for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param rule gets all rules if null
+     * @param monitor gets all monitors if null
      * @return metric map
      * @throws Exception errors
      */
-    public HashMap<String, String> getStats(String folder, Rule rule, String metricPrefix)
+    public HashMap<String, String> getStats(String folder, Monitor monitor, String metricPrefix)
             throws Exception {
         String statsRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
-        String ruleStr = EMPTY_STRING;
+        String monitorStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
@@ -345,36 +345,36 @@ public class AsmRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (rule != null) {
-            ruleStr = NAME_PARAM + rule.getName();
-            folder = folder + "|" + rule.getName();
+        if (monitor != null) {
+            monitorStr = NAME_PARAM + monitor.getName();
+            folder = folder + "|" + monitor.getName();
         } else {
-            rule = RuleFactory.getAllRulesRule();
+            monitor = MonitorFactory.getAllMonitorsMonitor();
         }
 
         String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
-                + folderStr + ruleStr + START_DATE_PARAM
+                + folderStr + monitorStr + START_DATE_PARAM
                 + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
         statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
         EpaUtils.getFeedback().verbose("getStats: folder = " + folder
-            + ", rule = " + rule.getName() + " of type " + rule.getType());
+            + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
 
-        return rule.generateMetrics(statsRequest, metricPrefix);
+        return monitor.generateMetrics(statsRequest, metricPrefix);
     }
 
     /**
-     * Get PSP information for folder and rule.
+     * Get PSP information for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param rule gets all rules if null
+     * @param monitor gets all monitors if null
      * @return metric map
      * @throws Exception errors
      */
-    public HashMap<String, String> getPsp(String folder, Rule rule, String metricPrefix)
+    public HashMap<String, String> getPsp(String folder, Monitor monitor, String metricPrefix)
             throws Exception {
         String pspRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
-        String ruleStr = EMPTY_STRING;
+        String monitorStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
@@ -382,61 +382,61 @@ public class AsmRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (rule != null) {
-            ruleStr = NAME_PARAM + rule.getName();
+        if (monitor != null) {
+            monitorStr = NAME_PARAM + monitor.getName();
         } else {
-            rule = RuleFactory.getAllRulesRule();
+            monitor = MonitorFactory.getAllMonitorsMonitor();
         }
 
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
-            + folderStr + ruleStr);
+            + folderStr + monitorStr);
 
         EpaUtils.getFeedback().verbose("getPsp: folder = " + folder
-            + ", rule = " + rule.getName() + " of type " + rule.getType());
+            + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
         
-        return rule.generateMetrics(pspRequest, metricPrefix);
+        return monitor.generateMetrics(pspRequest, metricPrefix);
     }
 
     /**
-     * Get logs for folder and rule.
+     * Get logs for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param rule gets all rules if null
-     * @param numRules number of rules in folder
+     * @param monitor gets all monitors if null
+     * @param numMonitors number of monitors in folder
      * @return metric map
      * @throws Exception errors
      */
     public HashMap<String, String> getLogs(String folder,
-        Rule rule,
-        int numRules,
+        Monitor monitor,
+        int numMonitors,
         String metricPrefix) throws Exception {
 
         String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
-        String ruleStr = EMPTY_STRING;
-        int numLogs = Integer.parseInt(this.properties.getProperty(NUM_LOGS)) * numRules;
+        String monitorStr = EMPTY_STRING;
+        int numLogs = Integer.parseInt(this.properties.getProperty(NUM_LOGS)) * numMonitors;
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
         } else {
             folder = ROOT_FOLDER;
             //TODO: check this again
-            //rule = RuleFactory.getAllRulesRule();
+            //monitor = MonitorFactory.getAllMonitorsMonitor();
         }
 
-        if (rule != null) {
-            ruleStr = NAME_PARAM + rule.getName();
+        if (monitor != null) {
+            monitorStr = NAME_PARAM + monitor.getName();
         }
-        String logStr = NKEY_PARAM + this.nkey + folderStr + ruleStr
+        String logStr = NKEY_PARAM + this.nkey + folderStr + monitorStr
                 + NUM_PARAM + numLogs + REVERSE_PARAM + CALLBACK_PARAM 
                 + DO_CALLBACK + FULL_PARAM;
-        //    String logStr = "nkey=" + this.nkey + folderStr + ruleStr
+        //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
         //        + "&num=" + numLogs + "&reverse=y&full=y";
 
         logRequest = accessor.executeApi(LOGS_CMD, logStr);
 
         EpaUtils.getFeedback().verbose("getLogs: folder = " + folder
-            + ", rule = " + rule.getName() + " of type " + rule.getType());
+            + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
 
-        return rule.generateMetrics(logRequest, metricPrefix);
+        return monitor.generateMetrics(logRequest, metricPrefix);
     }
 
     /**

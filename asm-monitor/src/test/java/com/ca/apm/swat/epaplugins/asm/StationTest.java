@@ -11,17 +11,17 @@ import org.junit.Test;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class CheckpointTest extends FileTest {
+public class StationTest extends FileTest {
 
     /**
-     * Test getCheckpoints().
+     * Test getMonitoringStations().
      */
     @Test
-    public void getCheckpoints() {
+    public void getMonitoringStations() {
 
         try {
             // call API
-            HashMap<String, String> checkpointMap = requestHelper.getCheckpoints();
+            HashMap<String, String> stationMap = requestHelper.getMonitoringStations();
 
             // metricMap should contain those entries
             String expectedMetrics[] = { "sf", "fl", "vi"};
@@ -30,12 +30,12 @@ public class CheckpointTest extends FileTest {
                                         "europe-east|Austria|Vienna"};
 
             // check
-            checkMetrics(expectedMetrics, expectedValues, checkpointMap);
+            checkMetrics(expectedMetrics, expectedValues, stationMap);
 
             // must have 95 entries
             int expectedCount = 95;
-            Assert.assertEquals("expected " + expectedCount + " checkpoints",
-                expectedCount, checkpointMap.size());
+            Assert.assertEquals("expected " + expectedCount + " monitoring stations",
+                expectedCount, stationMap.size());
 
         } catch (Exception e) {
             e.printStackTrace();

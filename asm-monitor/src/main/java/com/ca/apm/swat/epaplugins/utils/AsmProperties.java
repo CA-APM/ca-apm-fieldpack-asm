@@ -32,11 +32,11 @@ public interface AsmProperties {
     public static final String DEFAULT_LOCALE           = "en_US";
     public static final String ENCODING                 = "asm.encoding";
     public static final String WAIT_TIME                = "asm.waittime";
-    public static final String DISPLAY_CHECKPOINTS      = "asm.displaycheckpoints";
+    public static final String DISPLAY_STATIONS         = "asm.displayMonitoringStations";
 
     // which metrics to get and display
     public static final String METRICS_STATS_FOLDER     = "asm.metrics.stats.folder";
-    public static final String METRICS_STATS_RULE       = "asm.metrics.stats.rule";
+    public static final String METRICS_STATS_MONITOR    = "asm.metrics.stats.monitor";
     public static final String METRICS_CREDITS          = "asm.metrics.credits";
     public static final String METRICS_PUBLIC           = "asm.metrics.public";
     public static final String METRICS_LOGS             = "asm.metrics.logs";
@@ -70,7 +70,7 @@ public interface AsmProperties {
     public static final String INCLUDE_TAGS             = "asm.includeTags";
     public static final String INCLUDE_MONITORS         = "asm.includeMonitors";
     public static final String RESULT_GROUPS            = "asm.resultsGroups";
-    public static final String ALL_RULES                = "all_rules";
+    public static final String ALL_MONITORS             = "all_monitors";
     public static final String ALL_TAGS                 = "all_tags";
     public static final String GROUP_BY_FOLDER          = "by_folder";
     public static final String GROUP_BY_STATION         = "by_station";
@@ -133,9 +133,9 @@ public interface AsmProperties {
     public static final String LOGIN_CMD                = "acct_token";
     public static final String LOGOUT_CMD               = "acct_logout";
     public static final String CREDITS_CMD              = "acct_credits";
-    public static final String CHECKPOINTS_CMD          = "cp_list";
+    public static final String STATIONS_GET_CMD         = "cp_list";
     public static final String FOLDER_CMD               = "fldr_get";
-    public static final String RULE_CMD                 = "rule_get";
+    public static final String MONITOR_GET_CMD          = "rule_get";
     public static final String PSP_CMD                  = "rule_psp";
     public static final String STATS_CMD                = "rule_stats";
     public static final String LOGS_CMD                 = "rule_log";
@@ -185,12 +185,12 @@ public interface AsmProperties {
     public static final String HAR_OR_LOG_TAG           = "{\"har\""; //"{\"har\": {\"log\"";
     public static final String UNDEFINED                = "Undefined";
 
-    // rule types
-    public static final String HTTP_RULE                = "http";
-    public static final String HTTPS_RULE               = "https";
-    public static final String SCRIPT_RULE              = "script";
-    public static final String BROWSER_RULE             = "browser";
-    public static final String RBM_RULE                 = "script_firefox";
+    // monitor types
+    public static final String HTTP_MONITOR             = "http";
+    public static final String HTTPS_MONITOR            = "https";
+    public static final String SCRIPT_MONITOR           = "script";
+    public static final String FULL_PAGE_MONITOR        = "browser";
+    public static final String REAL_BROWSER_MONITOR     = "script_firefox";
     
     // JMeter log result tags
     public static final String TEST_RESULTS             = "testResults";

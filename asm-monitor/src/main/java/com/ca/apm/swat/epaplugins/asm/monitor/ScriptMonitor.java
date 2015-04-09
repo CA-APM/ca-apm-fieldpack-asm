@@ -1,4 +1,4 @@
-package com.ca.apm.swat.epaplugins.asm.rules;
+package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,17 +11,17 @@ import com.wily.introscope.epagent.EpaUtils;
 
 
 /**
- * {@link Rule} implementation for script monitors.
- * A ScriptRule generates additional metrics per JMeter step.
+ * {@link Monitor} implementation for script monitors.
+ * A ScriptMonitor generates additional metrics per JMeter step.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class ScriptRule extends BaseRule {
+public class ScriptMonitor extends BaseMonitor {
 
 
-    protected ScriptRule(String name, String folder, String[] tags) {
-        super(name, SCRIPT_RULE, folder, tags);
+    protected ScriptMonitor(String name, String folder, String[] tags) {
+        super(name, SCRIPT_MONITOR, folder, tags);
 
         // build chain of responsibility
         Handler jmeterHandler = new JMeterScriptHandler();
@@ -44,17 +44,17 @@ public class ScriptRule extends BaseRule {
                     new StringBuffer(metricTree).append(METRIC_PATH_SEPARATOR).append(getName());
             metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree.toString()));
 
-            EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
-                + " metrics from super() for rule " + getName() + " in metric tree "
+            EpaUtils.getFeedback().verbose("ScriptMonitor returning " + metricMap.size()
+                + " metrics from super() for monitor " + getName() + " in metric tree "
                 + statusMetricTree);
         } catch (JSONException e) {
-            EpaUtils.getFeedback().error(e.getMessage() + "\n rule " + getName()
+            EpaUtils.getFeedback().error(e.getMessage() + "\n monitor " + getName()
                 + ", metric tree  =" + metricTree + "\njsonString = " + jsonString);
             throw e;
         }
 
-        EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
-            + " metrics for rule " + getName() + " in metric tree " + metricTree);
+        EpaUtils.getFeedback().verbose("ScriptMonitor returning " + metricMap.size()
+            + " metrics for monitor " + getName() + " in metric tree " + metricTree);
 
         return metricMap;
     }
@@ -105,7 +105,7 @@ public class ScriptRule extends BaseRule {
                         metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
                     } catch (Exception e) {
                         //Don't throw. Some formats are not yet supported
-                        EpaUtils.getFeedback().warn(e.getMessage() + "\n rule " + getName()
+                        EpaUtils.getFeedback().warn(e.getMessage() + "\n monitor " + getName()
                             + ", metric tree  =" + metricTree + "\njsonString = " + jsonString);
                     }
                 }

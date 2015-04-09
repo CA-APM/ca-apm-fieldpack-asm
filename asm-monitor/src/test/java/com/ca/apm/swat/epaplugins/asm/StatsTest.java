@@ -7,8 +7,8 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.rules.Rule;
-import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
+import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
+import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 
 /**
  * Test class for testing the acct_credits API.
@@ -22,12 +22,12 @@ public class StatsTest extends FileTest {
     public void setup() {
         super.setup();
 
-        // we need to load the the checkpoint map
+        // we need to load the the monitoring station map
         try {
-            requestHelper.getCheckpoints();
+            requestHelper.getMonitoringStations();
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail("error getting checkpoints: " + e.getMessage());
+            Assert.fail("error getting monitoring stations: " + e.getMessage());
         }
     }
 
@@ -43,17 +43,16 @@ public class StatsTest extends FileTest {
             AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
-            Rule rule = RuleFactory.getRule("SFDC transaction", RBM_RULE, folder,
+            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
                 EMPTY_STRING_ARRAY);
-            int numRules = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
 
             // load file
-            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_rule.json");
+            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_monitor.json");
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getStats(folder, rule, metricPrefix);
+                    requestHelper.getStats(folder, monitor, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {

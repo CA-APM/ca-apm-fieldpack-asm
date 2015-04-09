@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.rules.Rule;
+import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 
 /**
  * Test class for testing the acct_credits API.
@@ -14,14 +14,14 @@ import com.ca.apm.swat.epaplugins.asm.rules.Rule;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class RuleTest extends FileTest {
+public class MonitorTest extends FileTest {
 
 
     /**
      * Test getFolders() without any properties.
      */
     @Test
-    public void getFoldersAndRulesSimple() {
+    public void getMonitorsSimple() {
 
         try {
             // set properties
@@ -32,14 +32,14 @@ public class RuleTest extends FileTest {
             String[] folders = {"root_folder"};
 
             // load file
-            accessor.loadFile(RULE_CMD, "target/test-classes/rule_get.json");
+            accessor.loadFile(MONITOR_GET_CMD, "target/test-classes/rule_get.json");
 
             // call API
-            HashMap<String, List<Rule>> folderMap = requestHelper.getFoldersAndRules(folders);
+            HashMap<String, List<Monitor>> folderMap = requestHelper.getMonitors(folders);
 
             // folderMap should contain those entries
-            String[] expectedRules = {
-                "all_rules",
+            String[] expectedMonitors = {
+                "all_monitors",
                 "AT&T Home",
                 "CA Home page",
                 "Cat.com click-through RBM",
@@ -55,13 +55,13 @@ public class RuleTest extends FileTest {
 //                String key = fit.next();
 //                System.out.println("folder " + key);
 //
-//                for (Iterator<Rule> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
+//                for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
 //                    System.out.println("  " + rit.next().getName());
 //                }
 //            }
 
             // check
-            checkRules(expectedRules, folderMap.get(folders[0]));
+            checkMonitors(expectedMonitors, folderMap.get(folders[0]));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class RuleTest extends FileTest {
      * Test getFolders() without any properties.
      */
     @Test
-    public void getFoldersAndRulesFolder() {
+    public void getMonitorsFolder() {
 
         try {
             // set properties
@@ -84,14 +84,14 @@ public class RuleTest extends FileTest {
             String[] folders = {"Tests"};
 
             // load file
-            accessor.loadFile(RULE_CMD, "target/test-classes/rule_get_folder.json");
+            accessor.loadFile(MONITOR_GET_CMD, "target/test-classes/rule_get_folder.json");
 
             // call API
-            HashMap<String, List<Rule>> folderMap = requestHelper.getFoldersAndRules(folders);
+            HashMap<String, List<Monitor>> folderMap = requestHelper.getMonitors(folders);
 
             // folderMap should contain those entries
-            String[] expectedRules = {
-                "all_rules",
+            String[] expectedMonitors = {
+                "all_monitors",
                 "Amazon.com",
                 "Bad request test",
                 "Simple HTTP validation test",
@@ -104,13 +104,13 @@ public class RuleTest extends FileTest {
 //                String key = fit.next();
 //                System.out.println("folder " + key);
 //
-//                for (Iterator<Rule> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
+//                for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
 //                    System.out.println("  " + rit.next().getName());
 //                }
 //            }
 
             // check
-            checkRules(expectedRules, folderMap.get(folders[0]));
+            checkMonitors(expectedMonitors, folderMap.get(folders[0]));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,7 +122,7 @@ public class RuleTest extends FileTest {
      * Test getFolders() with asm.skipInactiveMonitors=true.
      */
     @Test
-    public void getFoldersAndRulesSkipInactive() {
+    public void getMonitorsSkipInactive() {
 
         try {
             // set properties
@@ -133,13 +133,13 @@ public class RuleTest extends FileTest {
             String[] folders = {"Tests"};
 
             // load file
-            accessor.loadFile(RULE_CMD, "target/test-classes/rule_get_folder.json");
+            accessor.loadFile(MONITOR_GET_CMD, "target/test-classes/rule_get_folder.json");
 
             // call API
-            HashMap<String, List<Rule>> folderMap = requestHelper.getFoldersAndRules(folders);
+            HashMap<String, List<Monitor>> folderMap = requestHelper.getMonitors(folders);
 
             // folderMap should contain those entries
-            String[] expectedRules = {
+            String[] expectedMonitors = {
                 "Amazon.com",
                 "Bad request test",
                 "Simple HTTP validation test",
@@ -151,13 +151,13 @@ public class RuleTest extends FileTest {
 //                String key = fit.next();
 //                System.out.println("folder " + key);
 //
-//                for (Iterator<Rule> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
+//                for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
 //                    System.out.println("  " + rit.next().getName());
 //                }
 //            }
            
             // check
-            checkRules(expectedRules, folderMap.get(folders[0]));
+            checkMonitors(expectedMonitors, folderMap.get(folders[0]));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,11 +166,11 @@ public class RuleTest extends FileTest {
     }
 
     /**
-     * Checks that all expected rules exist in the list.
+     * Checks that all expected monitors exist in the list.
      * @param expected array of expected strings
-     * @param actual list of rules to check against
+     * @param actual list of monitors to check against
      */
-    public void checkRules(String[] expected, List<Rule> actual) {
+    public void checkMonitors(String[] expected, List<Monitor> actual) {
 
         Assert.assertEquals("expected " + expected.length + " entries",
             expected.length, actual.size());

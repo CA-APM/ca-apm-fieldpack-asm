@@ -12,10 +12,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XmlMetricWriter;
-import com.ca.apm.swat.epaplugins.asm.rules.Rule;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -122,7 +122,7 @@ public class AsmReader implements AsmProperties {
 
     /**
      * Main method of AsmReader.
-     * Connects to ASM API and gets all folder, monitor and checkpoint information.
+     * Connects to ASM API and gets all folder, monitor and monitoring station information.
      * Then starts a thread per folder to collect the monitor metrics.
      * @param epaWaitTime sleep time in main loop
      * @param properties properties read from config file
@@ -136,8 +136,8 @@ public class AsmReader implements AsmProperties {
         this.keepRunning = true;
         this.numRetriesLeft = 10;
 
-        // connect and read folders, rules and checkpoints
-        HashMap<String, List<Rule>> folderMap = initialize(requestHelper);
+        // connect and read folders, monitors and monitoring stations.
+        HashMap<String, List<Monitor>> folderMap = initialize(requestHelper);
 
         AsmMetricReporter metricReporter = new AsmMetricReporter(metricWriter);
 
@@ -211,13 +211,13 @@ public class AsmReader implements AsmProperties {
     }
 
     /**
-     * Initialize App Synthetic Monitor: connect and read folders, rules and checkpoints.
+     * Initialize AsmReader: connect and read folders, monitors and monitoring stations.
      * @param requestHelper the request helper
-     * @return map of folders and rules
+     * @return map of folders and monitors
      */
-    public HashMap<String, List<Rule>> initialize (AsmRequestHelper requestHelper) {
+    public HashMap<String, List<Monitor>> initialize (AsmRequestHelper requestHelper) {
         String[] folders = null;
-        HashMap<String, List<Rule>> folderMap = null;
+        HashMap<String, List<Monitor>> folderMap = null;
         boolean keepTrying = true;
         int initNumRetriesLeft = 10;
 
@@ -238,26 +238,26 @@ public class AsmReader implements AsmProperties {
                     EpaUtils.getFeedback().verbose(buf.toString());
                 }
 
-                // read rules
-                folderMap = requestHelper.getFoldersAndRules(folders);
+                // read monitors
+                folderMap = requestHelper.getMonitors(folders);
 
                 // TODO: remove or convert to message
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("read rules: ");
+                    EpaUtils.getFeedback().verbose("read monitors: ");
                     Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
                     for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
                         String folder = (String) fit.next();
                         StringBuffer buf = new StringBuffer("  " + folder + " = ");
-                        List<Rule> rules = folderMap.get(folder);
-                        for (Iterator<Rule> rit = rules.iterator(); rit.hasNext(); ) {
-                            buf.append(rit.next().getName() + ", ");
+                        List<Monitor> monitors = folderMap.get(folder);
+                        for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
+                            buf.append(mit.next().getName() + ", ");
                         }
                         EpaUtils.getFeedback().verbose(buf.toString());
                     }
                 }
 
-                // read checkpoints
-                requestHelper.getCheckpoints();
+                // read monitoring stations
+                requestHelper.getMonitoringStations();
 
                 keepTrying = false;
 

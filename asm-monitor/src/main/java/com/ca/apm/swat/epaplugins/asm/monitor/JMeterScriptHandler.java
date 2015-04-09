@@ -1,4 +1,4 @@
-package com.ca.apm.swat.epaplugins.asm.rules;
+package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -87,12 +87,10 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
     /**
      * Report JMeter steps as individual metrics. 
-     * @param folder folder name
-     * @param rule rule name
+     * @param metricTree metric tree prefix
      * @param step step number
      * @param stepNode step node
-     * @param metricMap map containing the metrics
-     * @return the step number
+     * @return metricMap map containing the metrics
      */
     private HashMap<String, String> reportJMeterStep(String metricTree,
         int step,
@@ -107,9 +105,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         //First the attributes
         NamedNodeMap attributes = stepNode.getAttributes();
-        int responsecode = Integer.parseInt(
+        int responseCode = Integer.parseInt(
             attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue());
-        String responsemessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
+        String responseMessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
         //String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
         final int errorCount = Integer.parseInt(attributes.getNamedItem(ERROR_COUNT_TAG)
             .getNodeValue());
@@ -156,20 +154,20 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         if (assertionAvailable) {
             if (assertionFailure) {
                 assertionFailed = true;
-                statusMessage = /* rule + */ ASSERTION_FAILURE;
+                statusMessage = /* monitor + */ ASSERTION_FAILURE;
                 statusCode = 3;
                 assertionFailures++;
             }
             if (assertionError) {
                 assertionFailed = true;
-                statusMessage = /* rule + */ ASSERTION_ERROR;
+                statusMessage = /* monitor + */ ASSERTION_ERROR;
                 statusCode = 3;
                 assertionErrors++;
             }
         }
         if (!assertionFailed) {
-            statusMessage = responsecode + " - " + responsemessage;
-            statusCode = format.mapResponseToStatusCode(responsecode);
+            statusMessage = responseCode + " - " + responseMessage;
+            statusCode = format.mapResponseToStatusCode(responseCode);
         }
 
         // report metrics
@@ -179,7 +177,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE_VALUE,
             Integer.toString(statusCode));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + RESPONSE_CODE,
-            Integer.toString(responsecode));
+            Integer.toString(responseCode));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + ERROR_COUNT,
             Integer.toString(errorCount));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + ASSERTION_FAILURES,

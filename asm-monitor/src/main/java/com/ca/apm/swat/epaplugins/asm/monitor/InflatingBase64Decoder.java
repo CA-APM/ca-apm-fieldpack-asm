@@ -1,4 +1,4 @@
-package com.ca.apm.swat.epaplugins.asm.rules;
+package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;

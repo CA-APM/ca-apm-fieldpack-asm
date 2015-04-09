@@ -21,8 +21,6 @@ public class AsmMetricReporter implements AsmProperties {
     /**
      * Report metrics to APM via metric writer.
      * @param metricWriter the metric writer
-     * @param displayCheckpoint display monitor info in metric path?
-     * @param checkpointMap map containing all checkpoints
      */
     public AsmMetricReporter(MetricWriter metricWriter) {
         this.metricWriter = metricWriter;

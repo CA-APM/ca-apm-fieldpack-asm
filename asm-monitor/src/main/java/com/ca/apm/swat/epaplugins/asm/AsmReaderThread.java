@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import com.ca.apm.swat.epaplugins.asm.rules.Rule;
-import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
+import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
+import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -23,7 +23,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     private boolean keepRunning = true;
     private int numRetriesLeft;
     private AsmRequestHelper requestHelper;
-    private HashMap<String, List<Rule>> folderMap;
+    private HashMap<String, List<Monitor>> folderMap;
     private Properties properties;
     private AsmMetricReporter metricReporter;
     private final int epaWaitTime;
@@ -32,13 +32,13 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * Worker thread for App Synthetic Monitor EPA plugin.
      * @param folderName name of the folder to monitor
      * @param requestHelper the request helper
-     * @param folderMap the folder map containing all folders and monitors (rules)
+     * @param folderMap the folder map containing all folders and monitors
      * @param metricReporter the metric reporter
      */
     public AsmReaderThread(
         String folderName,
         AsmRequestHelper requestHelper,
-        HashMap<String, List<Rule>> folderMap,
+        HashMap<String, List<Monitor>> folderMap,
         Properties properties,
         AsmMetricReporter metricReporter) {
 
@@ -134,14 +134,14 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     public HashMap<String, String> getFolderMetrics() throws Exception {
         HashMap<String, String> resultMetricMap = new HashMap<String, String>();
 
-        List<Rule> folderRules = this.folderMap.get(folder);
-        final Rule allRulesRule = RuleFactory.getAllRulesRule();
-        Rule rule = null;
+        List<Monitor> folderMonitors = this.folderMap.get(folder);
+        final Monitor allMonitorsMonitor = MonitorFactory.getAllMonitorsMonitor();
+        Monitor monitor = null;
         
         EpaUtils.getFeedback().verbose(
-            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderRules.size(), folder));
+            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderMonitors.size(), folder));
 
-        if ((null == folderRules) || (0 == folderRules.size())) {
+        if ((null == folderMonitors) || (0 == folderMonitors.size())) {
             return resultMetricMap;
         }
 
@@ -157,7 +157,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         // get stats for folder
         if (TRUE.equals(properties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
             EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderRules.size(), folder));
+                AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderMonitors.size(), folder));
 
             resultMetricMap.putAll(requestHelper.getStats(folder, null, folderPrefix));
         } else {
@@ -165,8 +165,8 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA, folder));
         }
 
-        // get stats for all rules
-        if ((folderRules.get(0).equals(allRulesRule))
+        // get stats for all monitors
+        if ((folderMonitors.get(0).equals(allMonitorsMonitor))
                 && (!folder.equals(EMPTY_STRING))) {
             
             if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
@@ -175,40 +175,40 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             
             if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                 resultMetricMap.putAll(
-                    requestHelper.getLogs(folder, null, folderRules.size() - 1, folderPrefix));
+                    requestHelper.getLogs(folder, null, folderMonitors.size() - 1, folderPrefix));
             }
 
-            if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
-                for (Iterator<Rule> it = folderRules.iterator(); it.hasNext(); ) {
-                    rule = it.next();
-                    if (rule.equals(allRulesRule)) {
+            if (properties.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
+                for (Iterator<Monitor> it = folderMonitors.iterator(); it.hasNext(); ) {
+                    monitor = it.next();
+                    if (monitor.equals(allMonitorsMonitor)) {
                         continue;
                     }
 //                    EpaUtils.getFeedback().verbose(
 //                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, 1,
-//                            folderPrefix + METRIC_PATH_SEPARATOR + rule.getName()));
+//                            folderPrefix + METRIC_PATH_SEPARATOR + monitor.getName()));
 
-                    resultMetricMap.putAll(requestHelper.getStats(folder, rule, folderPrefix));
+                    resultMetricMap.putAll(requestHelper.getStats(folder, monitor, folderPrefix));
                 }
             }
         } else {
-            for (Iterator<Rule> it = folderRules.iterator(); it.hasNext(); ) {
-                rule = it.next();
-                if (rule.equals(ALL_RULES)) {
+            for (Iterator<Monitor> it = folderMonitors.iterator(); it.hasNext(); ) {
+                monitor = it.next();
+                if (monitor.equals(ALL_MONITORS)) {
                     continue;
                 }
                 if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
-                    resultMetricMap.putAll(requestHelper.getPsp(folder, rule, folderPrefix));
+                    resultMetricMap.putAll(requestHelper.getPsp(folder, monitor, folderPrefix));
                 }
-                if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
+                if (properties.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
 //                    EpaUtils.getFeedback().verbose(
 //                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, -1,
-//                            folderPrefix + METRIC_PATH_SEPARATOR + rule.getName()));
+//                            folderPrefix + METRIC_PATH_SEPARATOR + monitor.getName()));
 
-                    resultMetricMap.putAll(requestHelper.getStats(folder, rule, folderPrefix));
+                    resultMetricMap.putAll(requestHelper.getStats(folder, monitor, folderPrefix));
                 }
                 if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
-                    resultMetricMap.putAll(requestHelper.getLogs(folder, rule, 1, folderPrefix));
+                    resultMetricMap.putAll(requestHelper.getLogs(folder, monitor, 1, folderPrefix));
                 }
             }
         }

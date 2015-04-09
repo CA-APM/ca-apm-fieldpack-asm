@@ -47,13 +47,13 @@ public class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("info", "Info");
         ASM_METRICS.put("ipaddr", "IP Address");
         ASM_METRICS.put("loc", "Location Code");
-        ASM_METRICS.put("name", "Rule Name");
+        ASM_METRICS.put("name", "Monitor Name");
         ASM_METRICS.put("probe_errors", "Probe Errors");
         ASM_METRICS.put("probes", "Probes");
         ASM_METRICS.put("ptime", "Processing Time (ms)");
         ASM_METRICS.put("repeat", "Repeat");
         ASM_METRICS.put("result", "Result Code");
-        ASM_METRICS.put("rid", "Rule ID");
+        ASM_METRICS.put("rid", "Monitor ID");
         ASM_METRICS.put("rtime", "Resolve Time (ms)");
         ASM_METRICS.put("secscan", "Vulnerability Scan Credits Available");
         ASM_METRICS.put("sla_poor", "SLA Violation Poor (%)");

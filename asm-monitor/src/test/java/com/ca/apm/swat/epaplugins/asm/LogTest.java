@@ -7,8 +7,8 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.rules.Rule;
-import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
+import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
+import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 
 /**
  * Test class for testing the acct_credits API.
@@ -22,12 +22,12 @@ public class LogTest extends FileTest {
     public void setup() {
         super.setup();
         
-        // we need to load the the checkpoint map
+        // we need to load the the monitoring station map
         try {
-            requestHelper.getCheckpoints();
+            requestHelper.getMonitoringStations();
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail("error getting checkpoints: " + e.getMessage());
+            Assert.fail("error getting monitoring stations: " + e.getMessage());
         }
     }
 
@@ -42,9 +42,9 @@ public class LogTest extends FileTest {
             AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
-            Rule rule = RuleFactory.getRule("Simple JMeter recording", SCRIPT_RULE, folder,
+            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
                 EMPTY_STRING_ARRAY);
-            int numRules = 5;
+            int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
             // load file
@@ -52,7 +52,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, rule, numRules, metricPrefix);
+                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -70,7 +70,7 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple JMeter recording|america-north|"
                         + "United States|Phoenix:Check Start Time",
                 "Monitors|Tests|Simple JMeter recording|america-north|"
-                        + "United States|Phoenix:Rule ID",
+                        + "United States|Phoenix:Monitor ID",
                 "Monitors|Tests|Simple JMeter recording|"
                         + "001 /index.html:Assertion Errors",
                 "Monitors|Tests|Simple JMeter recording|"
@@ -127,9 +127,9 @@ public class LogTest extends FileTest {
             AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
-            Rule rule = RuleFactory.getRule("Simple HTTP validation test", HTTP_RULE, folder,
+            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test", HTTP_MONITOR, folder,
                 EMPTY_STRING_ARRAY);
-            int numRules = 5;
+            int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
             // load file
@@ -137,7 +137,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, rule, numRules, metricPrefix);
+                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -154,8 +154,8 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Repeat",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Resolve Time (ms)",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Result Code",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Rule ID",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Rule Name",
+                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID",
+                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:id"
@@ -187,9 +187,9 @@ public class LogTest extends FileTest {
             AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
-            Rule rule = RuleFactory.getRule("Amazon.com", BROWSER_RULE, folder,
+            Monitor monitor = MonitorFactory.getMonitor("Amazon.com", FULL_PAGE_MONITOR, folder,
                 EMPTY_STRING_ARRAY);
-            int numRules = 5;
+            int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
             // load file
@@ -197,7 +197,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, rule, numRules, metricPrefix);
+                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -213,8 +213,8 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Amazon.com|europe-east|Serbia|Belgrade:Processing Time (ms)",
                 "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Repeat",
                 "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Result Code",
-                "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Rule ID",
-                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Rule Name",
+                "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Monitor ID",
+                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Monitor Name",
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Total Time (ms)",
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Type",
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:id"
@@ -246,9 +246,9 @@ public class LogTest extends FileTest {
             AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "";
-            Rule rule = RuleFactory.getRule("Cat.com click-through RBM", RBM_RULE, folder,
+            Monitor monitor = MonitorFactory.getMonitor("Cat.com click-through RBM", REAL_BROWSER_MONITOR, folder,
                 EMPTY_STRING_ARRAY);
-            int numRules = 5;
+            int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX.substring(0,
                 MONITOR_METRIC_PREFIX.length() - 1);
             
@@ -257,7 +257,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, rule, numRules, metricPrefix);
+                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -290,9 +290,9 @@ public class LogTest extends FileTest {
             AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
-            Rule rule = RuleFactory.getRule("SFDC transaction", RBM_RULE, folder,
+            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
                 EMPTY_STRING_ARRAY);
-            int numRules = 5;
+            int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
             // load file
@@ -300,7 +300,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, rule, numRules, metricPrefix);
+                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {

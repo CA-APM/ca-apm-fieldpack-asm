@@ -1,4 +1,4 @@
-package com.ca.apm.swat.epaplugins.asm.rules;
+package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,11 +13,11 @@ import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**
- * Base class for implementations of the {@link Rule} interface.
+ * Base class for implementations of the {@link Monitor} interface.
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class BaseRule implements Rule, AsmProperties {
+public class BaseMonitor implements Monitor, AsmProperties {
 
     private String name = null;
     private String folder = null;
@@ -27,12 +27,12 @@ public class BaseRule implements Rule, AsmProperties {
     protected Handler successor = null;
 
     /**
-     * Rule base class.
-     * @param name name of the rule
-     * @param folder folder of the rule
-     * @param tags tags of the rule
+     * Monitor base class.
+     * @param name name of the monitor
+     * @param folder folder of the monitor
+     * @param tags tags of the monitor
      */
-    protected BaseRule(String name, String type, String folder, String[] tags) {
+    protected BaseMonitor(String name, String type, String folder, String[] tags) {
         this.name = name;
         this.folder = folder;
         this.tags = tags;
@@ -56,24 +56,24 @@ public class BaseRule implements Rule, AsmProperties {
     }
 
     /**
-     * Compare the name of the rule with a string.
-     * Needed to include/exclude rules by name.
-     * @param anotherName string to compare rule name with
-     * @return true if the rule name equals anotherName
+     * Compare the name of the monitor with a string.
+     * Needed to include/exclude monitors by name.
+     * @param anotherName string to compare monitor name with
+     * @return true if the monitor name equals anotherName
      */
     public boolean equals(String anotherName) {
-        EpaUtils.getFeedback().debug("equals(String s) called for Rule " + name
+        EpaUtils.getFeedback().debug("equals(String s) called for Monitor " + name
             + " with s = anotherName"); 
         return this.name.equals(anotherName);
     }
 
     /**
-     * Compare the names of the rules.
-     * @param anotherRule rule to compare with
-     * @return true if the rule names are equal
+     * Compare the names of the monitors.
+     * @param anotherMonitor monitor to compare with
+     * @return true if the monitor names are equal
      */
-    public boolean equals(Rule anotherRule) {
-        return this.name.equals(anotherRule.getName());
+    public boolean equals(Monitor anotherMonitor) {
+        return this.name.equals(anotherMonitor.getName());
     }
 
 
@@ -97,10 +97,10 @@ public class BaseRule implements Rule, AsmProperties {
         }
 
         // append monitoring station to metric tree
-        if (TRUE.equals(AsmReader.getProperties().getProperty(DISPLAY_CHECKPOINTS, TRUE))) {
+        if (TRUE.equals(AsmReader.getProperties().getProperty(DISPLAY_STATIONS, TRUE))) {
             if (jsonObject.optString(LOCATION_TAG, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
-                        + AsmRequestHelper.getCheckpointMap().get(
+                        + AsmRequestHelper.getMonitoringStationMap().get(
                             jsonObject.getString(LOCATION_TAG));
             }
         }
@@ -162,7 +162,7 @@ public class BaseRule implements Rule, AsmProperties {
 
                 // map location
                 if (thisKey.equals(LOCATION_TAG)) {
-                    thisValue = AsmRequestHelper.getCheckpointMap().get(thisValue);
+                    thisValue = AsmRequestHelper.getMonitoringStationMap().get(thisValue);
                 }
 
                 // map metric key
@@ -184,8 +184,8 @@ public class BaseRule implements Rule, AsmProperties {
         }
 
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose("BaseRule returning " + metricMap.size()
-                + " metrics for rule " + getName() + " in metric tree " + metricTree);
+            EpaUtils.getFeedback().verbose("BaseMonitor returning " + metricMap.size()
+                + " metrics for monitor " + getName() + " in metric tree " + metricTree);
         }
         
         return metricMap;

@@ -8,7 +8,7 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.rules.RuleFactory;
+import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 
@@ -21,9 +21,9 @@ public class AsmAgentTest implements AsmProperties {
         
         try {
             Properties properties = AsmReader.readPropertiesFromFile(propertyFileName);
-            properties.setProperty(DISPLAY_CHECKPOINTS, FALSE);
+            properties.setProperty(DISPLAY_STATIONS, FALSE);
 
-            HashMap<String, String> map = RuleFactory.getAllRulesRule()
+            HashMap<String, String> map = MonitorFactory.getAllMonitorsMonitor()
                     .generateMetrics(json, "Monitors|CA");
 
             SortedSet<String> set = new TreeSet<String>();
