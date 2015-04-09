@@ -35,7 +35,7 @@ public class StatsTest extends FileTest {
     /**
      * Test getLog() for a real browser monitor (RBM).
      */
-//        @Test
+    @Test
     public void getStatsFirefox() {
 
         try {
@@ -49,15 +49,15 @@ public class StatsTest extends FileTest {
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
 
             // load file
-            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_firefox.json");
+            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_rule.json");
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, rule, numRules, metricPrefix);
+                    requestHelper.getStats(folder, rule, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
-                                        "Monitors|Caterpillar:Agent GMT Offset"
+                "Monitors|Caterpillar:Agent GMT Offset"
             };
 
             TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());

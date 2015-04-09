@@ -71,27 +71,41 @@ public class LogTest extends FileTest {
                         + "United States|Phoenix:Check Start Time",
                 "Monitors|Tests|Simple JMeter recording|america-north|"
                         + "United States|Phoenix:Rule ID",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "001 /index.html:Assertion Errors",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "001 /index.html:Assertion Failures",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "002 /usermanual/index.html:Error Count",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "002 /usermanual/index.html:Response Code",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "003 /usermanual/build-test-plan.html:Status Message",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "003 /usermanual/build-test-plan.html:Status Message Value",
-                "Status Monitoring|Tests|Simple JMeter recording|"
+                "Monitors|Tests|Simple JMeter recording|"
                         + "004 /foundation/thanks.html:URL"
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "001 /index.html:Assertion Errors",
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "001 /index.html:Assertion Failures",
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "002 /usermanual/index.html:Error Count",
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "002 /usermanual/index.html:Response Code",
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "003 /usermanual/build-test-plan.html:Status Message",
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "003 /usermanual/build-test-plan.html:Status Message Value",
+//                "Status Monitoring|Tests|Simple JMeter recording|"
+//                        + "004 /foundation/thanks.html:URL"
             };
 
-//            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-//            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-//                String key = it.next();
-//                System.out.println(key + " = " + metricMap.get(key));
-//            }
+            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                System.out.println(key + " = " + metricMap.get(key));
+            }
 
             // check
             checkMetrics(expectedMetrics, metricMap);
@@ -105,7 +119,7 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a http monitor.
      */
-    @Test
+//    @Test
     public void getLogHttp() {
 
         try {
@@ -165,8 +179,8 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a full page monitor (browser).
      */
-    @Test
-    public void getLogBrowser() {
+//    @Test
+    public void getLogFullPage() {
 
         try {
             // set properties
@@ -206,11 +220,11 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:id"
             };
 
-//            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-//            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-//                String key = it.next();
-//                System.out.println(key + " = " + metricMap.get(key));
-//            }
+            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                System.out.println(key + " = " + metricMap.get(key));
+            }
 
             // check
             checkMetrics(expectedMetrics, metricMap);
@@ -224,8 +238,8 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a real browser monitor (RBM).
      */
-    @Test
-    public void getLogFirefox() {
+    //@Test
+    public void getLogRealBrowserMonitor() {
 
         try {
             // set properties
@@ -268,8 +282,8 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a real browser monitor (RBM).
      */
-    @Test
-    public void getLogFirefox2() {
+//    @Test
+    public void getLogRealBrowserMonitor2() {
 
         try {
             // set properties
@@ -293,11 +307,11 @@ public class LogTest extends FileTest {
                 "Monitors|Caterpillar:Agent GMT Offset"
             };
 
-//            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-//            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-//                String key = it.next();
-//                System.out.println(key + " = " + metricMap.get(key));
-//            }
+            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                System.out.println(key + " = " + metricMap.get(key));
+            }
 
             // check
             checkMetrics(expectedMetrics, metricMap);

@@ -1,6 +1,7 @@
 package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.junit.Assert;
 import org.junit.Before;
