@@ -90,12 +90,15 @@ public interface AsmProperties {
     public static final int    ERROR_SESSION_EXPIRED    = 1008;
 
     // result codes
+    public static final int    RESULT_NOT_FOUND             = 404;
+    public static final int    RESULT_PAGE_LOAD_TIMEOUT     = 1043;
     public static final int    RESULT_BANDWITH_EXCEEDED     = 1060;
     public static final int    RESULT_DOMAIN_REDIRECT       = 6001;
     public static final int    RESULT_PAGE_ELEMENT_404      = 6404;
     public static final int    RESULT_CONNECTION_TERMINATED = 6007;
+    public static final int    RESULT_URL_CANNOT_BE_SHOWN   = 6101;
     public static final int    RESULT_RESPONSE_ASSERTION    = 7001;
-    public static final int    RESULT_NOT_MATCHED           = 9501;
+    public static final int    RESULT_ASSERTION_NOT_MATCHED = 9501;
 
     // retries
     public static final int    INIT_RETRIES             = 10;
