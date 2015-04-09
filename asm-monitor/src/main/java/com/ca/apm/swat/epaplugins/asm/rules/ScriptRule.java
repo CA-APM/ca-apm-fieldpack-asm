@@ -1,10 +1,8 @@
 package com.ca.apm.swat.epaplugins.asm.rules;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,11 +40,11 @@ public class ScriptRule extends BaseRule {
 
             // remove MONITOR_METRIC_PREFIX from metric tree for step metrics
             StringBuffer statusMetricTree = new StringBuffer(STATUS_METRIC_PREFIX);
-            
+
             // if it is MONITOR_METRIC_PREFIX|<folder>
             if (metricTree.length() > MONITOR_METRIC_PREFIX.length()) {
                 statusMetricTree.append(metricTree.substring(MONITOR_METRIC_PREFIX.length()))
-                    .append(METRIC_PATH_SEPARATOR);
+                .append(METRIC_PATH_SEPARATOR);
             }
             // append rule name
             statusMetricTree.append(getName());
@@ -76,7 +74,7 @@ public class ScriptRule extends BaseRule {
      * @throws JSONException errors
      */
     protected HashMap<String, String> analyzeContentResults(String jsonString, String metricTree)
-                throws JSONException {
+            throws JSONException {
 
         HashMap<String, String> metricMap = new HashMap<String, String>();
         JSONObject jsonObject = new JSONObject(jsonString);
@@ -112,7 +110,7 @@ public class ScriptRule extends BaseRule {
                 // chain of responsibility discover, decode, handle
                 if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
                     try {
-
+/*
                         byte[] decoded = Base64.decodeBase64(thisValue);
                         if (decoded != null) {
                             byte[] bytesDecompressed = decompress(decoded);
@@ -138,12 +136,10 @@ public class ScriptRule extends BaseRule {
                                 continue;
                             }
                         }
+ */
 
-                        /*
-                        metricMap.putAll(
-                            successor.generateMetrics(thisValue,
-                                metricTree, properties, checkpointMap));
-                         */
+                        metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
+
                     } catch (Exception uee) {
                         uee.printStackTrace();
                         //Don't throw. Some formats are not yet supported
@@ -153,32 +149,5 @@ public class ScriptRule extends BaseRule {
         }
 
         return metricMap;
-    }
-
-    /**
-     * Decompress compressed data.
-     * @param data compressed data
-     * @return uncompressed data
-     */
-    public byte[] decompress(byte[] data) {
-        try {
-            java.util.zip.Inflater inflater = new java.util.zip.Inflater();
-            inflater.setInput(data);
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-            byte[] buffer = new byte[1024];
-            while (!inflater.finished()) {
-                int count = inflater.inflate(buffer);
-                outputStream.write(buffer, 0, count);
-            }
-            outputStream.close();
-            byte[] output = outputStream.toByteArray();
-
-            inflater.end();
-            return output;
-        } catch (Exception ex) {
-            return null;
-        }
-
     }
 }

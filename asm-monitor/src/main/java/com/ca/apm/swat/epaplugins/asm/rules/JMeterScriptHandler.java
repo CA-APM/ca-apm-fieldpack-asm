@@ -40,6 +40,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         if (!xmlString.startsWith(XML_PREFIX)) {
             if (xmlString.startsWith(HAR_OR_LOG_TAG)) {
+                System.out.println(xmlString);
                 // Do nothing - already have seen it.
                 // and we don't need this log
             }
