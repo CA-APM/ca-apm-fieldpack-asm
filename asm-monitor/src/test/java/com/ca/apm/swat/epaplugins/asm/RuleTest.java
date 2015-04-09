@@ -1,7 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
@@ -38,7 +37,7 @@ public class RuleTest extends FileTest {
             // call API
             HashMap<String, List<Rule>> folderMap = requestHelper.getFoldersAndRules(folders);
 
-            // folderList should contain those entries
+            // folderMap should contain those entries
             String[] expectedRules = {
                 "all_rules",
                 "AT&T Home",
@@ -90,7 +89,7 @@ public class RuleTest extends FileTest {
             // call API
             HashMap<String, List<Rule>> folderMap = requestHelper.getFoldersAndRules(folders);
 
-            // folderList should contain those entries
+            // folderMap should contain those entries
             String[] expectedRules = {
                 "all_rules",
                 "Amazon.com",
@@ -139,7 +138,7 @@ public class RuleTest extends FileTest {
             // call API
             HashMap<String, List<Rule>> folderMap = requestHelper.getFoldersAndRules(folders);
 
-            // folderList should contain those entries
+            // folderMap should contain those entries
             String[] expectedRules = {
                 "Amazon.com",
                 "Bad request test",

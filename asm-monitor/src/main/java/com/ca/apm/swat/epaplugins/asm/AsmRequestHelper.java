@@ -418,7 +418,8 @@ public class AsmRequestHelper implements AsmProperties {
             folderStr = FOLDER_PARAM + folder;
         } else {
             folder = ROOT_FOLDER;
-            rule = RuleFactory.getAllRulesRule();
+            //TODO: check this again
+            //rule = RuleFactory.getAllRulesRule();
         }
 
         if (rule != null) {

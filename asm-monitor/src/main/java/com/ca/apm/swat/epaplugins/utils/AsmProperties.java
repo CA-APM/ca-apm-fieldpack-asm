@@ -92,6 +92,7 @@ public interface AsmProperties {
     // result codes
     public static final int    RESULT_BANDWITH_EXCEEDED     = 1060;
     public static final int    RESULT_DOMAIN_REDIRECT       = 6001;
+    public static final int    RESULT_PAGE_ELEMENT_404      = 6404;
     public static final int    RESULT_CONNECTION_TERMINATED = 6007;
     public static final int    RESULT_RESPONSE_ASSERTION    = 7001;
     public static final int    RESULT_NOT_MATCHED           = 9501;
@@ -178,7 +179,7 @@ public interface AsmProperties {
     public static final String VERSION_TAG              = "version";
     public static final String OUTPUT_TAG               = "output";
     public static final String TAGS_TAG                 = "tags";   
-    public static final String HAR_OR_LOG_TAG           = "{\"har\": {\"log\"";
+    public static final String HAR_OR_LOG_TAG           = "{\"har\""; //"{\"har\": {\"log\"";
     public static final String UNDEFINED                = "Undefined";
 
     // rule types

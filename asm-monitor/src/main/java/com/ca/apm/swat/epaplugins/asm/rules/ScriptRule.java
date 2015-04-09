@@ -41,13 +41,20 @@ public class ScriptRule extends BaseRule {
             metricMap = super.generateMetrics(jsonString, metricTree);
 
             // remove MONITOR_METRIC_PREFIX from metric tree for step metrics
-            String statusMetricTree = STATUS_METRIC_PREFIX
-                    + metricTree.substring(MONITOR_METRIC_PREFIX.length())
-                    + METRIC_PATH_SEPARATOR + getName();
-            metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree));
+            StringBuffer statusMetricTree = new StringBuffer(STATUS_METRIC_PREFIX);
+            
+            // if it is MONITOR_METRIC_PREFIX|<folder>
+            if (metricTree.length() > MONITOR_METRIC_PREFIX.length()) {
+                statusMetricTree.append(metricTree.substring(MONITOR_METRIC_PREFIX.length()))
+                    .append(METRIC_PATH_SEPARATOR);
+            }
+            // append rule name
+            statusMetricTree.append(getName());
+            metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree.toString()));
 
             EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
-                + " metrics from super() for rule " + getName() + " in metric tree " + metricTree);
+                + " metrics from super() for rule " + getName() + " in metric tree "
+                + statusMetricTree);
         } catch (JSONException e) {
             EpaUtils.getFeedback().error(e.getMessage());
             EpaUtils.getFeedback().error("jsonString = " + jsonString);
@@ -118,23 +125,12 @@ public class ScriptRule extends BaseRule {
                                         "calling JMeterScriptHandler directly");
                                 }
                                 if (returnValue.startsWith(XML_PREFIX)) {
-                                    /*
-                                    Handler jmeterHandler = new JMeterScriptHandler();
-                                    setSuccessor(jmeterHandler);
-                                    metricMap.putAll(
-                                        successor.generateMetrics(returnValue,
-                                            metricTree, properties, checkpointMap));
-
-                                    if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                                        EpaUtils.getFeedback().verbose(
-                                            "calling JMeterScriptHandler via handlers");
-                                    }
-                                     */
                                     metricMap.putAll(
                                         successor.generateMetrics(thisValue, metricTree));
 
                                 } else {
                                     if (returnValue.startsWith(HAR_OR_LOG_TAG)) {
+                                        System.out.println(returnValue);
                                         // Do nothing - already have seen it.
                                         // and we don't need this log
                                     }
