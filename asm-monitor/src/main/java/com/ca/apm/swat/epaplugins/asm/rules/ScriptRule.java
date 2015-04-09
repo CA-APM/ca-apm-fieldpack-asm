@@ -36,27 +36,20 @@ public class ScriptRule extends BaseRule {
         HashMap<String, String> metricMap = null;
 
         try {
+            // generate basic metrics
             metricMap = super.generateMetrics(jsonString, metricTree);
 
-            // remove MONITOR_METRIC_PREFIX from metric tree for step metrics
-            StringBuffer statusMetricTree = new StringBuffer(STATUS_METRIC_PREFIX);
-
-            // if it is MONITOR_METRIC_PREFIX|<folder>
-            if (metricTree.length() > MONITOR_METRIC_PREFIX.length()) {
-                statusMetricTree.append(metricTree.substring(MONITOR_METRIC_PREFIX.length()))
-                .append(METRIC_PATH_SEPARATOR);
-            }
-            // append rule name
-            statusMetricTree.append(getName());
+            // create metric tree
+            StringBuffer statusMetricTree =
+                    new StringBuffer(metricTree).append(METRIC_PATH_SEPARATOR).append(getName());
             metricMap.putAll(analyzeContentResults(jsonString, statusMetricTree.toString()));
 
             EpaUtils.getFeedback().verbose("ScriptRule returning " + metricMap.size()
                 + " metrics from super() for rule " + getName() + " in metric tree "
                 + statusMetricTree);
         } catch (JSONException e) {
-            EpaUtils.getFeedback().error(e.getMessage());
-            EpaUtils.getFeedback().error("jsonString = " + jsonString);
-            EpaUtils.getFeedback().error("rule " + getName() + ", metric tree  =" + metricTree);
+            EpaUtils.getFeedback().error(e.getMessage() + "\n rule " + getName()
+                + ", metric tree  =" + metricTree + "\njsonString = " + jsonString);
             throw e;
         }
 
@@ -106,43 +99,14 @@ public class ScriptRule extends BaseRule {
                 }
                 String thisValue = jsonObject.getString(thisKey);
 
-                // TODO: separate into different components -
-                // chain of responsibility discover, decode, handle
                 if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
                     try {
-/*
-                        byte[] decoded = Base64.decodeBase64(thisValue);
-                        if (decoded != null) {
-                            byte[] bytesDecompressed = decompress(decoded);
-                            if (bytesDecompressed != null) {
-                                String returnValue = new String(bytesDecompressed, 0,
-                                    bytesDecompressed.length, EpaUtils.getEncoding());
-
-                                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                                    EpaUtils.getFeedback().verbose(
-                                        "calling JMeterScriptHandler directly");
-                                }
-                                if (returnValue.startsWith(XML_PREFIX)) {
-                                    metricMap.putAll(
-                                        successor.generateMetrics(thisValue, metricTree));
-
-                                } else {
-                                    if (returnValue.startsWith(HAR_OR_LOG_TAG)) {
-                                        System.out.println(returnValue);
-                                        // Do nothing - already have seen it.
-                                        // and we don't need this log
-                                    }
-                                }
-                                continue;
-                            }
-                        }
- */
-
+                        // let successors do the work
                         metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
-
-                    } catch (Exception uee) {
-                        uee.printStackTrace();
+                    } catch (Exception e) {
                         //Don't throw. Some formats are not yet supported
+                        EpaUtils.getFeedback().warn(e.getMessage() + "\n rule " + getName()
+                            + ", metric tree  =" + metricTree + "\njsonString = " + jsonString);
                     }
                 }
             }

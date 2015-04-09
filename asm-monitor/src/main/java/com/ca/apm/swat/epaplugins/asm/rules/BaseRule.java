@@ -91,10 +91,12 @@ public class BaseRule implements Rule, AsmProperties {
 
         JSONObject jsonObject = new JSONObject(jsonString);
 
+        // if we find a name append it to metric tree
         if (jsonObject.optString(NAME_TAG, null) != null) {
             metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(NAME_TAG);
         }
 
+        // append monitoring station to metric tree
         if (TRUE.equals(AsmReader.getProperties().getProperty(DISPLAY_CHECKPOINTS, TRUE))) {
             if (jsonObject.optString(LOCATION_TAG, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
@@ -103,17 +105,22 @@ public class BaseRule implements Rule, AsmProperties {
             }
         }
 
+        // iterate over JSON object
         Iterator jsonObjectKeys = jsonObject.keys();
         while (jsonObjectKeys.hasNext()) {
             String thisKey = jsonObjectKeys.next().toString();
 
+            // if this is another object do recursion
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
                 metricMap.putAll(generateMetrics(innerJsonObject.toString(), metricTree));
             } else if (jsonObject.optJSONArray(thisKey) != null) {
+                // iterate over array
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
                 for (int i = 0; i < innerJsonArray.length(); i++) {
-                    if ((thisKey.equals(RESULT_TAG)) || (thisKey.equals(MONITORS_TAG))
+                    // recursively generate metrics for these tags
+                    if ((thisKey.equals(RESULT_TAG))
+                            || (thisKey.equals(MONITORS_TAG))
                             || (thisKey.equals(STATS_TAG))) {
                         metricMap.putAll(generateMetrics(
                             innerJsonArray.getJSONObject(i).toString(), metricTree));
@@ -124,6 +131,7 @@ public class BaseRule implements Rule, AsmProperties {
                     }
                 }
             } else {
+                // ignore these tags
                 if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
                         || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
@@ -131,12 +139,14 @@ public class BaseRule implements Rule, AsmProperties {
                 }
                 String thisValue = jsonObject.getString(thisKey);
 
+                // store description as error
                 if (thisKey.equals(DESCR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
                     metricMap.put(EpaUtils.fixMetric(rawErrorMetric), ONE);
                 }
 
+                // convert color to status value
                 if (thisKey.equals(COLOR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
@@ -150,6 +160,12 @@ public class BaseRule implements Rule, AsmProperties {
 
                 }
 
+                // map location
+                if (thisKey.equals(LOCATION_TAG)) {
+                    thisValue = AsmRequestHelper.getCheckpointMap().get(thisValue);
+                }
+
+                // map metric key
                 if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
                     thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
                 }
@@ -160,14 +176,17 @@ public class BaseRule implements Rule, AsmProperties {
                     continue;
                 }
 
+                // put metric into map
                 String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
                 metricMap.put(EpaUtils.fixMetric(rawMetric),
                     EpaUtils.fixMetric(thisValue));
             }
         }
 
-        EpaUtils.getFeedback().verbose("BaseRule returning " + metricMap.size()
-            + " metrics for rule " + getName() + " in metric tree " + metricTree);
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose("BaseRule returning " + metricMap.size()
+                + " metrics for rule " + getName() + " in metric tree " + metricTree);
+        }
         
         return metricMap;
     }

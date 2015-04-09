@@ -110,18 +110,18 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         int responsecode = Integer.parseInt(
             attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue());
         String responsemessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
-        String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
+        //String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
         final int errorCount = Integer.parseInt(attributes.getNamedItem(ERROR_COUNT_TAG)
             .getNodeValue());
         String url = attributes.getNamedItem(TEST_URL_TAG).getNodeValue();
         boolean assertionAvailable = false;
         boolean assertionFailure = false;
         boolean assertionError = false;
-        String assertionName = UNDEFINED_ASSERTION;
+        // String assertionName = UNDEFINED_ASSERTION;
 
         NodeList stepChildren = stepNode.getChildNodes();
 
-        //Walk Through the elements of one step
+        //Walk through the elements of one step
         for (int j = 0; j < stepChildren.getLength(); j++) {
             Node stepChild = stepChildren.item(j);
             if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
@@ -130,9 +130,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 NodeList assertionResultEntries = stepChild.getChildNodes();
                 for (int l = 0; l < assertionResultEntries.getLength(); l++) {
                     Node assertionResultEntry = assertionResultEntries.item(l);
-                    if (assertionResultEntry.getNodeName().equals(NAME_TAG)) {
-                        assertionName = assertionResultEntry.getFirstChild().getNodeValue();
-                    }
+//                    if (assertionResultEntry.getNodeName().equals(NAME_TAG)) {
+//                        assertionName = assertionResultEntry.getFirstChild().getNodeValue();
+//                    }
                     if (assertionResultEntry.getNodeName().equals(FAILURE)) {
                         assertionFailure = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());

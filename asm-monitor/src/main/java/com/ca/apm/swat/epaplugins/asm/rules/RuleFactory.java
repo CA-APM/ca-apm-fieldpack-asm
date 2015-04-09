@@ -24,10 +24,11 @@ public class RuleFactory implements AsmProperties {
     public static Rule getRule(String name, String type, String folder, String[] tags) {
         if (type == null) {
             return null;
-        }     
+        }
         if (type.equalsIgnoreCase(SCRIPT_RULE)
+                /* don't handle here until we figured out what to do with har data
                 || type.equalsIgnoreCase(RBM_RULE)
-                /*|| type.equalsIgnoreCase(BROWSER_RULE)*/) {
+                || type.equalsIgnoreCase(BROWSER_RULE)*/) {
             return new ScriptRule(name, folder, tags);
         }
 
