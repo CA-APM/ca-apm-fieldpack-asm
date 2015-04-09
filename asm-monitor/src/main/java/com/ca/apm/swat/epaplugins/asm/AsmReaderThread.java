@@ -63,8 +63,13 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         while (this.keepRunning) {
             try {
                 final Date startTime = new Date();
+                
+                // get the metrics for this folder and all its monitors
                 this.metricMap.putAll(getFolderMetrics());
+                
+                // send the metrics to Enterprise Manager
                 metricReporter.printMetrics(this.metricMap);
+               
                 // TODO: is putAll redundant? why reset and keep all the old stuff?                
                 this.metricMap.putAll(metricReporter.resetMetrics(this.metricMap));
                 final Date endTime = new Date();
@@ -173,7 +178,6 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     requestHelper.getLogs(folder, null, folderRules.size() - 1, folderPrefix));
             }
 
-            //TODO are stats different for RULE and FOLDER??? we (might) already have folder data
             if (properties.getProperty(METRICS_STATS_RULE, FALSE).equals(TRUE)) {
                 for (Iterator<Rule> it = folderRules.iterator(); it.hasNext(); ) {
                     rule = it.next();

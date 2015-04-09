@@ -32,7 +32,7 @@ public class AsmReader implements AsmProperties {
 
     private static Properties properties;
     private static AsmReader instance;
-    
+
     /**
      * Called by EPAgent.
      * @param args arguments
@@ -136,67 +136,10 @@ public class AsmReader implements AsmProperties {
         this.keepRunning = true;
         this.numRetriesLeft = 10;
 
-        String[] folders = null;
-        HashMap<String, List<Rule>> folderMap = null;
-        boolean keepTrying = true;
-        int initNumRetriesLeft = 10;
+        // connect and read folders, rules and checkpoints
+        HashMap<String, List<Rule>> folderMap = initialize(requestHelper);
 
-        // try to connect
-        while (keepTrying) {
-            try {
-                requestHelper.connect();
-                folders = requestHelper.getFolders();
-                // TODO: remove or convert to message
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    StringBuffer buf = new StringBuffer("read folders: ");
-                    for (int i = 0; i < folders.length; ++i) {
-                        buf.append(folders[i] + ", ");
-                    }
-                    EpaUtils.getFeedback().verbose(buf.toString());
-                }
-
-                folderMap = requestHelper.getFoldersAndRules(folders);
-
-                // TODO: remove or convert to message
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("read rules: ");
-                    Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
-                    for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
-                        String folder = (String) fit.next();
-                        StringBuffer buf = new StringBuffer("  " + folder + " = ");
-                        List<Rule> rules = folderMap.get(folder);
-                        for (Iterator<Rule> rit = rules.iterator(); rit.hasNext(); ) {
-                            buf.append(rit.next().getName() + ", ");
-                        }
-                        EpaUtils.getFeedback().verbose(buf.toString());
-                    }
-                }
-
-                requestHelper.getCheckpoints();
-
-                keepTrying = false;
-                
-            } catch (Exception e) {
-                if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
-                        && (initNumRetriesLeft > 0)) {
-                    initNumRetriesLeft = retryConnection(initNumRetriesLeft,
-                        AsmMessages.getMessage(AsmMessages.AGENT_INITIALIZATION));
-                } else {
-                    EpaUtils.getFeedback().error(
-                        AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
-                            ASM_PRODUCT_NAME, e.getMessage()));
-                    // e.printStackTrace();
-                    keepTrying = false;
-                    System.exit(1);
-                }
-            }
-        }
-
-        EpaUtils.getFeedback().info(AsmMessages.getMessage(
-            AsmMessages.CONNECTED, properties.getProperty(URL)));
-
-        AsmMetricReporter metricReporter =
-                new AsmMetricReporter(metricWriter);
+        AsmMetricReporter metricReporter = new AsmMetricReporter(metricWriter);
 
         // TODO: have a thread pool with a fixed number of threads that pick folders from a queue
         // start a thread per folder
@@ -212,12 +155,16 @@ public class AsmReader implements AsmProperties {
 
         while (keepRunning) {
             try {
-                if (properties.getProperty(METRICS_CREDITS,
-                    FALSE).equals(TRUE)) {
+
+                // get credits
+                if (properties.getProperty(METRICS_CREDITS, FALSE).equals(TRUE)) {
                     creditsMap.putAll(requestHelper.getCredits());
                     metricReporter.printMetrics(creditsMap);
                     creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
                 }
+
+                // TODO: read config and folders again
+
                 Thread.sleep(epaWaitTime);
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
@@ -261,6 +208,79 @@ public class AsmReader implements AsmProperties {
                 AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR));
         }
         return numRetriesLeft;
+    }
+
+    /**
+     * Initialize App Synthetic Monitor: connect and read folders, rules and checkpoints.
+     * @param requestHelper the request helper
+     * @return map of folders and rules
+     */
+    public HashMap<String, List<Rule>> initialize (AsmRequestHelper requestHelper) {
+        String[] folders = null;
+        HashMap<String, List<Rule>> folderMap = null;
+        boolean keepTrying = true;
+        int initNumRetriesLeft = 10;
+
+        while (keepTrying) {
+            try {
+                // connect
+                requestHelper.connect();
+
+                // read folders
+                folders = requestHelper.getFolders();
+
+                // TODO: remove or convert to message
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    StringBuffer buf = new StringBuffer("read folders: ");
+                    for (int i = 0; i < folders.length; ++i) {
+                        buf.append(folders[i] + ", ");
+                    }
+                    EpaUtils.getFeedback().verbose(buf.toString());
+                }
+
+                // read rules
+                folderMap = requestHelper.getFoldersAndRules(folders);
+
+                // TODO: remove or convert to message
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose("read rules: ");
+                    Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
+                    for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
+                        String folder = (String) fit.next();
+                        StringBuffer buf = new StringBuffer("  " + folder + " = ");
+                        List<Rule> rules = folderMap.get(folder);
+                        for (Iterator<Rule> rit = rules.iterator(); rit.hasNext(); ) {
+                            buf.append(rit.next().getName() + ", ");
+                        }
+                        EpaUtils.getFeedback().verbose(buf.toString());
+                    }
+                }
+
+                // read checkpoints
+                requestHelper.getCheckpoints();
+
+                keepTrying = false;
+
+            } catch (Exception e) {
+                if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
+                        && (initNumRetriesLeft > 0)) {
+                    initNumRetriesLeft = retryConnection(initNumRetriesLeft,
+                        AsmMessages.getMessage(AsmMessages.AGENT_INITIALIZATION));
+                } else {
+                    EpaUtils.getFeedback().error(
+                        AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
+                            ASM_PRODUCT_NAME, e.getMessage()));
+                    // e.printStackTrace();
+                    keepTrying = false;
+                    System.exit(1);
+                }
+            }
+        }
+
+        EpaUtils.getFeedback().info(AsmMessages.getMessage(
+            AsmMessages.CONNECTED, properties.getProperty(URL)));
+
+        return folderMap;
     }
 
     /**
