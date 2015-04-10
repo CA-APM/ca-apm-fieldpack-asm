@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -180,7 +181,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @throws Exception errors
      */
     public HashMap<String, String> getCredits() throws Exception {
-        HashMap<String, String> metricMap = new HashMap<String, String>();
+        MetricMap metricMap = new MetricMap();
         String creditsRequest = EMPTY_STRING;
         creditsRequest = accessor.executeApi(CREDITS_CMD, getCommandString());
 
@@ -209,7 +210,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @throws Exception errors
      */
     public HashMap<String, String> getMonitoringStations() throws Exception {
-        HashMap<String, String> returnCp = new HashMap<String, String>();
+        HashMap<String, String> stationMap = new HashMap<String, String>();
 
         String cpRequest = accessor.executeApi(STATIONS_GET_CMD, getCommandString());
 
@@ -218,13 +219,13 @@ public class AsmRequestHelper implements AsmProperties {
         for (int i = 0; i < cpJsonArray.length(); i++) {
             JSONObject cpJsonObject = cpJsonArray.getJSONObject(i);
             if (cpJsonObject.get(AREA_TAG).toString().contains(DEFAULT_DELIMITER)) {
-                returnCp.put(
+                stationMap.put(
                     cpJsonObject.get(LOCATION_TAG).toString(),
                     cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1] 
                             + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
                             + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
             } else {
-                returnCp.put(
+                stationMap.put(
                     cpJsonObject.get(LOCATION_TAG).toString(),
                     cpJsonObject.get(AREA_TAG)
                     + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
@@ -232,8 +233,8 @@ public class AsmRequestHelper implements AsmProperties {
             }
         }
 
-        AsmRequestHelper.stationMap = returnCp;
-        return returnCp;
+        AsmRequestHelper.stationMap = stationMap;
+        return stationMap;
     }
 
 
@@ -428,8 +429,8 @@ public class AsmRequestHelper implements AsmProperties {
             monitorStr = NAME_PARAM + monitor.getName();
         }
         String logStr = NKEY_PARAM + this.nkey + folderStr + monitorStr
-                + NUM_PARAM + numLogs + REVERSE_PARAM + CALLBACK_PARAM 
-                + DO_CALLBACK + FULL_PARAM;
+                + NUM_PARAM + numLogs + REVERSE_PARAM
+                + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
         //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
         //        + "&num=" + numLogs + "&reverse=y&full=y";
 

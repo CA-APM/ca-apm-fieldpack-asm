@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+@SuppressWarnings("rawtypes")
 public class TextNormalizer {
 
     protected static final String JAVA_NORMALIZER_CLASS         = "java.text.Normalizer";

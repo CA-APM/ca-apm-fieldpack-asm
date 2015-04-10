@@ -158,9 +158,9 @@ public class AsmReader implements AsmProperties {
 
                 // get credits
                 if (properties.getProperty(METRICS_CREDITS, FALSE).equals(TRUE)) {
-                    creditsMap.putAll(requestHelper.getCredits());
+                    creditsMap = requestHelper.getCredits();
                     metricReporter.printMetrics(creditsMap);
-                    creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
+                    //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
                 }
 
                 // TODO: read config and folders again

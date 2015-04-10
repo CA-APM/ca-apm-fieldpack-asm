@@ -2,8 +2,8 @@ package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -24,7 +24,7 @@ public class Inflater implements Handler {
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String compressedString, String metricTree) {
+    public MetricMap generateMetrics(String compressedString, String metricTree) {
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {
@@ -51,7 +51,7 @@ public class Inflater implements Handler {
         } else {
             EpaUtils.getFeedback().error("Inflater has no sucessor!");
         }
-        return new HashMap<String, String>();
+        return new MetricMap();
     }
 
     /**

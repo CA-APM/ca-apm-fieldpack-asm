@@ -1,12 +1,12 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.wily.introscope.epagent.EpaUtils;
 
 
@@ -31,9 +31,9 @@ public class ScriptMonitor extends BaseMonitor {
     }
 
     @Override
-    public HashMap<String, String> generateMetrics(String jsonString, String metricTree) {
+    public MetricMap generateMetrics(String jsonString, String metricTree) {
 
-        HashMap<String, String> metricMap = null;
+        MetricMap metricMap = null;
 
         try {
             // generate basic metrics
@@ -66,16 +66,13 @@ public class ScriptMonitor extends BaseMonitor {
      * @return metric map
      * @throws JSONException errors
      */
-    protected HashMap<String, String> analyzeContentResults(String jsonString, String metricTree)
+    @SuppressWarnings("rawtypes")
+    protected MetricMap analyzeContentResults(String jsonString, String metricTree)
             throws JSONException {
 
-        HashMap<String, String> metricMap = new HashMap<String, String>();
+        MetricMap metricMap = new MetricMap();
         JSONObject jsonObject = new JSONObject(jsonString);
 
-        String name = UNDEFINED;
-        if (jsonObject.optString(NAME_TAG, null) != null) {
-            name = jsonObject.getString(NAME_TAG);
-        }
         Iterator jsonObjectKeys = jsonObject.keys();
         while (jsonObjectKeys.hasNext()) {
             String thisKey = jsonObjectKeys.next().toString();

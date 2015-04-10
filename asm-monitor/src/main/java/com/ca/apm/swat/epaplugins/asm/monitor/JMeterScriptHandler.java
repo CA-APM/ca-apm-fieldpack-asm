@@ -1,7 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.io.StringReader;
-import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,6 +12,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 
@@ -30,9 +30,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * @param metricTree metric tree prefix
      * @return map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String xmlString, String metricTree) {
+    public MetricMap generateMetrics(String xmlString, String metricTree) {
 
-        HashMap<String, String> metricMap = new HashMap<String, String>();
+        MetricMap metricMap = new MetricMap();
 
         if (EpaUtils.getFeedback().isDebugEnabled()) {
             EpaUtils.getFeedback().debug("JMeterScriptHandler - xmlString = " + xmlString);
@@ -92,7 +92,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * @param stepNode step node
      * @return metricMap map containing the metrics
      */
-    private HashMap<String, String> reportJMeterStep(String metricTree,
+    private MetricMap reportJMeterStep(String metricTree,
         int step,
         Node stepNode) {
         int assertionFailures = 0;
@@ -171,7 +171,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         }
 
         // report metrics
-        HashMap<String, String> metricMap = new HashMap<String, String>();
+        MetricMap metricMap = new MetricMap();
         metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE,
             statusMessage);
         metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE_VALUE,

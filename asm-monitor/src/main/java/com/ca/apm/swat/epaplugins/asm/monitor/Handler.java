@@ -1,6 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
-import java.util.HashMap;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 
 /**
  * Handler interface for generating metrics from a JSON string.
@@ -23,5 +23,5 @@ public interface Handler {
      * @param metricTree metric tree prefix
      * @return map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String jsonString, String metricTree);
+    public MetricMap generateMetrics(String jsonString, String metricTree);
 }

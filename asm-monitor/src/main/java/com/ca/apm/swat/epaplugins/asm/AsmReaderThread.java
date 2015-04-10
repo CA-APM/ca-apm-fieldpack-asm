@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -65,13 +66,14 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 final Date startTime = new Date();
                 
                 // get the metrics for this folder and all its monitors
-                this.metricMap.putAll(getFolderMetrics());
+                this.metricMap = getFolderMetrics();
                 
                 // send the metrics to Enterprise Manager
                 metricReporter.printMetrics(this.metricMap);
                
                 // TODO: is putAll redundant? why reset and keep all the old stuff?                
-                this.metricMap.putAll(metricReporter.resetMetrics(this.metricMap));
+                //this.metricMap.putAll(metricReporter.resetMetrics(this.metricMap));
+                
                 final Date endTime = new Date();
 
                 long timeElapsed = endTime.getTime() - startTime.getTime();
@@ -132,7 +134,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * @throws Exception errors
      */
     public HashMap<String, String> getFolderMetrics() throws Exception {
-        HashMap<String, String> resultMetricMap = new HashMap<String, String>();
+        MetricMap resultMetricMap = new MetricMap();
 
         List<Monitor> folderMonitors = this.folderMap.get(folder);
         final Monitor allMonitorsMonitor = MonitorFactory.getAllMonitorsMonitor();

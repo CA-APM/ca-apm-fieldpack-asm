@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.JSONArray;
@@ -8,6 +7,7 @@ import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
@@ -83,11 +83,12 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(
+    @SuppressWarnings("rawtypes")
+    public MetricMap generateMetrics(
         String jsonString,
         String metricTree) {
 
-        HashMap<String, String> metricMap = new HashMap<String, String>();
+        MetricMap metricMap = new MetricMap();
 
         JSONObject jsonObject = new JSONObject(jsonString);
 

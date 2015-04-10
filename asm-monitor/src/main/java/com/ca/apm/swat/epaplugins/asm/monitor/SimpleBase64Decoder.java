@@ -2,11 +2,11 @@ package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 import java.util.zip.Inflater;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -27,7 +27,7 @@ public class SimpleBase64Decoder implements Handler {
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      */
-    public HashMap<String, String> generateMetrics(String encodedString, String metricTree) {
+    public MetricMap generateMetrics(String encodedString, String metricTree) {
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {
@@ -60,7 +60,7 @@ public class SimpleBase64Decoder implements Handler {
         } else {
             EpaUtils.getFeedback().warn("SimpleBase64Decoder has no sucessor!");
         }
-        return new HashMap<String, String>();
+        return new MetricMap();
     }
 
     /**

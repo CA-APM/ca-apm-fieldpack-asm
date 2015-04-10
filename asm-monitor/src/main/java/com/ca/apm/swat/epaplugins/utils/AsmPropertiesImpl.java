@@ -4,10 +4,11 @@ import java.util.HashMap;
 
 /**
  * Contains constant maps for CA App Synthetic Monitor EPA plugin.
+ * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class AsmPropertiesImpl implements AsmProperties {
+public abstract class AsmPropertiesImpl implements AsmProperties {
 
     /**
      * Mapping table of ASM tags to APM metric names.

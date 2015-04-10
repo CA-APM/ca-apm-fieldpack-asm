@@ -78,7 +78,7 @@ public interface AsmProperties {
     public static final String GROUP_NONE               = "no_groups";
     public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
     public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
-    public static final String HTTP_CODE_TRANSLATION    = "asm.HTTPCodeTrans";
+    public static final String RESPONSE_CODES           = "asm.responseCodes";
     public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
     public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
     public static final String LOG_ASM_ISSUES           = "asm.logASMIssues=";
@@ -91,6 +91,7 @@ public interface AsmProperties {
 
     // result codes
     public static final int    RESULT_NOT_FOUND             = 404;
+    public static final int    RESULT_EXECUTION_TIMEOUT     = 1042;
     public static final int    RESULT_PAGE_LOAD_TIMEOUT     = 1043;
     public static final int    RESULT_BANDWITH_EXCEEDED     = 1060;
     public static final int    RESULT_DOMAIN_REDIRECT       = 6001;
