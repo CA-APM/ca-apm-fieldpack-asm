@@ -215,7 +215,7 @@ public class AsmReader implements AsmProperties {
      * @param requestHelper the request helper
      * @return map of folders and monitors
      */
-    public HashMap<String, List<Monitor>> initialize (AsmRequestHelper requestHelper) {
+    public HashMap<String, List<Monitor>> initialize(AsmRequestHelper requestHelper) {
         String[] folders = null;
         HashMap<String, List<Monitor>> folderMap = null;
         boolean keepTrying = true;

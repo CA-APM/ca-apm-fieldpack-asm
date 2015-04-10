@@ -253,7 +253,8 @@ public class AsmRequestHelper implements AsmProperties {
             folderStr = FOLDER_PARAM + folder;
         }
 
-        String monitorRequest = accessor.executeApi(MONITOR_GET_CMD, getCommandString() + folderStr);
+        String monitorRequest = accessor.executeApi(MONITOR_GET_CMD,
+            getCommandString() + folderStr);
 
         JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
 
@@ -319,7 +320,8 @@ public class AsmRequestHelper implements AsmProperties {
                 monitors = getMonitors(folders[i], folderProp);
             }
             // must be at least one monitor != ALL_MONITORS
-            if (((monitors.size() > 0) && !monitors.get(0).equals(ALL_MONITORS)) || (monitors.size() > 1))  {
+            if (((monitors.size() > 0) && (!monitors.get(0).equals(ALL_MONITORS)))
+                    || (monitors.size() > 1))  {
                 foldersAndMonitors.put(folders[i], monitors);
             }
         }
