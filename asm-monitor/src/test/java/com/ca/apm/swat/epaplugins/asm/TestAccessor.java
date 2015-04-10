@@ -12,7 +12,8 @@ import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * TestAccessor mimics the real accessor but reads test responses from disk
- *   instead of calling the App Synthetic Monitor API. 
+ *   instead of calling the App Synthetic Monitor API.
+ *
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
@@ -101,8 +102,7 @@ public class TestAccessor extends Accessor implements AsmProperties {
     }
 
     public String login() throws LoginError, Exception {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("login()");
     }
 
 }

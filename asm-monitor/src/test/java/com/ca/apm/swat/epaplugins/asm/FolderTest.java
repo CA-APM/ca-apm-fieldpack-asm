@@ -5,6 +5,7 @@ import org.junit.Test;
 
 /**
  * Test class for testing the fldr_get API.
+ *   Run with -DDEBUG=true for debug output.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *

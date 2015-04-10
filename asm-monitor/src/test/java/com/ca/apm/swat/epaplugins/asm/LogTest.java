@@ -11,7 +11,8 @@ import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 
 /**
- * Test class for testing the acct_credits API.
+ * Test class for testing the rule_log API.
+ *   Run with -DDEBUG=true for debug output.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *
@@ -101,12 +102,14 @@ public class LogTest extends FileTest {
 //                        + "004 /foundation/thanks.html:URL"
             };
 
-            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                String key = it.next();
-                System.out.println(key + " = " + metricMap.get(key));
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
             }
-
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 
@@ -161,12 +164,14 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:id"
                 };
 
-//            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-//            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-//                String key = it.next();
-//                System.out.println(key + " = " + metricMap.get(key));
-//            }
-
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 
@@ -220,12 +225,14 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:id"
             };
 
-            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                String key = it.next();
-                System.out.println(key + " = " + metricMap.get(key));
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
             }
-
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 
@@ -264,12 +271,14 @@ public class LogTest extends FileTest {
                 "Monitors:Agent GMT Offset"
             };
 
-//            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-//            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-//                String key = it.next();
-//                System.out.println(key + " = " + metricMap.get(key));
-//            }
-
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 
@@ -307,12 +316,14 @@ public class LogTest extends FileTest {
                 "Monitors|Caterpillar:Agent GMT Offset"
             };
 
-            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                String key = it.next();
-                System.out.println(key + " = " + metricMap.get(key));
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
             }
-
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 

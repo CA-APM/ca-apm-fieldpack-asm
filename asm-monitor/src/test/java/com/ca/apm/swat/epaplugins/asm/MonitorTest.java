@@ -1,6 +1,7 @@
 package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
@@ -9,7 +10,8 @@ import org.junit.Test;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 
 /**
- * Test class for testing the acct_credits API.
+ * Test class for testing the rule_get API.
+ *   Run with -DDEBUG=true for debug output.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *
@@ -51,15 +53,17 @@ public class MonitorTest extends FileTest {
                 "Yammer - Web landing page"
             };
 
-//            for (Iterator<String> fit = folderMap.keySet().iterator(); fit.hasNext(); ) {
-//                String key = fit.next();
-//                System.out.println("folder " + key);
-//
-//                for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
-//                    System.out.println("  " + rit.next().getName());
-//                }
-//            }
+            if (DEBUG) {
+                for (Iterator<String> fit = folderMap.keySet().iterator(); fit.hasNext(); ) {
+                    String key = fit.next();
+                    System.out.println("folder " + key);
 
+                    for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
+                        System.out.println("  " + rit.next().getName());
+                    }
+                }
+            }
+            
             // check
             checkMonitors(expectedMonitors, folderMap.get(folders[0]));
 
@@ -100,15 +104,17 @@ public class MonitorTest extends FileTest {
                 "Simple JMeter recording"
             };
 
-//            for (Iterator<String> fit = folderMap.keySet().iterator(); fit.hasNext(); ) {
-//                String key = fit.next();
-//                System.out.println("folder " + key);
-//
-//                for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
-//                    System.out.println("  " + rit.next().getName());
-//                }
-//            }
+            if (DEBUG) {
+                for (Iterator<String> fit = folderMap.keySet().iterator(); fit.hasNext(); ) {
+                    String key = fit.next();
+                    System.out.println("folder " + key);
 
+                    for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
+                        System.out.println("  " + rit.next().getName());
+                    }
+                }
+            }
+            
             // check
             checkMonitors(expectedMonitors, folderMap.get(folders[0]));
 
@@ -147,15 +153,17 @@ public class MonitorTest extends FileTest {
                 "Simple JMeter recording"
             };
 
-//            for (Iterator<String> fit = folderMap.keySet().iterator(); fit.hasNext(); ) {
-//                String key = fit.next();
-//                System.out.println("folder " + key);
-//
-//                for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
-//                    System.out.println("  " + rit.next().getName());
-//                }
-//            }
-           
+            if (DEBUG) {
+                for (Iterator<String> fit = folderMap.keySet().iterator(); fit.hasNext(); ) {
+                    String key = fit.next();
+                    System.out.println("folder " + key);
+
+                    for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
+                        System.out.println("  " + rit.next().getName());
+                    }
+                }
+            }
+            
             // check
             checkMonitors(expectedMonitors, folderMap.get(folders[0]));
 

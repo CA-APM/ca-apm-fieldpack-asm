@@ -7,6 +7,7 @@ import org.junit.Test;
 
 /**
  * Test class for testing the cp_list API.
+ *   Run with -DDEBUG=true for debug output.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *

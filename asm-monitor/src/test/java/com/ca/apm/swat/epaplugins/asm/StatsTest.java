@@ -12,6 +12,7 @@ import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 
 /**
  * Test class for testing the acct_credits API.
+ *   Run with -DDEBUG=true for debug output.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
  *
@@ -48,7 +49,7 @@ public class StatsTest extends FileTest {
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
 
             // load file
-            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_monitor.json");
+            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_rule.json");
 
             // call API
             HashMap<String, String> metricMap =
@@ -59,12 +60,14 @@ public class StatsTest extends FileTest {
                 "Monitors|Caterpillar:Agent GMT Offset"
             };
 
-            TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-            for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                String key = it.next();
-                System.out.println(key + " = " + metricMap.get(key));
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
             }
-
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 

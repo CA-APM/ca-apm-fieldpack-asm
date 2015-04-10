@@ -10,6 +10,8 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 /**
  * Base class for file based tests.
+ *   Run with -DDEBUG=true for debug output.
+ *
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
@@ -18,6 +20,12 @@ public abstract class FileTest implements AsmProperties {
     protected TestAccessor accessor = null;
     protected AsmRequestHelper requestHelper = null;
 
+    /**
+     * Print debug output to System.out if true.
+     *   Run with -DDEBUG=true for debug output.
+     */
+    public final static boolean DEBUG = TRUE.equals(System.getProperty("DEBUG", FALSE));
+    
     /**
      * Set up the test environment.
      *   read properties from file and create {@link TestAccessor}
@@ -47,11 +55,6 @@ public abstract class FileTest implements AsmProperties {
             Assert.assertTrue(expectedMetricNames[i] + " missing",
                 metricMap.containsKey(expectedMetricNames[i]));
         }
-
-//        for (Iterator<String> it = metricMap.keySet().iterator(); it.hasNext(); ) {
-//            String key = it.next();
-//            System.out.println(key + " = " + metricMap.get(key));
-//        }
     }    
 
     /**
