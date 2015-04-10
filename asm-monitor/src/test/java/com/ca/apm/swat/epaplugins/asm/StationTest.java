@@ -1,6 +1,8 @@
 package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,6 +31,14 @@ public class StationTest extends FileTest {
             String expectedValues[] = { "america-north|United States|San Francisco",
                                         "america-north|United States|Orlando",
                                         "europe-east|Austria|Vienna"};
+
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(stationMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + stationMap.get(key));
+                }
+            }
 
             // check
             checkMetrics(expectedMetrics, expectedValues, stationMap);
