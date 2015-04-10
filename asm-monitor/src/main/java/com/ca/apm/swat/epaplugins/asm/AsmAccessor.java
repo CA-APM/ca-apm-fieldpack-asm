@@ -33,7 +33,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
      * Access the App Synthetic Monitor API.
      */
     public AsmAccessor() {
-        this.properties = AsmReader.getProperties();
+        this.properties = EpaUtils.getProperties();
 
         boolean useProxy = Boolean.parseBoolean(this.properties.getProperty(USE_PROXY, FALSE));
 

@@ -1,9 +1,9 @@
 package com.wily.introscope.epagent;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
-import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -22,6 +22,11 @@ import com.wily.util.feedback.SystemOutFeedbackChannel;
  */
 public class EpaUtils {
 
+    private static Properties properties;
+
+    /**
+     * Cannot instantiate.
+     */
     private EpaUtils() {
     }
 
@@ -69,11 +74,48 @@ public class EpaUtils {
     }
 
     /**
+     * Get the global properties.
+     * @return the properties
+     */
+    public static Properties getProperties() {
+        return properties;
+    }
+
+    /**
+     * Set the global properties.
+     * @param properties the properties
+     */
+    public static void setProperties(Properties properties) {
+        EpaUtils.properties = properties;
+    }
+
+    /**
+     * Searches for the property with the specified key in the global property list.
+     *   The method returns the default value argument if the property is not found.
+     * @param key the property key (name)
+     * @param defaultValue the default value
+     * @return the value in this property list with the specified key value.
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * Searches for the property with the specified key in the global property list.
+     *   The method returns null if the property is not found.
+     * @param key the property key (name)
+     * @param defaultValue the default value
+     * @return the value in this property list with the specified key value.
+     */
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    /**
      * Returns the name of the encoding (e.g. UTF_8) to use.
-     * @return naem of the encdoing (default: UTF_8)
+     * @return name of the encoding (default: UTF_8)
      */
     public static String getEncoding() {
-        return AsmReader.getProperties().getProperty(AsmProperties.ENCODING,
-            StandardCharsets.UTF_8.name());
+        return getProperty(AsmProperties.ENCODING, StandardCharsets.UTF_8.name());
     }
 }

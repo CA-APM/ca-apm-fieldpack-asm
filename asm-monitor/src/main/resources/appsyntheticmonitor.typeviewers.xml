@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TypeViewerSet xmlns="wily.typeviews" xmlns:its="http://www.w3.org/2005/11/its"
-	namespace="cloud.monitor" version="2.0">
+	namespace="asm.monitor" version="2.0">
 	<!-- Component Definitions - Start -->
 	<ComponentDefinition id="alert-panel">
 		<Panel columns="3" constraint="Center" layout="GridLayout" rows="1">
@@ -75,6 +75,13 @@
 				<Title xml:lang="ko">프로브 오류</Title>
 				<Title xml:lang="ja">プローブ エラー</Title>
 			</Column>
+			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Total Time \(ms\)">
+				<Title its:translate="yes">Total Time (ms)</Title>
+				<Title xml:lang="zh-TW">時間總計 (毫秒)</Title>
+				<Title xml:lang="zh">总时间 (毫秒)</Title>
+				<Title xml:lang="ko">총 시간(ms)</Title>
+				<Title xml:lang="ja">合計時間 (ミリ秒)</Title>
+			</Column>
 			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Connect Time \(ms\)">
 				<Title its:translate="yes">Connect Time (ms)</Title>
 				<Title xml:lang="zh-TW">連線時間 (毫秒)</Title>
@@ -95,13 +102,6 @@
 				<Title xml:lang="zh">处理时间 (毫秒)</Title>
 				<Title xml:lang="ko">처리 시간(ms)</Title>
 				<Title xml:lang="ja">処理時間 (ミリ秒)</Title>
-			</Column>
-			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Total Time \(ms\)">
-				<Title its:translate="yes">Total Time (ms)</Title>
-				<Title xml:lang="zh-TW">時間總計 (毫秒)</Title>
-				<Title xml:lang="zh">总时间 (毫秒)</Title>
-				<Title xml:lang="ko">총 시간(ms)</Title>
-				<Title xml:lang="ja">合計時間 (ミリ秒)</Title>
 			</Column>
 			<Column content-type="NumericalValue" relative-specifier="\|([^\|]*):Download Size \(kB\)">
 				<Title its:translate="yes">Download Size (kB)</Title>
@@ -240,6 +240,14 @@
 				<Title xml:lang="ko">영역</Title>
 				<Title xml:lang="ja">領域</Title>
 			</Column>
+			<Column caution-threshold="399" content-type="NumericalValue"
+				danger-threshold="399" relative-specifier=":Status Message Value">
+				<Title its:translate="yes">Status Message Value</Title>
+			</Column>
+			<Column caution-threshold="399" content-type="NumericalValue"
+				danger-threshold="399" relative-specifier=":Result Code">
+				<Title its:translate="yes">Result Code</Title>
+			</Column>
 			<Column content-type="NumericalValue" relative-specifier=":Total Time \(ms\)"
 				sort="Descending">
 				<Title its:translate="yes">Total Time (ms)</Title>
@@ -282,7 +290,7 @@
 		<Panel layout="BorderLayout">
 			<Panel constraint="North" layout="BorderLayout">
 				<Panel columns="1" constraint="Center" layout="GridLayout"
-					rows="2">
+					rows="3">
 					<SelectedNodeLabel justify="Center"
 						node-relative-index="3">
 						<Title its:translate="yes">Monitor: </Title>
@@ -300,12 +308,32 @@
 					</SelectedNodeLabel>
 				</Panel>
 			</Panel>
-			<Graph relative-specifier=":.*Time \(ms\)" sort="Descending">
+			<Graph relative-specifier=":(Result Code|Status Messsage Value)" sort="Descending">
 				<Title its:translate="yes">Performance (ms)</Title>
 				<Title xml:lang="zh-TW">效能 (毫秒)</Title>
 				<Title xml:lang="zh">性能 (毫秒)</Title>
 				<Title xml:lang="ko">성능(ms)</Title>
 				<Title xml:lang="ja">パフォーマンス (ミリ秒)</Title>
+			</Graph>
+			<Graph relative-specifier=":.*Time \(ms\)">
+				<Title its:translate="yes">Performance (ms)</Title>
+				<Title xml:lang="zh-TW">效能 (毫秒)</Title>
+				<Title xml:lang="zh">性能 (毫秒)</Title>
+				<Title xml:lang="ko">성능(ms)</Title>
+				<Title xml:lang="ja">パフォーマンス (ミリ秒)</Title>
+			</Graph>
+		</Panel>
+	</ComponentDefinition>
+	<ComponentDefinition id="credit-graphs">
+		<Panel columns="1" constraint="Center" layout="GridLayout" rows="3">
+			<Graph relative-specifier=":API Credits Available">
+				<Title its:translate="yes">API Credits Available</Title>
+			</Graph>
+			<Graph relative-specifier=":Check Credits Available">
+				<Title its:translate="yes">Check Credits Available</Title>
+			</Graph>
+			<Graph relative-specifier=":SMS Credits Available">
+				<Title its:translate="yes">SMS Credits Available</Title>
 			</Graph>
 		</Panel>
 	</ComponentDefinition>
@@ -382,12 +410,12 @@
 		<Title xml:lang="ja">App Synthetic Monitor</Title>
 		<SplitPane split-ratio="0.2">
 			<Component id="alert-panel" />
-			<Component id="folder-table" specifier-prepend="App Synthetic Monitor" />
+			<Component id="folder-table" specifier-prepend="App Synthetic Monitor\|Monitors" />
 		</SplitPane>
 	</TypeViewer>
-	<TypeViewer id="agent_node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-type="com.wily.introscope.spec.server.types.AgentItemType.kAgentItemType"
-		tab-order="1">
+	<!-- App Synthetic Monitor node -->
+	<TypeViewer id="asm-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor" tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
 		<Title xml:lang="zh">App Synthetic Monitor</Title>
@@ -395,12 +423,12 @@
 		<Title xml:lang="ja">App Synthetic Monitor</Title>
 		<SplitPane split-ratio="0.2">
 			<Component id="alert-panel" />
-			<Component id="folder-table" specifier-prepend="App Synthetic Monitor" />
+			<Component id="folder-table" specifier-prepend="\|Monitors"/>
 		</SplitPane>
 	</TypeViewer>
-	<!-- App Synthetic Monitor node -->
-	<TypeViewer id="apmcm-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor" tab-order="1">
+	<!-- Monitors node -->
+	<TypeViewer id="monitors-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Monitors" tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
 		<Title xml:lang="zh">App Synthetic Monitor</Title>
@@ -410,6 +438,16 @@
 			<Component id="alert-panel" />
 			<Component id="folder-table" />
 		</SplitPane>
+	</TypeViewer>
+	<!-- Credits node -->
+	<TypeViewer id="credits-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+		supported-items-specifier="App Synthetic Monitor\|Credits" tab-order="1">
+		<Title its:translate="yes">App Synthetic Monitor</Title>
+		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
+		<Title xml:lang="zh">App Synthetic Monitor</Title>
+		<Title xml:lang="ko">클라우드 모니터</Title>
+		<Title xml:lang="ja">App Synthetic Monitor</Title>
+		<Component id="credit-graphs" />
 	</TypeViewer>
 	<!-- Folder node -->
 	<TypeViewer id="folder-node" supported-agents=".*\|AppSyntheticMonitor\|.*"

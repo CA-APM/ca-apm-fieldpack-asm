@@ -5,7 +5,6 @@ import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
@@ -101,7 +100,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         // append monitoring station to metric tree
-        if (TRUE.equals(AsmReader.getProperties().getProperty(DISPLAY_STATIONS, TRUE))) {
+        if (TRUE.equals(EpaUtils.getProperty(DISPLAY_STATIONS, TRUE))) {
             if (jsonObject.optString(LOCATION_TAG, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
                         + AsmRequestHelper.getMonitoringStationMap().get(

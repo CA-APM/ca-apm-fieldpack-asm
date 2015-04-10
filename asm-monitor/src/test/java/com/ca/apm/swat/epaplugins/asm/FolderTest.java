@@ -1,7 +1,11 @@
 package com.ca.apm.swat.epaplugins.asm;
 
+import java.util.Properties;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Test class for testing the fldr_get API.
@@ -21,8 +25,9 @@ public class FolderTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
-            AsmReader.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+            Properties props = EpaUtils.getProperties();
+            props.setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+            props.setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
 
             // call API
             String[] folderList = requestHelper.getFolders();
@@ -76,8 +81,9 @@ public class FolderTest extends FileTest {
             }
 
             // set properties
-            AsmReader.getProperties().setProperty(INCLUDE_FOLDERS, buf.toString());
-            AsmReader.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+            Properties props = EpaUtils.getProperties();
+            props.setProperty(INCLUDE_FOLDERS, buf.toString());
+            props.setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
 
             // call API
             String[] folderList = requestHelper.getFolders();
@@ -124,8 +130,9 @@ public class FolderTest extends FileTest {
             }
 
             // set properties
-            AsmReader.getProperties().setProperty(INCLUDE_FOLDERS, EMPTY_STRING);
-            AsmReader.getProperties().setProperty(EXCLUDE_FOLDERS, buf.toString());
+            Properties props = EpaUtils.getProperties();
+            props.setProperty(INCLUDE_FOLDERS, EMPTY_STRING);
+            props.setProperty(EXCLUDE_FOLDERS, buf.toString());
 
             // call API
             String[] folderList = requestHelper.getFolders();

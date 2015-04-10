@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricNameFilter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XmlMetricWriter;
@@ -31,7 +32,6 @@ public class AsmReader implements AsmProperties {
     private boolean keepRunning;
     private int numRetriesLeft;
 
-    private static Properties properties;
     private static AsmReader instance;
 
     /**
@@ -52,7 +52,9 @@ public class AsmReader implements AsmProperties {
             AsmReader thisReader = new AsmReader();
             int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
-            MetricWriter metricWriter = new XmlMetricWriter(psEpa);
+            MetricWriter metricWriter = getMetricWriter(psEpa);
+
+            // start main loop
             thisReader.work(epaWaitTime, metricWriter);
 
         } catch (Exception e) {
@@ -106,19 +108,11 @@ public class AsmReader implements AsmProperties {
     }
 
     /**
-     * Get the global properties.
-     * @return the properties
-     */
-    public static Properties getProperties() {
-        return properties;
-    }
-
-    /**
      * Set the global properties.
      * @param properties the properties
      */
     protected static void setProperties(Properties properties) {
-        AsmReader.properties = properties;
+        EpaUtils.setProperties(properties);
         Formatter.setProperties(properties);
     }
 
@@ -150,7 +144,6 @@ public class AsmReader implements AsmProperties {
                 it.next(),
                 requestHelper,
                 folderMap,
-                properties,
                 metricReporter);
             rt.start();
         }
@@ -159,7 +152,7 @@ public class AsmReader implements AsmProperties {
             try {
 
                 // get credits
-                if (properties.getProperty(METRICS_CREDITS, FALSE).equals(TRUE)) {
+                if (EpaUtils.getProperty(METRICS_CREDITS, FALSE).equals(TRUE)) {
                     creditsMap = requestHelper.getCredits();
                     metricReporter.printMetrics(creditsMap);
                     //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
@@ -280,9 +273,27 @@ public class AsmReader implements AsmProperties {
         }
 
         EpaUtils.getFeedback().info(AsmMessages.getMessage(
-            AsmMessages.CONNECTED, properties.getProperty(URL)));
+            AsmMessages.CONNECTED, EpaUtils.getProperty(URL)));
 
         return folderMap;
+    }
+
+    /**
+     * Returns a {@link MetricWriter} object according to the configuration.
+     * @param ps stream to write metrics to
+     * @return the new metric writer
+     */
+    public static MetricWriter getMetricWriter(PrintStream ps) {
+        // configure MetricWriter
+        MetricWriter metricWriter = new XmlMetricWriter(ps);
+
+        // check for metrics to ignore
+        String ignoreMetric = EpaUtils.getProperty(IGNORE_METRICS, EMPTY_STRING);
+        if (!EMPTY_STRING.equals(ignoreMetric)) {
+            metricWriter = new MetricNameFilter(metricWriter, ignoreMetric.split(","));
+        }
+        
+        return metricWriter;
     }
 
     /**

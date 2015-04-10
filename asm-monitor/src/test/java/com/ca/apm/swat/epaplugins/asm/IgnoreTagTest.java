@@ -2,16 +2,19 @@ package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
- * This test checks if asm.ignoreTags and asm.ignoreTagsMonitor are handled correctly.
+ * This test checks if asm.ignoreTags is handled correctly.
  *   Run with -DDEBUG=true for debug output.
  * 
  * @author Guenter Grossberger - CA APM SWAT Team
@@ -19,12 +22,10 @@ import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
  */
 public class IgnoreTagTest extends FileTest {
 
-    // TODO: create test cases
-    
     @Override
     public void setup() {
         super.setup();
-        
+
         // we need to load the the monitoring station map
         try {
             requestHelper.getMonitoringStations();
@@ -35,108 +36,65 @@ public class IgnoreTagTest extends FileTest {
     }
 
     /**
-     * Test getLog() for a script monitor.
+     * Test asm.ignoreTags property handling.
      */
     @Test
-    public void getLogScript() {
+    public void ignoreOneTag() {
 
-        try {
-            // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+        // set properties
+        Properties props = EpaUtils.getProperties(); 
+        props.setProperty(METRICS_LOGS, TRUE);
+        props.setProperty(IGNORE_TAGS, "repeat");
 
-            String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
-            int numMonitors = 5;
-            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
-            // load file
-            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
+        // metricMap should contain those entries
+        String[] expectedMetrics = {
+                                    "Monitors|Tests:Agent Time Zone",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Alerts Per Interval",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check End Time",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check Start Time",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Connect Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Size (kB)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:IP Address",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Location Code",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Processing Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Resolve Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Result Code",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID"
+        };
 
-            // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+        String[] notExpectedMetrics = {
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Repeat"
+        };
 
-            // metricMap should contain those entries
-            String[] expectedMetrics = {
-                "Monitors|Tests:Agent Time Zone",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Calgary:Alerts Per Interval",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Calgary:Resolve Time (ms)",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Toronto:Processing Time (ms)",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Vancouver:Download Size (kB)",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Vancouver:Result Code",
-                "Monitors|Tests|Simple JMeter recording|america-north|"
-                        + "United States|Phoenix:Check Start Time",
-                "Monitors|Tests|Simple JMeter recording|america-north|"
-                        + "United States|Phoenix:Monitor ID",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "001 /index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "001 /index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "002 /usermanual/index.html:Error Count",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "002 /usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "003 /usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "003 /usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "004 /foundation/thanks.html:URL"
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "001 /index.html:Assertion Errors",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "001 /index.html:Assertion Failures",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "002 /usermanual/index.html:Error Count",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "002 /usermanual/index.html:Response Code",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "003 /usermanual/build-test-plan.html:Status Message",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "003 /usermanual/build-test-plan.html:Status Message Value",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "004 /foundation/thanks.html:URL"
-            };
-
-            if (DEBUG) {
-                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                    String key = it.next();
-                    System.out.println(key + " = " + metricMap.get(key));
-                }
-            }
-            
-            // check
-            checkMetrics(expectedMetrics, metricMap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
+        runTest(props, expectedMetrics, notExpectedMetrics);
     }
 
     /**
-     * Test getLog() for a http monitor.
+     * Run the test with the supplied properties and check results.
+     * @param props properties
+     * @param expectedMetrics metrics that must be returned
+     * @param notExpectedMetrics metrics that must not be returned
      */
-//    @Test
-    public void getLogHttp() {
-
+    private void runTest(Properties props,
+                         String[] expectedMetrics,
+                         String[] notExpectedMetrics) {
         try {
-            // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            Formatter.setProperties(props);
 
             String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test", HTTP_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test",
+                HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
+
             // load file
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_http.json");
 
@@ -144,28 +102,6 @@ public class IgnoreTagTest extends FileTest {
             HashMap<String, String> metricMap =
                     requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
-            // metricMap should contain those entries
-            String[] expectedMetrics = {
-                "Monitors|Tests:Agent Time Zone",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Alerts Per Interval",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check End Time",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check Start Time",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Connect Time (ms)",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Size (kB)",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Time (ms)",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:IP Address",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Location Code",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Processing Time (ms)",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Repeat",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Resolve Time (ms)",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Result Code",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:id"
-                };
-
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
                 for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
@@ -173,165 +109,95 @@ public class IgnoreTagTest extends FileTest {
                     System.out.println(key + " = " + metricMap.get(key));
                 }
             }
-            
+
             // check
             checkMetrics(expectedMetrics, metricMap);
+            checkNotExistMetrics(notExpectedMetrics, metricMap);
 
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
         }
+
     }
 
     /**
-     * Test getLog() for a full page monitor (browser).
+     * Test asm.ignoreTags property handling.
      */
-//    @Test
-    public void getLogFullPage() {
+    @Test
+    public void ignoreTwoTags() {
 
-        try {
-            // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+        // set properties
+        Properties props = EpaUtils.getProperties(); 
+        props.setProperty(METRICS_LOGS, TRUE);
+        props.setProperty(IGNORE_TAGS, "repeat,type");
 
-            String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Amazon.com", FULL_PAGE_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
-            int numMonitors = 5;
-            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
-            // load file
-            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_browser.json");
+        // metricMap should contain those entries
+        String[] expectedMetrics = {
+                                    "Monitors|Tests:Agent Time Zone",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Alerts Per Interval",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check End Time",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check Start Time",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Connect Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Size (kB)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:IP Address",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Location Code",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Processing Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Resolve Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Result Code",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID"
+        };
 
-            // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+        String[] notExpectedMetrics = {
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Repeat",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Type",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Type",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Type",
+                                       "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type"
+        };
 
-            // metricMap should contain those entries
-            String[] expectedMetrics = {
-                "Monitors|Tests:Agent GMT Offset",
-                "Monitors|Tests|Amazon.com|america-south|Panama|Panama City:Alerts Per Interval",
-                "Monitors|Tests|Amazon.com|america-south|Panama|Panama City:Check End Time",
-                "Monitors|Tests|Amazon.com|america-south|Panama|Panama City:Check Start Time",
-                "Monitors|Tests|Amazon.com|australia|Australia|Perth:Connect Time (ms)",
-                "Monitors|Tests|Amazon.com|australia|Australia|Perth:Download Size (kB)",
-                "Monitors|Tests|Amazon.com|australia|Australia|Perth:Download Time (ms)",
-                "Monitors|Tests|Amazon.com|europe-east|Serbia|Belgrade:IP Address",
-                "Monitors|Tests|Amazon.com|europe-east|Serbia|Belgrade:Location Code",
-                "Monitors|Tests|Amazon.com|europe-east|Serbia|Belgrade:Processing Time (ms)",
-                "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Repeat",
-                "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Result Code",
-                "Monitors|Tests|Amazon.com|europe-west|Denmark|Copenhagen:Monitor ID",
-                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Monitor Name",
-                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Total Time (ms)",
-                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Type",
-                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:id"
-            };
-
-            if (DEBUG) {
-                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                    String key = it.next();
-                    System.out.println(key + " = " + metricMap.get(key));
-                }
-            }
-            
-            // check
-            checkMetrics(expectedMetrics, metricMap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
+        runTest(props, expectedMetrics, notExpectedMetrics);
     }
 
     /**
-     * Test getLog() for a real browser monitor (RBM).
+     * Test asm.ignoreTags property handling.
      */
-    //@Test
-    public void getLogRealBrowserMonitor() {
+    @Test
+    public void ignoreEmptyTag() {
 
-        try {
-            // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+        // set properties
+        Properties props = EpaUtils.getProperties(); 
+        props.setProperty(METRICS_LOGS, TRUE);
+        props.setProperty(IGNORE_TAGS, EMPTY_STRING);
 
-            String folder = "";
-            Monitor monitor = MonitorFactory.getMonitor("Cat.com click-through RBM", REAL_BROWSER_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
-            int numMonitors = 5;
-            String metricPrefix = MONITOR_METRIC_PREFIX.substring(0,
-                MONITOR_METRIC_PREFIX.length() - 1);
-            
-            // load file
-            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_firefox.json");
+        // metricMap should contain those entries
+        String[] expectedMetrics = {
+                                    "Monitors|Tests:Agent Time Zone",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Alerts Per Interval",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check End Time",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check Start Time",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Connect Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Size (kB)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:IP Address",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Location Code",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Processing Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Resolve Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Result Code",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Repeat",
+                                    "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Monitor ID"
+        };
 
-            // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
-
-            // metricMap should contain those entries
-            String[] expectedMetrics = {
-                "Monitors:Agent GMT Offset"
-            };
-
-            if (DEBUG) {
-                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                    String key = it.next();
-                    System.out.println(key + " = " + metricMap.get(key));
-                }
-            }
-            
-            // check
-            checkMetrics(expectedMetrics, metricMap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
-    }
-
-    /**
-     * Test getLog() for a real browser monitor (RBM).
-     */
-//    @Test
-    public void getLogRealBrowserMonitor2() {
-
-        try {
-            // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
-
-            String folder = "Caterpillar";
-            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
-            int numMonitors = 5;
-            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
-            // load file
-            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_firefox2.json");
-
-            // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
-
-            // metricMap should contain those entries
-            String[] expectedMetrics = {
-                "Monitors|Caterpillar:Agent GMT Offset"
-            };
-
-            if (DEBUG) {
-                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
-                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
-                    String key = it.next();
-                    System.out.println(key + " = " + metricMap.get(key));
-                }
-            }
-            
-            // check
-            checkMetrics(expectedMetrics, metricMap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
+        runTest(props, expectedMetrics, EMPTY_STRING_ARRAY);
     }
 }

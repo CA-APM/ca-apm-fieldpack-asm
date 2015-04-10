@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Test class for testing the rule_log API.
@@ -40,7 +41,7 @@ public class LogTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
@@ -122,12 +123,12 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a http monitor.
      */
-//    @Test
+    @Test
     public void getLogHttp() {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test", HTTP_MONITOR, folder,
@@ -161,7 +162,7 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
                 "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type",
-                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:id"
+                "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID"
                 };
 
             if (DEBUG) {
@@ -184,12 +185,12 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a full page monitor (browser).
      */
-//    @Test
+    @Test
     public void getLogFullPage() {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Amazon.com", FULL_PAGE_MONITOR, folder,
@@ -222,7 +223,7 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Monitor Name",
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Total Time (ms)",
                 "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Type",
-                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:id"
+                "Monitors|Tests|Amazon.com|europe-west|Switzerland|Zurich:Monitor ID"
             };
 
             if (DEBUG) {
@@ -245,12 +246,12 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a real browser monitor (RBM).
      */
-    //@Test
+    @Test
     public void getLogRealBrowserMonitor() {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "";
             Monitor monitor = MonitorFactory.getMonitor("Cat.com click-through RBM", REAL_BROWSER_MONITOR, folder,
@@ -291,12 +292,12 @@ public class LogTest extends FileTest {
     /**
      * Test getLog() for a real browser monitor (RBM).
      */
-//    @Test
+    @Test
     public void getLogRealBrowserMonitor2() {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
             Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,

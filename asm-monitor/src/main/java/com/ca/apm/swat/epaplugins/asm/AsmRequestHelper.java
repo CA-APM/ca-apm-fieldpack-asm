@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,7 +26,6 @@ public class AsmRequestHelper implements AsmProperties {
     private Accessor accessor;
     private String nkey;
     private String user;
-    private Properties properties;
     private static HashMap<String, String> stationMap;
     
     /**
@@ -36,8 +34,7 @@ public class AsmRequestHelper implements AsmProperties {
      */
     public AsmRequestHelper(Accessor accessor) {
         this.accessor = accessor;
-        this.properties = AsmReader.getProperties();
-        this.user = properties.getProperty(USER);
+        this.user = EpaUtils.getProperty(USER);
     }
 
     /**
@@ -65,8 +62,8 @@ public class AsmRequestHelper implements AsmProperties {
      * @throws Exception errors
      */
     public String[] getFolders() throws Exception {
-        String includeFolders = properties.getProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
-        String excludeFolders = properties.getProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+        String includeFolders = EpaUtils.getProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+        String excludeFolders = EpaUtils.getProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
         String[] folders;
 
         if ((includeFolders.length() == 0) || (includeFolders.contains(ALL_FOLDERS))) {
@@ -96,7 +93,7 @@ public class AsmRequestHelper implements AsmProperties {
         for (int i = 0; i < folderJsonArray.length(); i++) {
             JSONObject folderJsonObject = folderJsonArray.getJSONObject(i);
 
-            if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_FOLDERS, FALSE)))
+            if ((TRUE.equals(EpaUtils.getProperty(SKIP_INACTIVE_FOLDERS, FALSE)))
                     && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_FOLDER,
@@ -273,7 +270,7 @@ public class AsmRequestHelper implements AsmProperties {
                         monitorJsonObject.getString(FOLDER_TAG)));
             }
 
-            if ((TRUE.equals(this.properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
+            if ((TRUE.equals(EpaUtils.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
                     && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_MONITOR,
@@ -310,11 +307,11 @@ public class AsmRequestHelper implements AsmProperties {
 
 
         for (int i = 0; i < folders.length; i++) {
-            String folderProp = properties.getProperty(FOLDER_PREFIX + folders[i], ALL_MONITORS);
+            String folderProp = EpaUtils.getProperty(FOLDER_PREFIX + folders[i], ALL_MONITORS);
             List<Monitor> monitors;
             if (((folderProp.length() == 0) || (folderProp.equals(ALL_MONITORS)))
                     // if we skip inactive monitors we can't use ALL_MONITORS
-                    && (!TRUE.equals(properties.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))) {
+                    && (!TRUE.equals(EpaUtils.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))) {
                 monitors = getMonitors(folders[i], ALL_MONITORS);
                 monitors.add(0, MonitorFactory.getAllMonitorsMonitor());
             } else {
@@ -416,7 +413,7 @@ public class AsmRequestHelper implements AsmProperties {
         String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         String monitorStr = EMPTY_STRING;
-        int numLogs = Integer.parseInt(this.properties.getProperty(NUM_LOGS)) * numMonitors;
+        int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS)) * numMonitors;
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
         } else {

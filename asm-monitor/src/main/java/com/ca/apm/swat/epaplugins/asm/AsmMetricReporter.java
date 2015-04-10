@@ -16,7 +16,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 public class AsmMetricReporter implements AsmProperties {
 
     private MetricWriter metricWriter;
-    protected  static final String SEPARATOR = "\\.";
+    protected static final String SEPARATOR = "\\.";
 
     /**
      * Report metrics to APM via metric writer.

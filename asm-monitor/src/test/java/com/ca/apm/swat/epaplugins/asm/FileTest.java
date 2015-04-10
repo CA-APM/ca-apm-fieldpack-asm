@@ -45,6 +45,7 @@ public abstract class FileTest implements AsmProperties {
             Assert.fail(e.getMessage());
         }
     }
+
     /**
      * Checks that all metric names exist in the metric map.
      * @param expectedMetricNames array of expected metric names
@@ -58,7 +59,33 @@ public abstract class FileTest implements AsmProperties {
     }    
 
     /**
-     * Checks that all metrics exist in the metric map.
+     * Checks that all metric names do not exist in the metric map.
+     * @param notExpectedMetricNames array of not expected metric names
+     * @param metricMap metric map to check against
+     */
+    public void checkNotExistMetrics(String[] notExpectedMetricNames,
+                                     HashMap<String, String> metricMap) {
+        for (int i = 0; i < notExpectedMetricNames.length; ++i) {
+            Assert.assertFalse(notExpectedMetricNames[i] + " found",
+                metricMap.containsKey(notExpectedMetricNames[i]));
+        }
+    }    
+
+    /**
+     * Checks that no not expected strings exist in the string array.
+     * @param notExpected array of not expected metric names
+     * @param actual string array to check against
+     */
+    public void checkNotExistMetrics(String[] notExpected, String[] actual) {
+        for (int i = 0; i < notExpected.length; ++i) {
+            for (int j = 0; j < actual.length; ++j) {
+                Assert.assertNotEquals(notExpected[i] + " found", notExpected[i], actual[j]);
+            }
+        }
+    }    
+
+    /**
+     * Checks that all metrics exist in the metric map and the values match expectations.
      * @param expectedMetricNames array of expected metric names
      * @param expectedMetricValues array of their expected values
      * @param metricMap metric map to check against
@@ -79,10 +106,6 @@ public abstract class FileTest implements AsmProperties {
      * @param actual string array to check against
      */
     public void checkMetrics(String[] expected, String[] actual) {
-
-        Assert.assertEquals("expected " + expected.length + " entries",
-            expected.length, actual.length);
-
         for (int i = 0; i < expected.length; ++i) {
             boolean match = false;
             

@@ -62,13 +62,15 @@ public interface AsmProperties {
     public static final String FOLDER_PREFIX            = "asm.folder.";
     public static final String NUM_LOGS                 = "asm.numlogs";
     public static final String IGNORE_TAGS              = "asm.ignoreTags";
-    public static final String IGNORE_TAGS_MONITOR      = "asm.ignoreTags.monitor";
-
+    public static final String IGNORE_METRICS           = "asm.ignoreMetrics";
+    
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";
     public static final String ALL_FOLDERS              = "all_folders";
 
     // TODO: not implemented yet!!!
+    public static final String IGNORE_TAGS_MONITOR      = "asm.ignoreTags.monitor";
+    public static final String IGNORE_METRICS_MONITOR   = "asm.ignoreMetrics.monitor";
     public static final String INCLUDE_TAGS             = "asm.includeTags";
     public static final String INCLUDE_MONITORS         = "asm.includeMonitors";
     public static final String RESULT_GROUPS            = "asm.resultsGroups";
@@ -92,6 +94,7 @@ public interface AsmProperties {
     public static final int    ERROR_SESSION_EXPIRED    = 1008;
 
     // result codes
+    public static final int    RESULT_CONNECT_TIMEOUT       = 110;
     public static final int    RESULT_NOT_FOUND             = 404;
     public static final int    RESULT_EXECUTION_TIMEOUT     = 1042;
     public static final int    RESULT_PAGE_LOAD_TIMEOUT     = 1043;
@@ -101,6 +104,7 @@ public interface AsmProperties {
     public static final int    RESULT_CONNECTION_TERMINATED = 6007;
     public static final int    RESULT_URL_CANNOT_BE_SHOWN   = 6101;
     public static final int    RESULT_RESPONSE_ASSERTION    = 7001;
+    public static final int    RESULT_OPERATION_TIMEOUT     = 7011;
     public static final int    RESULT_ASSERTION_NOT_MATCHED = 9501;
 
     // retries

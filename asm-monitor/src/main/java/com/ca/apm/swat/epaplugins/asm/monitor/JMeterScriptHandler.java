@@ -142,10 +142,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 }
             }
         }
-        Formatter format = Formatter.getInstance();
         
         url = EpaUtils.fixMetric(url);
-        String metric = metricTree + METRIC_PATH_SEPARATOR  + format.formatStep(step, url);
 
         //Collect results
         String statusMessage = null;
@@ -170,9 +168,11 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         }
 
         // always map responseCode
+        Formatter format = Formatter.getInstance();
         statusCode = format.mapResponseToStatusCode(responseCode);
 
         // report metrics
+        String metric = metricTree + METRIC_PATH_SEPARATOR  + format.formatStep(step, url);
         MetricMap metricMap = new MetricMap();
         metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE,
             statusMessage);

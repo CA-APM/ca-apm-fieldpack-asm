@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Test class for testing the rule_get API.
@@ -27,9 +28,9 @@ public class MonitorTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
-            AsmReader.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
-            AsmReader.getProperties().setProperty(SKIP_INACTIVE_MONITORS, FALSE);
+            EpaUtils.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+            EpaUtils.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+            EpaUtils.getProperties().setProperty(SKIP_INACTIVE_MONITORS, FALSE);
 
             String[] folders = {"root_folder"};
 
@@ -81,9 +82,9 @@ public class MonitorTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
-            AsmReader.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
-            AsmReader.getProperties().setProperty(SKIP_INACTIVE_MONITORS, FALSE);
+            EpaUtils.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+            EpaUtils.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+            EpaUtils.getProperties().setProperty(SKIP_INACTIVE_MONITORS, FALSE);
 
             String[] folders = {"Tests"};
 
@@ -132,9 +133,9 @@ public class MonitorTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
-            AsmReader.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
-            AsmReader.getProperties().setProperty(SKIP_INACTIVE_MONITORS, TRUE);
+            EpaUtils.getProperties().setProperty(INCLUDE_FOLDERS, ALL_FOLDERS);
+            EpaUtils.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+            EpaUtils.getProperties().setProperty(SKIP_INACTIVE_MONITORS, TRUE);
 
             String[] folders = {"Tests"};
 

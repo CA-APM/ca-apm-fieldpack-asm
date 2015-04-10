@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
@@ -25,7 +24,6 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     private int numRetriesLeft;
     private AsmRequestHelper requestHelper;
     private HashMap<String, List<Monitor>> folderMap;
-    private Properties properties;
     private AsmMetricReporter metricReporter;
     private final int epaWaitTime;
 
@@ -40,16 +38,14 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         String folderName,
         AsmRequestHelper requestHelper,
         HashMap<String, List<Monitor>> folderMap,
-        Properties properties,
         AsmMetricReporter metricReporter) {
 
         this.folder = folderName;
         this.requestHelper = requestHelper;
         this.folderMap = folderMap;
-        this.properties = properties;
         this.metricReporter = metricReporter;
         this.numRetriesLeft = 10;
-        this.epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
+        this.epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
     }
 
 
@@ -157,7 +153,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         }
         
         // get stats for folder
-        if (TRUE.equals(properties.getProperty(METRICS_STATS_FOLDER, FALSE))) {
+        if (TRUE.equals(EpaUtils.getProperty(METRICS_STATS_FOLDER, FALSE))) {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderMonitors.size(), folder));
 
@@ -171,16 +167,16 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         if ((folderMonitors.get(0).equals(allMonitorsMonitor))
                 && (!folder.equals(EMPTY_STRING))) {
             
-            if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
+            if (EpaUtils.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
                 resultMetricMap.putAll(requestHelper.getPsp(folder, null, folderPrefix));
             }
             
-            if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
+            if (EpaUtils.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                 resultMetricMap.putAll(
                     requestHelper.getLogs(folder, null, folderMonitors.size() - 1, folderPrefix));
             }
 
-            if (properties.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
+            if (EpaUtils.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
                 for (Iterator<Monitor> it = folderMonitors.iterator(); it.hasNext(); ) {
                     monitor = it.next();
                     if (monitor.equals(allMonitorsMonitor)) {
@@ -199,17 +195,17 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 if (monitor.equals(ALL_MONITORS)) {
                     continue;
                 }
-                if (properties.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
+                if (EpaUtils.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
                     resultMetricMap.putAll(requestHelper.getPsp(folder, monitor, folderPrefix));
                 }
-                if (properties.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
+                if (EpaUtils.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
 //                    EpaUtils.getFeedback().verbose(
 //                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, -1,
 //                            folderPrefix + METRIC_PATH_SEPARATOR + monitor.getName()));
 
                     resultMetricMap.putAll(requestHelper.getStats(folder, monitor, folderPrefix));
                 }
-                if (properties.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
+                if (EpaUtils.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                     resultMetricMap.putAll(requestHelper.getLogs(folder, monitor, 1, folderPrefix));
                 }
             }

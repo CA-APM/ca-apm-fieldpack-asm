@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Test class for testing the acct_credits API.
@@ -41,7 +42,7 @@ public class StatsTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
             Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,

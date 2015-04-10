@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Test class for testing the rule_psp API.
@@ -40,7 +41,7 @@ public class PublicTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
@@ -127,7 +128,7 @@ public class PublicTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test", HTTP_MONITOR, folder,
@@ -189,7 +190,7 @@ public class PublicTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Amazon.com", FULL_PAGE_MONITOR, folder,
@@ -250,7 +251,7 @@ public class PublicTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "";
             Monitor monitor = MonitorFactory.getMonitor("Cat.com click-through RBM", REAL_BROWSER_MONITOR, folder,
@@ -296,7 +297,7 @@ public class PublicTest extends FileTest {
 
         try {
             // set properties
-            AsmReader.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
             Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
