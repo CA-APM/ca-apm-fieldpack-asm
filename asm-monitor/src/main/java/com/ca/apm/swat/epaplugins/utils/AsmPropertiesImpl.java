@@ -44,7 +44,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("elapsed", "API Call Time (ms)");
         ASM_METRICS.put("end", "Check End Time");
         ASM_METRICS.put("errors", "Errors Per Interval");
-        ASM_METRICS.put("gmtoffset", "Agent GMT Offset");
+        ASM_METRICS.put(GMT_OFFSET_TAG, "Agent GMT Offset");
         ASM_METRICS.put("info", "Info");
         ASM_METRICS.put("ipaddr", "IP Address");
         ASM_METRICS.put("loc", "Location Code");
@@ -53,7 +53,8 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("probes", "Probes");
         ASM_METRICS.put("ptime", "Processing Time (ms)");
         ASM_METRICS.put("repeat", "Repeat");
-        ASM_METRICS.put("result", "Result Code");
+        ASM_METRICS.put(RESULT_TAG, "Result Code");
+        ASM_METRICS.put("id", "Monitor ID");
         ASM_METRICS.put("rid", "Monitor ID");
         ASM_METRICS.put("rtime", "Resolve Time (ms)");
         ASM_METRICS.put("secscan", "Vulnerability Scan Credits Available");
@@ -66,7 +67,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("timewarn", "Time Threshold Warning (ms)");
         ASM_METRICS.put("ttime", "Total Time (ms)");
         ASM_METRICS.put(TYPE_TAG, "Type");
-        ASM_METRICS.put("tz", "Agent Time Zone");
+        ASM_METRICS.put(TIMEZONE_TAG, "Agent Time Zone");
         ASM_METRICS.put("uptime", "Uptime (%)");
         ASM_METRICS.put("version", "API Version");
         ASM_METRICS.put("xspeed", "Transfer Speed (kB/s)");

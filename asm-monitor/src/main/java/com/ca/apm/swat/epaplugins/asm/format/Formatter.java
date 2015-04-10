@@ -1,9 +1,12 @@
 package com.ca.apm.swat.epaplugins.asm.format;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Properties;
 
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Formatter formats the output.
@@ -15,8 +18,11 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
  */
 public class Formatter implements AsmProperties {
 
-    private static Properties properties = null;
     private static Formatter  instance = null;
+    
+    HashMap<String, String> responseCodeMap = null;
+    HashSet<String> ignoreTags = null;
+    HashSet<String> ignoreTagsMonitor = null;
     
     private NumberFormat stepNumberFormat = null;
     private String stepPrefix = EMPTY_STRING;
@@ -26,7 +32,6 @@ public class Formatter implements AsmProperties {
      * Create a new Formatter.
      */
     private Formatter() {
-        // TODO use properties
         stepNumberFormat = NumberFormat.getIntegerInstance();
         stepNumberFormat.setMinimumIntegerDigits(3);
     }
@@ -36,7 +41,97 @@ public class Formatter implements AsmProperties {
      * @param properties the properties
      */
     public static void setProperties(Properties properties) {
-        Formatter.properties = properties;
+        getInstance().createResponseCodeMappings(properties);
+        getInstance().createIgnoreTags(properties);
+    }
+
+    private void createIgnoreTags(Properties properties) {
+        this.ignoreTags = new HashSet<String>();
+        this.ignoreTagsMonitor = new HashSet<String>();
+
+        String tag = properties.getProperty(IGNORE_TAGS, EMPTY_STRING);
+
+        if (EMPTY_STRING.equals(tag)) {
+            return;
+        }
+        
+        String[] tags = tag.split(",");
+        
+        // add to set
+        for (int i = 0; i < tags.length;  ++i) {
+            this.ignoreTags.add(tags[i]);
+            // also ignore for monitors
+            this.ignoreTagsMonitor.add(tags[i]);
+        }
+
+        // do again for monitors
+        tag = properties.getProperty(IGNORE_TAGS_MONITOR, EMPTY_STRING);
+
+        if (EMPTY_STRING.equals(tag)) {
+            return;
+        }
+        
+        tags = tag.split(",");
+        
+        for (int i = 0; i < tags.length;  ++i) {
+            this.ignoreTagsMonitor.add(tags[i]);
+        }
+    }
+
+    /**
+     * Create response code mappings.
+     *   Mapping is from right to left so asm.responseCodes.404=6404,7001
+     *   means both 6404 and 7001 will be mapped to 404!
+     * @param properties the properties
+     */
+    private void createResponseCodeMappings(Properties properties) {
+        this.responseCodeMap = new HashMap<String, String>();
+
+        String responseCode = properties.getProperty(RESPONSE_CODES, EMPTY_STRING);
+        
+        if (EMPTY_STRING.equals(responseCode)) {
+            return;
+        }
+        
+        String[] codes = responseCode.split(",");
+        
+        for (int i = 0; i < codes.length;  ++i) {
+
+            // make sure it's an integer
+            try {
+                Integer.parseInt(codes[i]);
+            } catch (NumberFormatException e) {
+                EpaUtils.getFeedback().warn("error in " + RESPONSE_CODES + ": "
+                        + codes[i] + " is not an integer! mapping will be ignored");
+                continue;
+            }
+            
+            String map = properties.getProperty(RESPONSE_CODES + "." + codes[i], EMPTY_STRING);
+
+            if (!EMPTY_STRING.equals(map)) {
+                String[] mappings = map.split(",");
+
+                for (int j = 0; j < mappings.length;  ++j) {
+                                        
+                    // make sure it's an integer
+                    try {
+                        Integer.parseInt(mappings[j]);
+                    } catch (NumberFormatException e) {
+                        EpaUtils.getFeedback().warn("error in " + RESPONSE_CODES + ": "
+                                + mappings[j] + " is not an integer! mapping will be ignored");
+                        continue;
+                    }
+
+                    // put entry into map
+                    this.responseCodeMap.put(mappings[j], codes[i]);
+                    
+                    if (EpaUtils.getFeedback().isDebugEnabled()) {
+                        EpaUtils.getFeedback().debug("response code mapping: "
+                                + mappings[j] + " -> " + codes[i]);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -94,34 +189,42 @@ public class Formatter implements AsmProperties {
     
     /**
      * Map status values.
-     * @param responsecode input value
+     * @param responseCode input value
      * @return mapped output status code
      */
-    public int mapResponseToStatusCode(int responsecode) {
-        // TODO: map status values according to configuration
-        int statusCode = 0;
-        switch (responsecode) {
-          case 403 :
-              statusCode = 401;
-              break;
-
-          case 404 :
-              statusCode = 404;
-              break;
-
-          case 500 :
-              statusCode = 500;
-              break;
-
-          case 503 :
-              statusCode = 500;
-              break;
-
-          default:
-              break;
-        }
-        return statusCode;
+    public int mapResponseToStatusCode(int responseCode) {
+        return Integer.parseInt(mapResponseToStatusCode(Integer.toString(responseCode)));
     }
 
+    /**
+     * Map status values.
+     * @param responseCode input value
+     * @return mapped output status code
+     */
+    public String mapResponseToStatusCode(String responseCode) {
+        // try to find in map
+        if ((null != responseCodeMap) && (responseCodeMap.containsKey(responseCode))) {
+            return responseCodeMap.get(responseCode);
+        }
+        
+        return responseCode;
+    }
 
+    /**
+     * Ignore a tag? I.e. don't generate a metric for it.
+     * @param tag tag to test
+     * @return true if it should be ignored
+     */
+    public boolean ignoreTag(String tag) {
+        return ignoreTags.contains(tag);
+    }
+
+    /**
+     * Ignore a tag for a monitor metric? I.e. don't generate a metric for it.
+     * @param tag tag to test
+     * @return true if it should be ignored
+     */
+    public boolean ignoreTagForMonitor(String tag) {
+        return ignoreTagsMonitor.contains(tag);
+    }
 }

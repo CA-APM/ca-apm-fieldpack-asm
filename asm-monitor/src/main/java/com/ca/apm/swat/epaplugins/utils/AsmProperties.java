@@ -61,6 +61,8 @@ public interface AsmProperties {
     public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String FOLDER_PREFIX            = "asm.folder.";
     public static final String NUM_LOGS                 = "asm.numlogs";
+    public static final String IGNORE_TAGS              = "asm.ignoreTags";
+    public static final String IGNORE_TAGS_MONITOR      = "asm.ignoreTags.monitor";
 
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";
@@ -163,6 +165,8 @@ public interface AsmProperties {
     public static final String CODE_TAG                 = "code";
     public static final String CHECKPOINTS_TAG          = "checkpoints";
     public static final String CREDITS_TAG              = "credits";
+    public static final String GMT_OFFSET_TAG           = "gmtoffset";
+    public static final String TIMEZONE_TAG             = "tz";
     public static final String RESULT_TAG               = "result";
     public static final String NKEY_TAG                 = "nkey";
     public static final String ERROR_TAG                = "error";

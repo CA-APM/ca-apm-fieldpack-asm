@@ -167,8 +167,10 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         }
         if (!assertionFailed) {
             statusMessage = responseCode + " - " + responseMessage;
-            statusCode = format.mapResponseToStatusCode(responseCode);
         }
+
+        // always map responseCode
+        statusCode = format.mapResponseToStatusCode(responseCode);
 
         // report metrics
         MetricMap metricMap = new MetricMap();

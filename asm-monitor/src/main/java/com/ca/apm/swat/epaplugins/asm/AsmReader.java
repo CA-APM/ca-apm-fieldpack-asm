@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
@@ -118,6 +119,7 @@ public class AsmReader implements AsmProperties {
      */
     protected static void setProperties(Properties properties) {
         AsmReader.properties = properties;
+        Formatter.setProperties(properties);
     }
 
     /**

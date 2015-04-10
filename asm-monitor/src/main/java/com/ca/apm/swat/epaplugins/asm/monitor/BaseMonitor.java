@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
+import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -26,6 +27,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
     protected Handler successor = null;
 
+    protected static Formatter format = Formatter.getInstance();
+    
     /**
      * Monitor base class.
      * @param name name of the monitor
@@ -135,9 +138,15 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 // ignore these tags
                 if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
                         || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
-                        || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)) {
+                        || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)
+                        || format.ignoreTagForMonitor(thisKey)) {
+                    continue;
+                } else if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
+
+                    //Handled different
                     continue;
                 }
+
                 String thisValue = jsonObject.getString(thisKey);
 
                 // store description as error
@@ -145,10 +154,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
                     metricMap.put(EpaUtils.fixMetric(rawErrorMetric), ONE);
-                }
-
+                
                 // convert color to status value
-                if (thisKey.equals(COLOR_TAG)) {
+                } else if (thisKey.equals(COLOR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
                     if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
@@ -159,24 +167,22 @@ public class BaseMonitor implements Monitor, AsmProperties {
                         metricMap.put(EpaUtils.fixMetric(rawErrorMetric), ZERO);
                     }
 
-                }
-
                 // map location
-                if (thisKey.equals(LOCATION_TAG)) {
+                } else if (thisKey.equals(LOCATION_TAG)) {
                     thisValue = AsmRequestHelper.getMonitoringStationMap().get(thisValue);
+
+                // map result code
+                } else if (thisKey.equals(RESULT_TAG)) {
+                    metricMap.put(EpaUtils.fixMetric(metricTree + METRIC_NAME_SEPARATOR
+                        + STATUS_MESSAGE_VALUE), 
+                        format.mapResponseToStatusCode(thisValue));
                 }
 
                 // map metric key
                 if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
                     thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
                 }
-
-                if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
-
-                    //Handled different
-                    continue;
-                }
-
+             
                 // put metric into map
                 String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
                 metricMap.put(EpaUtils.fixMetric(rawMetric),
