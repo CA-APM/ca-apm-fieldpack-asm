@@ -141,8 +141,18 @@ public class BaseMonitor implements Monitor, AsmProperties {
                         || format.ignoreTagForMonitor(thisKey)) {
                     continue;
                 } else if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
-
-                    //Handled different
+                    if (null != successor) {
+                        try {
+                            // let successors do the work
+                            String thisValue = jsonObject.getString(thisKey);
+                            metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
+                        } catch (Exception e) {
+                            //Don't throw. Some formats are not yet supported
+                            EpaUtils.getFeedback().warn(e.getMessage() + "\n monitor " + getName()
+                                + ", metric tree  =" + metricTree + "\njsonString = " + jsonString);
+                        }
+                    }
+                    // anyway don't write metric
                     continue;
                 }
 
