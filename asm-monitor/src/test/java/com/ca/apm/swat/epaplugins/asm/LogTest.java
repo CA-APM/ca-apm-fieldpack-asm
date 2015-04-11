@@ -37,11 +37,13 @@ public class LogTest extends FileTest {
      * Test getLog() for a script monitor.
      */
     @Test
-    public void getLogScript() {
+    public void getLogScriptWithStations() {
 
         try {
             // set properties
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, TRUE);
+            boolean stations = true;
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
@@ -57,50 +59,93 @@ public class LogTest extends FileTest {
                     requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
+            final String CALGARY    = "|america-north|Canada|Calgary";
+            final String TORONTO    = "|america-north|Canada|Toronto";
+            final String VANCOUVER  = "|america-north|Canada|Vancouver";
+            final String PHOENIX    = "|america-north|United States|Phoenix";
+            
             String[] expectedMetrics = {
                 "Monitors|Tests:Agent Time Zone",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Calgary:Alerts Per Interval",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Calgary:Resolve Time (ms)",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Toronto:Processing Time (ms)",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Vancouver:Download Size (kB)",
-                "Monitors|Tests|Simple JMeter recording|america-north|Canada|"
-                        + "Vancouver:Result Code",
-                "Monitors|Tests|Simple JMeter recording|america-north|"
-                        + "United States|Phoenix:Check Start Time",
-                "Monitors|Tests|Simple JMeter recording|america-north|"
-                        + "United States|Phoenix:Monitor ID",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "001 /index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "001 /index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "002 /usermanual/index.html:Error Count",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "002 /usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "003 /usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "003 /usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording|"
-                        + "004 /foundation/thanks.html:URL"
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "001 /index.html:Assertion Errors",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "001 /index.html:Assertion Failures",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "002 /usermanual/index.html:Error Count",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "002 /usermanual/index.html:Response Code",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "003 /usermanual/build-test-plan.html:Status Message",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "003 /usermanual/build-test-plan.html:Status Message Value",
-//                "Status Monitoring|Tests|Simple JMeter recording|"
-//                        + "004 /foundation/thanks.html:URL"
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Alerts Per Interval",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Resolve Time (ms)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + ":Processing Time (ms)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + ":Download Size (kB)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Error Count",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
+            };
+
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+            
+            // check
+            checkMetrics(expectedMetrics, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test getLog() for a script monitor.
+     */
+    @Test
+    public void getLogScriptWithoutStations() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            boolean stations = false;
+
+            String folder = "Tests";
+            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
+                EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+            
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
+
+            // call API
+            HashMap<String, String> metricMap =
+                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+
+            // metricMap should contain those entries
+            final String CALGARY    = "|america-north|Canada|Calgary";
+            final String TORONTO    = "|america-north|Canada|Toronto";
+            final String VANCOUVER  = "|america-north|Canada|Vancouver";
+            final String PHOENIX    = "|america-north|United States|Phoenix";
+            
+            String[] expectedMetrics = {
+                "Monitors|Tests:Agent Time Zone",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Alerts Per Interval",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Resolve Time (ms)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + ":Processing Time (ms)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + ":Download Size (kB)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Error Count",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
             if (DEBUG) {
