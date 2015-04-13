@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class MetricNameFilter extends MetricFilter {
+public class MetricNameFilter extends MetricFilterBase {
 
     private String[] names = null;
 
@@ -44,28 +44,23 @@ public class MetricNameFilter extends MetricFilter {
         return true;
     }
 
-    @Override
-    protected boolean testMetric(String metricName, String metricValue) {
+    public boolean testMetric(String metricName, String metricValue) {
         return allowMetric(metricName);
     }
 
-    @Override
-    protected boolean testMetric(String metricName, int metricValue) {
+    public boolean testMetric(String metricName, int metricValue) {
         return allowMetric(metricName);
     }
 
-    @Override
-    protected boolean testMetric(String metricName, long metricValue) {
+    public boolean testMetric(String metricName, long metricValue) {
         return allowMetric(metricName);
     }
 
-    @Override
-    protected boolean testMetric(String metricName, float metricValue) {
+    public boolean testMetric(String metricName, float metricValue) {
         return allowMetric(metricName);
     }
 
-    @Override
-    protected boolean testMetric(String metricName, Date metricValue) {
+    public boolean testMetric(String metricName, Date metricValue) {
         return allowMetric(metricName);
     }
 }
