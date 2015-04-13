@@ -1,5 +1,5 @@
 <project name="test" basedir="." default="help">
-	<property name="epagent.dir" location="/Users/grogu01/work/epagent" />
+	<property name="epagent.dir" location="/Users/grogu01/work/asmmonitor" />
 	<property name="em.dir" location="/Applications/Introscope9.7.1.16" />
 	
 	<target name="help">

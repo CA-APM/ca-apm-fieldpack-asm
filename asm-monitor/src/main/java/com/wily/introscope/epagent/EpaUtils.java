@@ -1,6 +1,5 @@
 package com.wily.introscope.epagent;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -116,6 +115,6 @@ public class EpaUtils {
      * @return name of the encoding (default: UTF_8)
      */
     public static String getEncoding() {
-        return getProperty(AsmProperties.ENCODING, StandardCharsets.UTF_8.name());
+        return getProperty(AsmProperties.ENCODING, "UTF-8");
     }
 }

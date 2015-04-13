@@ -69,6 +69,12 @@ public interface AsmProperties {
     public static final String ALL_FOLDERS              = "all_folders";
 
     // TODO: not implemented yet!!!
+    public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
+    public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
+    public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
+    public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
+    public static final String LOG_ASM_ISSUES           = "asm.logASMIssues";
+
     public static final String IGNORE_TAGS_MONITOR      = "asm.ignoreTags.monitor";
     public static final String IGNORE_METRICS_MONITOR   = "asm.ignoreMetrics.monitor";
     public static final String INCLUDE_TAGS             = "asm.includeTags";
@@ -80,12 +86,7 @@ public interface AsmProperties {
     public static final String GROUP_BY_STATION         = "by_station";
     public static final String GROUP_MIXED              = "mixed";
     public static final String GROUP_NONE               = "no_groups";
-    public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
-    public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
     public static final String RESPONSE_CODES           = "asm.responseCodes";
-    public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
-    public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
-    public static final String LOG_ASM_ISSUES           = "asm.logASMIssues=";
 
     // error codes
     public static final int    ERROR_OK                 = 0;

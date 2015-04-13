@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ca.apm.swat</groupId>
 	<artifactId>asm-monitor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>ASMMonitor</name>
 	<description>Fieldpack to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
 	<properties>
@@ -36,6 +36,19 @@
 	</dependencies>
 	<build>
 		<finalName>ca.apm.swat.asm-monitor</finalName>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.3</version>
+					<configuration>
+						<compilerVersion>1.6</compilerVersion>
+						<fork>true</fork>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
