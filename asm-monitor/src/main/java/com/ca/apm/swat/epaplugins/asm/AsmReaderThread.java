@@ -1,5 +1,7 @@
 package com.ca.apm.swat.epaplugins.asm;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,8 +91,16 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                         AsmMessages.FOLDER_THREAD_ERROR,
                         ASM_PRODUCT_NAME, this.folder, e.getMessage()));
-                    //TODO: remove
-                    //e.printStackTrace();
+                    try {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        PrintStream stream = new PrintStream(out);
+                        e.printStackTrace(stream);
+                        EpaUtils.getFeedback().error(this.folder + ": " + out.toString());
+                    } catch (Exception ex) {
+                        EpaUtils.getFeedback().error("error in " + this.folder + ":"
+                                + ex.getMessage());
+                        EpaUtils.getFeedback().error("error in " + this.folder + ": " + ex);
+                    }
                     this.keepRunning = Boolean.valueOf(false);
                 }
             }

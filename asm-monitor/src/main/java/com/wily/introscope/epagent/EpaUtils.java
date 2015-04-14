@@ -1,13 +1,8 @@
 package com.wily.introscope.epagent;
 
 import java.util.Properties;
-import java.util.regex.Pattern;
 
-import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
-import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
-import com.ca.apm.swat.epaplugins.utils.StringFilter;
-import com.ca.apm.swat.epaplugins.utils.TextNormalizer;
 import com.wily.util.feedback.IModuleFeedbackChannel;
 import com.wily.util.feedback.SeverityLevel;
 import com.wily.util.feedback.SystemOutFeedbackChannel;
@@ -51,6 +46,7 @@ public class EpaUtils {
      * @return cleansed metric name
      */
     public static String fixMetric(String rawMetric) {
+        /*
         StringFilter normalizer = null;
         try {
             normalizer = TextNormalizer.getNormalizationStringFilter();
@@ -64,8 +60,26 @@ public class EpaUtils {
         Pattern pattern = Pattern.compile(AsmProperties.JSON_PATTERN);
         String fixedMetric =
                 pattern.matcher(metricKeyNormalized).replaceAll(AsmProperties.EMPTY_STRING);
+*/
+        if (null == rawMetric) {
+            return null;
+        }
 
-        return fixedMetric.replace("\\", "-")
+        String fixedMetric = rawMetric;
+
+        // replace all but the last occurence of ':'
+        int lastColon = fixedMetric.lastIndexOf(':');
+        if (lastColon > -1) {
+            while (true) {
+                int otherColon = fixedMetric.indexOf(':');
+                if ((otherColon == lastColon) || (otherColon == -1)) {
+                    break;
+                }
+                fixedMetric = fixedMetric.replaceFirst(":", "_");
+            }
+        }
+        
+        return fixedMetric.toString().replace("\\", "-")
                 //.replace("/", "-")
                 .replace(",", "_")
                 .replace(";", "-")

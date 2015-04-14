@@ -194,8 +194,12 @@ public class BaseMonitor implements Monitor, AsmProperties {
              
                 // put metric into map
                 String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
-                metricMap.put(EpaUtils.fixMetric(rawMetric),
+                if ((null == rawMetric) || (null == thisValue)) {
+                    EpaUtils.getFeedback().warn("null value in " + rawMetric + " = " + thisValue);
+                } else {
+                    metricMap.put(EpaUtils.fixMetric(rawMetric),
                     EpaUtils.fixMetric(thisValue));
+                }
             }
         }
 

@@ -225,31 +225,31 @@ public class AsmReader implements AsmProperties {
                 folders = requestHelper.getFolders();
 
                 // TODO: remove or convert to message
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                //if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     StringBuffer buf = new StringBuffer("read folders: ");
                     for (int i = 0; i < folders.length; ++i) {
                         buf.append(folders[i] + ", ");
                     }
-                    EpaUtils.getFeedback().verbose(buf.toString());
-                }
+                    EpaUtils.getFeedback().info(buf.toString());
+                //}
 
                 // read monitors
                 folderMap = requestHelper.getMonitors(folders);
 
                 // TODO: remove or convert to message
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("read monitors: ");
+                //if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().info("read monitors: ");
                     Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
                     for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
                         String folder = (String) fit.next();
-                        StringBuffer buf = new StringBuffer("  " + folder + " = ");
+                        buf = new StringBuffer("  " + folder + " = ");
                         List<Monitor> monitors = folderMap.get(folder);
                         for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
                             buf.append(mit.next().getName() + ", ");
                         }
-                        EpaUtils.getFeedback().verbose(buf.toString());
+                        EpaUtils.getFeedback().info(buf.toString());
                     }
-                }
+                //}
 
                 // read monitoring stations
                 requestHelper.getMonitoringStations();

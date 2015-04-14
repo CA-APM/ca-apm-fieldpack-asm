@@ -21,16 +21,16 @@ public class MetricMap extends HashMap<String, String> {
      *   If the map previously contained a mapping for the key, the old value is NOT replaced.
      */
     @Override
-    public String put(String key, String value) {
-        if (this.containsKey(key)) {
+    public String put(String metricPath, String value) {
+        if (this.containsKey(metricPath)) {
             if (EpaUtils.getFeedback().isDebugEnabled()) {
-                EpaUtils.getFeedback().debug("not putting " + key + "=" + value
-                    + " in map, original value =" + this.get(key));
+                EpaUtils.getFeedback().debug("not putting " + metricPath + "=" + value
+                    + " in map, original value =" + this.get(metricPath));
             }
             // don't insert
             return null;
         }
-        return super.put(key, value);
+        return super.put(metricPath, value);
     }
 
     /**
