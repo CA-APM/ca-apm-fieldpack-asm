@@ -45,6 +45,7 @@ public class IgnoreTagTest extends FileTest {
         Properties props = EpaUtils.getProperties(); 
         props.setProperty(METRICS_LOGS, TRUE);
         props.setProperty(IGNORE_TAGS, "repeat");
+        props.setProperty(DISPLAY_STATIONS, "true");
 
         // metricMap should contain those entries
         String[] expectedMetrics = {
@@ -131,6 +132,7 @@ public class IgnoreTagTest extends FileTest {
         Properties props = EpaUtils.getProperties(); 
         props.setProperty(METRICS_LOGS, TRUE);
         props.setProperty(IGNORE_TAGS, "repeat,type");
+        props.setProperty(DISPLAY_STATIONS, "true");
 
         // metricMap should contain those entries
         String[] expectedMetrics = {
@@ -175,6 +177,7 @@ public class IgnoreTagTest extends FileTest {
         Properties props = EpaUtils.getProperties(); 
         props.setProperty(METRICS_LOGS, TRUE);
         props.setProperty(IGNORE_TAGS, EMPTY_STRING);
+        props.setProperty(DISPLAY_STATIONS, "true");
 
         // metricMap should contain those entries
         String[] expectedMetrics = {

@@ -174,6 +174,7 @@ public class LogTest extends FileTest {
         try {
             // set properties
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, "true");
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test", HTTP_MONITOR, folder,
@@ -236,6 +237,7 @@ public class LogTest extends FileTest {
         try {
             // set properties
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, "true");
 
             String folder = "Tests";
             Monitor monitor = MonitorFactory.getMonitor("Amazon.com", FULL_PAGE_MONITOR, folder,

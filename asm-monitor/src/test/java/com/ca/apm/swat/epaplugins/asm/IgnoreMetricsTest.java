@@ -46,6 +46,7 @@ public class IgnoreMetricsTest extends FileTest {
         Properties props = EpaUtils.getProperties(); 
         props.setProperty(METRICS_LOGS, TRUE);
         props.setProperty(IGNORE_METRICS, "Repeat");
+        props.setProperty(DISPLAY_STATIONS, "true");
 
         // metricMap should contain those entries
         String[] expectedMetrics = {
@@ -154,6 +155,7 @@ public class IgnoreMetricsTest extends FileTest {
         Properties props = EpaUtils.getProperties(); 
         props.setProperty(METRICS_LOGS, TRUE);
         props.setProperty(IGNORE_METRICS, "Repeat,Type,Alerts Per Interval,Download Time (ms)");
+        props.setProperty(DISPLAY_STATIONS, "true");
 
         // metricMap should contain those entries
         String[] expectedMetrics = {
@@ -204,6 +206,7 @@ public class IgnoreMetricsTest extends FileTest {
         Properties props = EpaUtils.getProperties(); 
         props.setProperty(METRICS_LOGS, TRUE);
         props.setProperty(IGNORE_METRICS, EMPTY_STRING);
+        props.setProperty(DISPLAY_STATIONS, "true");
 
         // metricMap should contain those entries
         String[] expectedMetrics = {
