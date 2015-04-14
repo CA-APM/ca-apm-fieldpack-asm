@@ -10,7 +10,7 @@
 			<fileset dir="target" includes="ca.apm.swat.asm-monitor.jar"/>
 		</copy>
 		<copy todir="${epagent.dir}/">
-			<fileset dir="target/classes" includes="*.properties"/>
+			<fileset dir="target/test-classes" includes="*.properties"/>
 		</copy>
 		<copy todir="${em.dir}/ext/xmltv">
 			<fileset dir="target/classes" includes="*.typeviewers.xml"/>
