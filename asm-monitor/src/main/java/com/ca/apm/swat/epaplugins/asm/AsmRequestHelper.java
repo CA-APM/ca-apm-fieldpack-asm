@@ -229,6 +229,9 @@ public class AsmRequestHelper implements AsmProperties {
                     + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
             }
         }
+        
+        // put an entry for OPMS in the map
+        stationMap.put(OPMS, OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR + OPMS);
 
         AsmRequestHelper.stationMap = stationMap;
         return stationMap;

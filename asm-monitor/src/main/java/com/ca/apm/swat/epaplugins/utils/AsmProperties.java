@@ -135,6 +135,7 @@ public interface AsmProperties {
     public static final String STATUS_METRIC_PREFIX     = "Status Monitoring|";
     public static final String METRIC_PATH_SEPARATOR    = "|";
     public static final String METRIC_NAME_SEPARATOR    = ":";
+    public static final String OPMS                     = "OPMS";
 
     // API commands
     public static final String HTTP_POST                = "POST";

@@ -178,8 +178,11 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
                 // map location
                 } else if (thisKey.equals(LOCATION_TAG)) {
+                    // replace null with OPMS
+                    if (null == thisValue) {
+                        thisValue = OPMS;
+                    }
                     thisValue = AsmRequestHelper.getMonitoringStationMap().get(thisValue);
-
                 // map result code
                 } else if (thisKey.equals(RESULT_TAG)) {
                     metricMap.put(EpaUtils.fixMetric(metricTree + METRIC_NAME_SEPARATOR

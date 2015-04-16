@@ -173,7 +173,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         // report metrics
         String metric = EpaUtils.fixMetric(metricTree + METRIC_PATH_SEPARATOR
-            + format.formatStep(step, url));
+            + EpaUtils.fixMetric(format.formatStep(step, url)));
         
         MetricMap metricMap = new MetricMap();
         metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE,
