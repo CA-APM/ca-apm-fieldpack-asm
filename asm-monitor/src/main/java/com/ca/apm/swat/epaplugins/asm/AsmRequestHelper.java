@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -27,7 +28,9 @@ public class AsmRequestHelper implements AsmProperties {
     private String nkey;
     private String user;
     private static HashMap<String, String> stationMap;
-    
+    private static HashMap<String, Integer> apiCallMap = null;
+    private static HashMap<String, HashMap<String, Integer>> objectApiCallMap = null;
+       
     /**
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
@@ -35,6 +38,14 @@ public class AsmRequestHelper implements AsmProperties {
     public AsmRequestHelper(Accessor accessor) {
         this.accessor = accessor;
         this.user = EpaUtils.getProperty(USER);
+
+        if (null == apiCallMap) {
+            apiCallMap = new HashMap<String, Integer>();
+        }
+
+        if (null == objectApiCallMap) {
+            objectApiCallMap = new HashMap<String, HashMap<String, Integer>>();
+        }
     }
 
     /**
@@ -54,6 +65,69 @@ public class AsmRequestHelper implements AsmProperties {
         this.nkey = accessor.login();
     }
 
+    /**
+     * Count API calls per object (folder or monitor).
+     * @param cmd API command called
+     */
+    private void countApiCall(String cmd) {
+        Integer count = apiCallMap.get(cmd);
+        if (null == count) {
+            apiCallMap.put(cmd, new Integer(1));
+        } else {
+            apiCallMap.put(cmd, new Integer(count.intValue() + 1));
+        }
+    }
+
+    /**
+     * Count API calls per object (folder or monitor).
+     * @param cmd API command called
+     * @param name of the object (folder or monitor)
+     */
+    private void countApiCall(String cmd, String name) {
+        HashMap<String, Integer> map = objectApiCallMap.get(name);
+
+        if (null == map) {
+            map = new HashMap<String, Integer>();
+            map.put(cmd, new Integer(1));
+            objectApiCallMap.put(name, map);
+        } else {
+            Integer count = map.get(cmd);
+            if (null == count) {
+                map.put(cmd, new Integer(1));
+            } else {
+                map.put(cmd, new Integer(count.intValue() + 1));
+            }
+        }
+    }
+    
+    /**
+     * Write the API call statistics to the log.
+     */
+    public void printApiCallStatistics() {
+        if (TRUE.equals(EpaUtils.getProperty(PRINT_API_STATISTICS, TRUE))) {
+            EpaUtils.getFeedback().info("API Call Statistics  ");
+
+            for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
+                String cmd = it.next();
+                EpaUtils.getFeedback().info("  " + cmd + " = " + apiCallMap.get(cmd));
+            }
+
+            for (Iterator<String> it = objectApiCallMap.keySet().iterator(); it.hasNext(); ) {
+                String name = it.next();
+                HashMap<String, Integer> map = objectApiCallMap.get(name);
+
+                StringBuffer buf = new StringBuffer();
+                int count = 0;
+                for (Iterator<String> mit = map.keySet().iterator(); mit.hasNext(); ) {
+                    String cmd = mit.next();
+                    buf.append(map.get(cmd)).append(' ').append(cmd).append(',');
+                    count += map.get(cmd);
+                }
+                EpaUtils.getFeedback().info("  " + name + " = " + count + " (" + buf + ")");
+            }
+        }
+    }
+    
     /**
      * Get the folders to monitor.
      * Properties like asm.includeFolders and asm.excludeFolders are taken
@@ -86,7 +160,8 @@ public class AsmRequestHelper implements AsmProperties {
     private String[] getFolders(String folderList, String excludeList) throws Exception {
         List<String> folderQueryOutput = new ArrayList<String>();
         String folderRequest = accessor.executeApi(FOLDER_CMD, getCommandString());
-
+        countApiCall(FOLDER_CMD);
+        
         JSONArray folderJsonArray = extractJsonArray(folderRequest, FOLDERS_TAG);
 
         folderQueryOutput.add(ROOT_FOLDER);
@@ -181,7 +256,8 @@ public class AsmRequestHelper implements AsmProperties {
         MetricMap metricMap = new MetricMap();
         String creditsRequest = EMPTY_STRING;
         creditsRequest = accessor.executeApi(CREDITS_CMD, getCommandString());
-
+        countApiCall(CREDITS_CMD);
+        
         JSONArray creditJsonArray = extractJsonArray(creditsRequest, CREDITS_TAG);
 
         for (int i = 0; i < creditJsonArray.length(); i++) {
@@ -210,6 +286,7 @@ public class AsmRequestHelper implements AsmProperties {
         HashMap<String, String> stationMap = new HashMap<String, String>();
 
         String cpRequest = accessor.executeApi(STATIONS_GET_CMD, getCommandString());
+        countApiCall(STATIONS_GET_CMD);
 
         JSONArray cpJsonArray = extractJsonArray(cpRequest, CHECKPOINTS_TAG);
 
@@ -256,6 +333,7 @@ public class AsmRequestHelper implements AsmProperties {
 
         String monitorRequest = accessor.executeApi(MONITOR_GET_CMD,
             getCommandString() + folderStr);
+        countApiCall(MONITOR_GET_CMD, folder);
 
         JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
 
@@ -351,8 +429,10 @@ public class AsmRequestHelper implements AsmProperties {
         if (monitor != null) {
             monitorStr = NAME_PARAM + monitor.getName();
             folder = folder + "|" + monitor.getName();
+            countApiCall(STATS_CMD, monitor.getName());
         } else {
             monitor = MonitorFactory.getAllMonitorsMonitor();
+            countApiCall(STATS_CMD, folder);
         }
 
         String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
@@ -387,8 +467,10 @@ public class AsmRequestHelper implements AsmProperties {
 
         if (monitor != null) {
             monitorStr = NAME_PARAM + monitor.getName();
+            countApiCall(PSP_CMD, monitor.getName());
         } else {
             monitor = MonitorFactory.getAllMonitorsMonitor();
+            countApiCall(PSP_CMD, folder);
         }
 
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
@@ -427,7 +509,11 @@ public class AsmRequestHelper implements AsmProperties {
 
         if (monitor != null) {
             monitorStr = NAME_PARAM + monitor.getName();
+            countApiCall(LOGS_CMD, monitor.getName());
+        } else {
+            countApiCall(LOGS_CMD, folder);           
         }
+
         String logStr = NKEY_PARAM + this.nkey + folderStr + monitorStr
                 + NUM_PARAM + numLogs + REVERSE_PARAM
                 + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;

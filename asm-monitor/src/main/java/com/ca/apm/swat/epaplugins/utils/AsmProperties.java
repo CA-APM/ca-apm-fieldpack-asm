@@ -33,7 +33,8 @@ public interface AsmProperties {
     public static final String ENCODING                 = "asm.encoding";
     public static final String WAIT_TIME                = "asm.waittime";
     public static final String DISPLAY_STATIONS         = "asm.displayMonitoringStations";
-
+    public static final String PRINT_API_STATISTICS     = "asm.printApiStatistics";
+    
     // which metrics to get and display
     public static final String METRICS_STATS_FOLDER     = "asm.metrics.stats.folder";
     public static final String METRICS_STATS_MONITOR    = "asm.metrics.stats.monitor";

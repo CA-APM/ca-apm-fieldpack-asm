@@ -201,7 +201,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                     EpaUtils.getFeedback().warn("null value in " + rawMetric + " = " + thisValue);
                 } else {
                     metricMap.put(EpaUtils.fixMetric(rawMetric),
-                    EpaUtils.fixMetric(thisValue));
+                        EpaUtils.fixMetric(thisValue));
                 }
             }
         }

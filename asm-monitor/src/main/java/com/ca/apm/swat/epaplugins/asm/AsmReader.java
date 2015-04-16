@@ -157,7 +157,8 @@ public class AsmReader implements AsmProperties {
                     metricReporter.printMetrics(creditsMap);
                     //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
                 }
-
+                requestHelper.printApiCallStatistics();
+                
                 // TODO: read config and folders again
 
                 Thread.sleep(epaWaitTime);
