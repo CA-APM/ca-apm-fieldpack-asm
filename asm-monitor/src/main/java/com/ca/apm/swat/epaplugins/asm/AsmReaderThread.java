@@ -4,11 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
-import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -143,15 +141,14 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         MetricMap resultMetricMap = new MetricMap();
 
         List<Monitor> folderMonitors = this.folderMap.get(folder);
-        final Monitor allMonitorsMonitor = MonitorFactory.getAllMonitorsMonitor();
-        Monitor monitor = null;
-        
-        EpaUtils.getFeedback().verbose(
-            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderMonitors.size(), folder));
-
+       
         if ((null == folderMonitors) || (0 == folderMonitors.size())) {
             return resultMetricMap;
         }
+
+        EpaUtils.getFeedback().verbose(
+            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderMonitors.size(), folder));
+
 
         // prefix for metric name
         String folderPrefix = MONITOR_METRIC_PREFIX + folder;
@@ -167,60 +164,32 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderMonitors.size(), folder));
 
-            resultMetricMap.putAll(requestHelper.getStats(folder, null, folderPrefix));
+            // get aggregated folder stats
+            resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, true));
         } else {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA, folder));
         }
 
-        // get stats for all monitors
-        if ((folderMonitors.get(0).equals(allMonitorsMonitor))
-                && (!folder.equals(EMPTY_STRING))) {
-            
-            if (EpaUtils.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
-                resultMetricMap.putAll(requestHelper.getPsp(folder, null, folderPrefix));
+        // don't get aggregate metrics for root folder
+        if (!EMPTY_STRING.equals(folder)) {
+
+            // get stats for all monitors of this folder
+            if (EpaUtils.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
+                resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, false));
             }
             
+            // get logs for all monitors of this folder
             if (EpaUtils.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
                 resultMetricMap.putAll(
-                    requestHelper.getLogs(folder, null, folderMonitors.size() - 1, folderPrefix));
+                    requestHelper.getLogs(folder, folderMonitors.size() - 1, folderPrefix));
             }
-
-            if (EpaUtils.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
-                for (Iterator<Monitor> it = folderMonitors.iterator(); it.hasNext(); ) {
-                    monitor = it.next();
-                    if (monitor.equals(allMonitorsMonitor)) {
-                        continue;
-                    }
-//                    EpaUtils.getFeedback().verbose(
-//                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, 1,
-//                            folderPrefix + METRIC_PATH_SEPARATOR + monitor.getName()));
-
-                    resultMetricMap.putAll(requestHelper.getStats(folder, monitor, folderPrefix));
-                }
-            }
-        } else {
-            for (Iterator<Monitor> it = folderMonitors.iterator(); it.hasNext(); ) {
-                monitor = it.next();
-                if (monitor.equals(ALL_MONITORS)) {
-                    continue;
-                }
-                if (EpaUtils.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
-                    resultMetricMap.putAll(requestHelper.getPsp(folder, monitor, folderPrefix));
-                }
-                if (EpaUtils.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
-//                    EpaUtils.getFeedback().verbose(
-//                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, -1,
-//                            folderPrefix + METRIC_PATH_SEPARATOR + monitor.getName()));
-
-                    resultMetricMap.putAll(requestHelper.getStats(folder, monitor, folderPrefix));
-                }
-                if (EpaUtils.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
-                    resultMetricMap.putAll(requestHelper.getLogs(folder, monitor, 1, folderPrefix));
-                }
+            // get public metrics for all monitors of this folder
+            if (EpaUtils.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
+                resultMetricMap.putAll(requestHelper.getPsp(folder, folderPrefix));
             }
         }
-
+        
         EpaUtils.getFeedback().verbose("getFolderMetrics finished for folder " + folder
             + ", returning " + resultMetricMap.size() + " metrics");
 

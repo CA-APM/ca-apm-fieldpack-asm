@@ -92,11 +92,22 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
         MetricMap metricMap = new MetricMap();
 
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose("generateMetrics(" + metricTree + ", " 
+                + jsonString + ")");
+        }
+        
         JSONObject jsonObject = new JSONObject(jsonString);
 
         // if we find a name append it to metric tree
         if (jsonObject.optString(NAME_TAG, null) != null) {
+            // TODO: check if monitor is active
             metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(NAME_TAG);
+        }
+
+        // return if this monitor is inactive
+        if (jsonObject.optString(ACTIVE_TAG, YES) == NO) {
+            return metricMap;
         }
 
         // append monitoring station to metric tree
@@ -137,6 +148,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 // ignore these tags
                 if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
                         || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
+                        || (thisKey.equals(ACTIVE_TAG))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)
                         || format.ignoreTagForMonitor(thisKey)) {
                     continue;
@@ -145,7 +157,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
                         try {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
-                            metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
+                            if (null != thisValue) {
+                                metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
+                            }
                         } catch (Exception e) {
                             //Don't throw. Some formats are not yet supported
                             EpaUtils.getFeedback().warn(e.getMessage() + "\n monitor " + getName()

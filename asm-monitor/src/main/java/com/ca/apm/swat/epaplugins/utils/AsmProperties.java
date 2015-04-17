@@ -157,6 +157,8 @@ public interface AsmProperties {
     public static final String FOLDER_PARAM             = "&folder=";
     public static final String NAME_PARAM               = "&name=";
     public static final String REVERSE_PARAM            = "&reverse=y";
+    public static final String NOT_AGGREGATE_PARAM      = "&aggregate=n";
+    public static final String AGGREGATE_PARAM          = "&aggregate=y";
     public static final String NUM_PARAM                = "&num=";
     public static final String START_DATE_PARAM         = "&start_date=";
     public static final String ACCOUNT_PARAM            = "&acct=";

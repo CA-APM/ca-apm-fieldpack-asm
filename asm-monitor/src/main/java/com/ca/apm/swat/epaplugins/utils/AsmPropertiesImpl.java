@@ -47,6 +47,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put(GMT_OFFSET_TAG, "Agent GMT Offset");
         ASM_METRICS.put("info", "Info");
         ASM_METRICS.put("ipaddr", "IP Address");
+        ASM_METRICS.put("lastcheck", "Last Check");
         ASM_METRICS.put("loc", "Location Code");
         ASM_METRICS.put("name", "Monitor Name");
         ASM_METRICS.put("probe_errors", "Probe Errors");

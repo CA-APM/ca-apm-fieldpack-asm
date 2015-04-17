@@ -9,8 +9,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
-import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
-import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.wily.introscope.epagent.EpaUtils;
 
@@ -92,8 +90,8 @@ public class IgnoreMetricsTest extends FileTest {
             Formatter.setProperties(props);
 
             String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test",
-                HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test",
+//                HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
 
@@ -102,7 +100,7 @@ public class IgnoreMetricsTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // create a filtered MetricWriter
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();

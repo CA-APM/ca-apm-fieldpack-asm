@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,9 @@ public class AsmRequestHelper implements AsmProperties {
     private static HashMap<String, String> stationMap;
     private static HashMap<String, Integer> apiCallMap = null;
     private static HashMap<String, HashMap<String, Integer>> objectApiCallMap = null;
-       
+    private long lastPrintApiTimestamp = 0;
+    private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
+    
     /**
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
@@ -104,26 +107,34 @@ public class AsmRequestHelper implements AsmProperties {
      * Write the API call statistics to the log.
      */
     public void printApiCallStatistics() {
-        if (TRUE.equals(EpaUtils.getProperty(PRINT_API_STATISTICS, TRUE))) {
-            EpaUtils.getFeedback().info("API Call Statistics  ");
+        if (TRUE.equals(EpaUtils.getProperty(PRINT_API_STATISTICS, FALSE))) {
 
-            for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
-                String cmd = it.next();
-                EpaUtils.getFeedback().info("  " + cmd + " = " + apiCallMap.get(cmd));
-            }
+            final Date now = new Date();
+            long timeElapsed = now.getTime() - lastPrintApiTimestamp;
+            
+            if (PRINT_API_INTERVAL < timeElapsed) {
+                lastPrintApiTimestamp = now.getTime();
+            
+                EpaUtils.getFeedback().info("API Call Statistics  ");
 
-            for (Iterator<String> it = objectApiCallMap.keySet().iterator(); it.hasNext(); ) {
-                String name = it.next();
-                HashMap<String, Integer> map = objectApiCallMap.get(name);
-
-                StringBuffer buf = new StringBuffer();
-                int count = 0;
-                for (Iterator<String> mit = map.keySet().iterator(); mit.hasNext(); ) {
-                    String cmd = mit.next();
-                    buf.append(map.get(cmd)).append(' ').append(cmd).append(',');
-                    count += map.get(cmd);
+                for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
+                    String cmd = it.next();
+                    EpaUtils.getFeedback().info("  " + cmd + " = " + apiCallMap.get(cmd));
                 }
-                EpaUtils.getFeedback().info("  " + name + " = " + count + " (" + buf + ")");
+
+                for (Iterator<String> it = objectApiCallMap.keySet().iterator(); it.hasNext(); ) {
+                    String name = it.next();
+                    HashMap<String, Integer> map = objectApiCallMap.get(name);
+
+                    StringBuffer buf = new StringBuffer();
+                    int count = 0;
+                    for (Iterator<String> mit = map.keySet().iterator(); mit.hasNext(); ) {
+                        String cmd = mit.next();
+                        buf.append(map.get(cmd)).append(' ').append(cmd).append(',');
+                        count += map.get(cmd);
+                    }
+                    EpaUtils.getFeedback().info("  " + name + " = " + count + " (" + buf + ")");
+                }
             }
         }
     }
@@ -410,15 +421,15 @@ public class AsmRequestHelper implements AsmProperties {
     /**
      * Get statistics for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param monitor gets all monitors if null
+     * @param metricPrefix prefix for metrics
+     * @param aggregate aggregate folder stats?
      * @return metric map
-     * @throws Exception errors
+     * @throws Exception if an error occurred
      */
-    public HashMap<String, String> getStats(String folder, Monitor monitor, String metricPrefix)
+    public HashMap<String, String> getStats(String folder, String metricPrefix, boolean aggregate)
             throws Exception {
-        String statsRequest = EMPTY_STRING;
+        String aggregateStr = NOT_AGGREGATE_PARAM;
         String folderStr = EMPTY_STRING;
-        String monitorStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
@@ -426,19 +437,17 @@ public class AsmRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (monitor != null) {
-            monitorStr = NAME_PARAM + monitor.getName();
-            folder = folder + "|" + monitor.getName();
-            countApiCall(STATS_CMD, monitor.getName());
-        } else {
-            monitor = MonitorFactory.getAllMonitorsMonitor();
-            countApiCall(STATS_CMD, folder);
-        }
+        Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
+        countApiCall(STATS_CMD, folder);
 
+        if (aggregate) {
+            aggregateStr = AGGREGATE_PARAM;
+        }
+        
         String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
-                + folderStr + monitorStr + START_DATE_PARAM
+                + folderStr + aggregateStr + START_DATE_PARAM
                 + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
-        statsRequest = accessor.executeApi(STATS_CMD, statsStr);
+        String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
         EpaUtils.getFeedback().verbose("getStats: folder = " + folder
             + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
@@ -449,11 +458,10 @@ public class AsmRequestHelper implements AsmProperties {
     /**
      * Get PSP information for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param monitor gets all monitors if null
      * @return metric map
      * @throws Exception errors
      */
-    public HashMap<String, String> getPsp(String folder, Monitor monitor, String metricPrefix)
+    public HashMap<String, String> getPsp(String folder, String metricPrefix)
             throws Exception {
         String pspRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
@@ -465,39 +473,29 @@ public class AsmRequestHelper implements AsmProperties {
             folder = ROOT_FOLDER;
         }
 
-        if (monitor != null) {
-            monitorStr = NAME_PARAM + monitor.getName();
-            countApiCall(PSP_CMD, monitor.getName());
-        } else {
-            monitor = MonitorFactory.getAllMonitorsMonitor();
-            countApiCall(PSP_CMD, folder);
-        }
-
+        countApiCall(PSP_CMD, folder);
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
             + folderStr + monitorStr);
 
-        EpaUtils.getFeedback().verbose("getPsp: folder = " + folder
-            + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
+        EpaUtils.getFeedback().verbose("getPsp: folder = " + folder);
         
+        Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
         return monitor.generateMetrics(pspRequest, metricPrefix);
     }
 
     /**
      * Get logs for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param monitor gets all monitors if null
      * @param numMonitors number of monitors in folder
      * @return metric map
      * @throws Exception errors
      */
     public HashMap<String, String> getLogs(String folder,
-        Monitor monitor,
         int numMonitors,
         String metricPrefix) throws Exception {
 
         String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
-        String monitorStr = EMPTY_STRING;
         int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS)) * numMonitors;
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
@@ -507,14 +505,9 @@ public class AsmRequestHelper implements AsmProperties {
             //monitor = MonitorFactory.getAllMonitorsMonitor();
         }
 
-        if (monitor != null) {
-            monitorStr = NAME_PARAM + monitor.getName();
-            countApiCall(LOGS_CMD, monitor.getName());
-        } else {
-            countApiCall(LOGS_CMD, folder);           
-        }
+        countApiCall(LOGS_CMD, folder);           
 
-        String logStr = NKEY_PARAM + this.nkey + folderStr + monitorStr
+        String logStr = NKEY_PARAM + this.nkey + folderStr
                 + NUM_PARAM + numLogs + REVERSE_PARAM
                 + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
         //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
@@ -522,9 +515,9 @@ public class AsmRequestHelper implements AsmProperties {
 
         logRequest = accessor.executeApi(LOGS_CMD, logStr);
 
-        EpaUtils.getFeedback().verbose("getLogs: folder = " + folder
-            + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
+        EpaUtils.getFeedback().verbose("getLogs: folder = " + folder);
 
+        Monitor monitor = MonitorFactory.getMonitor("dummy", SCRIPT_MONITOR, folderStr, null);
         return monitor.generateMetrics(logRequest, metricPrefix);
     }
 

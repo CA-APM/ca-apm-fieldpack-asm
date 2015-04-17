@@ -7,8 +7,6 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
-import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**
@@ -45,16 +43,16 @@ public class StatsTest extends FileTest {
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
-            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
+//                EMPTY_STRING_ARRAY);
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
 
             // load file
-            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_rule.json");
+            accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_aggregate.json");
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getStats(folder, monitor, metricPrefix);
+                    requestHelper.getStats(folder, metricPrefix, true);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {

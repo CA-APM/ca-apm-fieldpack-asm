@@ -7,8 +7,6 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
-import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**
@@ -46,8 +44,8 @@ public class LogTest extends FileTest {
             boolean stations = true;
 
             String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
@@ -56,7 +54,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             final String CALGARY    = "|america-north|Canada|Calgary";
@@ -112,8 +110,8 @@ public class LogTest extends FileTest {
             boolean stations = false;
 
             String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording", SCRIPT_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
@@ -122,7 +120,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             final String CALGARY    = "|america-north|Canada|Calgary";
@@ -166,6 +164,86 @@ public class LogTest extends FileTest {
     }
 
     /**
+     * Test getLog() for a script monitor.
+     */
+    @Test
+    public void getLogFolder() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+
+            String folder = "Tests";
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+            
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_all.json");
+
+            // call API
+            HashMap<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+
+            // metricMap should contain those entries
+            
+            String[] expectedMetrics = {
+                "Monitors|Tests:Agent Time Zone",
+                "Monitors|Tests|Simple HTTP validation test:Alerts Per Interval",
+                "Monitors|Tests|Simple HTTP validation test:Check End Time",
+                "Monitors|Tests|Simple HTTP validation test:Check Start Time",
+                "Monitors|Tests|Simple HTTP validation test:Connect Time (ms)",
+                "Monitors|Tests|Simple HTTP validation test:Download Size (kB)",
+                "Monitors|Tests|Simple HTTP validation test:Download Time (ms)",
+                "Monitors|Tests|Simple HTTP validation test:IP Address",
+                "Monitors|Tests|Simple HTTP validation test:Location Code",
+                "Monitors|Tests|Simple HTTP validation test:Processing Time (ms)",
+                "Monitors|Tests|Simple HTTP validation test:Repeat",
+                "Monitors|Tests|Simple HTTP validation test:Resolve Time (ms)",
+                "Monitors|Tests|Simple HTTP validation test:Result Code",
+                "Monitors|Tests|Simple HTTP validation test:Monitor ID",
+                "Monitors|Tests|Simple HTTP validation test:Monitor Name",
+                "Monitors|Tests|Simple HTTP validation test:Total Time (ms)",
+                "Monitors|Tests|Simple HTTP validation test:Type",
+                "Monitors|Tests|Simple HTTP validation test:Monitor ID",
+                "Monitors|Tests|DNS test:Alerts Per Interval",
+                "Monitors|Tests|DNS test:Check End Time",
+                "Monitors|Tests|DNS test:Check Start Time",
+                "Monitors|Tests|DNS test:Download Size (kB)",
+                "Monitors|Tests|DNS test:Download Time (ms)",
+                "Monitors|Tests|FTP test:IP Address",
+                "Monitors|Tests|FTP test:Location Code",
+                "Monitors|Tests|FTP test:Processing Time (ms)",
+                "Monitors|Tests|FTP test:Repeat",
+                "Monitors|Tests|FTP test:Result Code",
+                "Monitors|Tests|FTP test:Monitor ID",
+                "Monitors|Tests|FTP test:Monitor Name",
+                "Monitors|Tests|Custom page ping:Total Time (ms)",
+                "Monitors|Tests|Custom page ping:Type",
+                "Monitors|Tests|Custom page ping:Monitor ID",
+                "Monitors|Tests|Custom page ping:Connect Time (ms)",
+            };
+
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+            
+            // check
+            checkMetrics(expectedMetrics, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
      * Test getLog() for a http monitor.
      */
     @Test
@@ -177,8 +255,8 @@ public class LogTest extends FileTest {
             EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, "true");
 
             String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test", HTTP_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test",
+//                HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
@@ -187,7 +265,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -240,8 +318,8 @@ public class LogTest extends FileTest {
             EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, "true");
 
             String folder = "Tests";
-            Monitor monitor = MonitorFactory.getMonitor("Amazon.com", FULL_PAGE_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Amazon.com",
+//                FULL_PAGE_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
@@ -250,7 +328,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -301,8 +379,8 @@ public class LogTest extends FileTest {
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "";
-            Monitor monitor = MonitorFactory.getMonitor("Cat.com click-through RBM", REAL_BROWSER_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Cat.com click-through RBM",
+//                REAL_BROWSER_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX.substring(0,
                 MONITOR_METRIC_PREFIX.length() - 1);
@@ -312,7 +390,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -347,8 +425,8 @@ public class LogTest extends FileTest {
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
 
             String folder = "Caterpillar";
-            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction", REAL_BROWSER_MONITOR, folder,
-                EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("SFDC transaction",
+//                REAL_BROWSER_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
             
@@ -357,7 +435,7 @@ public class LogTest extends FileTest {
 
             // call API
             HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, monitor, numMonitors, metricPrefix);
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
