@@ -125,6 +125,31 @@ public class EpaUtils {
     }
 
     /**
+     * Searches for the property with the specified key in the global property list.
+     *   The method returns null if the property is not found.
+     * @param key the property key (name)
+     * @param defaultValue the default value
+     * @return the value in this property list with the specified key value.
+     */
+    public static boolean getBooleanProperty(String key) {
+        return Boolean.getBoolean(properties.getProperty(key));
+    }
+
+    /**
+     * Searches for the property with the specified key in the global property list.
+     *   The method returns the default value argument if the property is not found.
+     * @param key the property key (name)
+     * @param defaultValue the default value
+     * @return the value in this property list with the specified key value.
+     */
+    public static boolean getBooleanProperty(String key, boolean defaultValue) {
+        if (properties.containsKey(key)) {
+            return Boolean.valueOf(properties.getProperty(key));
+        }
+        return defaultValue;
+    }
+
+    /**
      * Returns the name of the encoding (e.g. UTF_8) to use.
      * @return name of the encoding (default: UTF_8)
      */

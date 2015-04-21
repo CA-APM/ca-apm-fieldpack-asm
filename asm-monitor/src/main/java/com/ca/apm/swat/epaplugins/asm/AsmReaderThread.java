@@ -160,7 +160,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         }
         
         // get stats for folder
-        if (TRUE.equals(EpaUtils.getProperty(METRICS_STATS_FOLDER, FALSE))) {
+        if (EpaUtils.getBooleanProperty(METRICS_STATS_FOLDER, false)) {
             EpaUtils.getFeedback().verbose(
                 AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderMonitors.size(), folder));
 
@@ -175,17 +175,17 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         if (!EMPTY_STRING.equals(folder)) {
 
             // get stats for all monitors of this folder
-            if (EpaUtils.getProperty(METRICS_STATS_MONITOR, FALSE).equals(TRUE)) {
+            if (EpaUtils.getBooleanProperty(METRICS_STATS_MONITOR, false)) {
                 resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, false));
             }
             
             // get logs for all monitors of this folder
-            if (EpaUtils.getProperty(METRICS_LOGS, FALSE).equals(TRUE)) {
+            if (EpaUtils.getBooleanProperty(METRICS_LOGS, false)) {
                 resultMetricMap.putAll(
                     requestHelper.getLogs(folder, folderMonitors.size() - 1, folderPrefix));
             }
             // get public metrics for all monitors of this folder
-            if (EpaUtils.getProperty(METRICS_PUBLIC, FALSE).equals(TRUE)) {
+            if (EpaUtils.getBooleanProperty(METRICS_PUBLIC, false)) {
                 resultMetricMap.putAll(requestHelper.getPsp(folder, folderPrefix));
             }
         }

@@ -56,7 +56,7 @@ public class CryptoUtils implements AsmProperties {
             System.out.println(AsmMessages.getMessage(AsmMessages.PUT_PW_IN_PROPERTIES,
                 PROPERTY_FILE_NAME));
             System.out.println(PASSWORD + '=' + encrypted);
-            System.out.println(PASSWORD_ENCRYPTED + '=' + TRUE);
+            System.out.println(PASSWORD_ENCRYPTED + "=true");
         } catch (Exception e) {
             e.printStackTrace();
         }

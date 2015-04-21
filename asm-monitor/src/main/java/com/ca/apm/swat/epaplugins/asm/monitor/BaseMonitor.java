@@ -111,7 +111,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         // append monitoring station to metric tree
-        if (TRUE.equals(EpaUtils.getProperty(DISPLAY_STATIONS, TRUE))) {
+        if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
             if (jsonObject.optString(LOCATION_TAG, null) != null) {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
                         + AsmRequestHelper.getMonitoringStationMap().get(
@@ -214,8 +214,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 if ((null == rawMetric) || (null == thisValue)) {
                     EpaUtils.getFeedback().warn("null value in " + rawMetric + " = " + thisValue);
                 } else {
-                    metricMap.put(EpaUtils.fixMetric(rawMetric),
-                        EpaUtils.fixMetric(thisValue));
+                    metricMap.put(EpaUtils.fixMetric(rawMetric), thisValue);
                 }
             }
         }

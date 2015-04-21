@@ -152,7 +152,7 @@ public class AsmReader implements AsmProperties {
             try {
 
                 // get credits
-                if (EpaUtils.getProperty(METRICS_CREDITS, FALSE).equals(TRUE)) {
+                if (EpaUtils.getBooleanProperty(METRICS_CREDITS, false)) {
                     creditsMap = requestHelper.getCredits();
                     metricReporter.printMetrics(creditsMap);
                     //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));

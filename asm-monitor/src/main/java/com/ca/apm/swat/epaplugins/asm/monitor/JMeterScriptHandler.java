@@ -197,24 +197,17 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         
         // report metrics
         String metric = EpaUtils.fixMetric(metricTree + METRIC_PATH_SEPARATOR
-            + EpaUtils.fixMetric(format.formatStep(step, url)));
+            + format.formatStep(step, url) + METRIC_NAME_SEPARATOR);
         
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE_VALUE,
-            Integer.toString(statusCode));
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + RESPONSE_CODE,
-            Integer.toString(responseCode));
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + ERROR_COUNT,
-            Integer.toString(errorCount));
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + ASSERTION_FAILURES,
-            Integer.toString(assertionFailures));
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + ASSERTION_ERRORS,
-            Integer.toString(assertionErrors));
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + TEST_URL,
-            EpaUtils.fixMetric(url));
+        metricMap.put(metric + STATUS_MESSAGE_VALUE, Integer.toString(statusCode));
+        metricMap.put(metric + RESPONSE_CODE,        Integer.toString(responseCode));
+        metricMap.put(metric + ERROR_COUNT,          Integer.toString(errorCount));
+        metricMap.put(metric + ASSERTION_FAILURES,   Integer.toString(assertionFailures));
+        metricMap.put(metric + ASSERTION_ERRORS,     Integer.toString(assertionErrors));
+        metricMap.put(metric + TEST_URL,             url);
 
-        if (TRUE.equals(EpaUtils.getProperty(REPORT_STRING_RESULTS, TRUE))) {
-            metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE,
-                statusMessage);
+        if (EpaUtils.getBooleanProperty(REPORT_STRING_RESULTS, true)) {
+            metricMap.put(metric + STATUS_MESSAGE, statusMessage);
         }
 
         return metricMap;

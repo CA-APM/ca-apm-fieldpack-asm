@@ -17,6 +17,9 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
  */
 public abstract class FileTest implements AsmProperties {
 
+    public static final String TRUE  = "true";
+    public static final String FALSE = "false";
+
     protected TestAccessor accessor = null;
     protected AsmRequestHelper requestHelper = null;
 

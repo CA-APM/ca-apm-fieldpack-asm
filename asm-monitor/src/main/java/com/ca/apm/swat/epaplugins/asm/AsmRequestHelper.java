@@ -107,7 +107,7 @@ public class AsmRequestHelper implements AsmProperties {
      * Write the API call statistics to the log.
      */
     public void printApiCallStatistics() {
-        if (TRUE.equals(EpaUtils.getProperty(PRINT_API_STATISTICS, FALSE))) {
+        if (EpaUtils.getBooleanProperty(PRINT_API_STATISTICS, false)) {
 
             final Date now = new Date();
             long timeElapsed = now.getTime() - lastPrintApiTimestamp;
@@ -179,7 +179,7 @@ public class AsmRequestHelper implements AsmProperties {
         for (int i = 0; i < folderJsonArray.length(); i++) {
             JSONObject folderJsonObject = folderJsonArray.getJSONObject(i);
 
-            if ((TRUE.equals(EpaUtils.getProperty(SKIP_INACTIVE_FOLDERS, FALSE)))
+            if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_FOLDERS, false))
                     && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_FOLDER,
@@ -282,7 +282,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             String rawMetric = CREDITS_CATEGORY + METRIC_NAME_SEPARATOR + key;
-            metricMap.put(EpaUtils.fixMetric(rawMetric), EpaUtils.fixMetric(value));
+            metricMap.put(EpaUtils.fixMetric(rawMetric), value);
         }
 
         return metricMap;
@@ -362,7 +362,7 @@ public class AsmRequestHelper implements AsmProperties {
                         monitorJsonObject.getString(FOLDER_TAG)));
             }
 
-            if ((TRUE.equals(EpaUtils.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))
+            if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))
                     && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_MONITOR,
@@ -403,7 +403,7 @@ public class AsmRequestHelper implements AsmProperties {
             List<Monitor> monitors;
             if (((folderProp.length() == 0) || (folderProp.equals(ALL_MONITORS)))
                     // if we skip inactive monitors we can't use ALL_MONITORS
-                    && (!TRUE.equals(EpaUtils.getProperty(SKIP_INACTIVE_MONITORS, FALSE)))) {
+                    && (!EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))) {
                 monitors = getMonitors(folders[i], ALL_MONITORS);
                 monitors.add(0, MonitorFactory.getAllMonitorsMonitor());
             } else {
@@ -519,7 +519,7 @@ public class AsmRequestHelper implements AsmProperties {
 
         // report JMeter steps?
         String monitorType = SCRIPT_MONITOR;
-        if (FALSE.equals(EpaUtils.getProperty(REPORT_JMETER_STEPS, TRUE))) {
+        if (!EpaUtils.getBooleanProperty(REPORT_JMETER_STEPS, true)) {
             monitorType = HTTP_MONITOR;
         }
         

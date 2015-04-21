@@ -8,8 +8,6 @@ package com.ca.apm.swat.epaplugins.utils;
 public interface AsmProperties {
 
     // constants
-    public static final String TRUE                     = "true";
-    public static final String FALSE                    = "false";
     public static final String EMPTY_STRING             = "";
     public static final String[] EMPTY_STRING_ARRAY     = new String[0];
     public static final String ZERO                     = "0";

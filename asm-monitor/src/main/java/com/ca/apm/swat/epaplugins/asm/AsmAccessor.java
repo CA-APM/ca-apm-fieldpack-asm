@@ -35,7 +35,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
     public AsmAccessor() {
         this.properties = EpaUtils.getProperties();
 
-        boolean useProxy = Boolean.parseBoolean(this.properties.getProperty(USE_PROXY, FALSE));
+        boolean useProxy = EpaUtils.getBooleanProperty(USE_PROXY, false);
 
         String proxyHost = null;
         String proxyPort = null;
@@ -47,7 +47,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             proxyPort = this.properties.getProperty(PROXY_PORT, "");
             proxyUser = this.properties.getProperty(PROXY_USER, "");
 
-            if (this.properties.getProperty(PROXY_PASSWORD_ENCRYPTED, FALSE).equals(TRUE)) {
+            if (EpaUtils.getBooleanProperty(PROXY_PASSWORD_ENCRYPTED, false)) {
                 proxyPassword = AsmAccessor.crypto.decrypt(
                     this.properties.getProperty(PROXY_PASSWORD, ""));
             } else {
@@ -57,8 +57,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
 
         this.restClient = new RestClient(useProxy, proxyHost, proxyPort, proxyUser, proxyPassword);
 
-        this.localTest =
-                Boolean.parseBoolean(this.properties.getProperty(LOCAL_TEST, FALSE));
+        this.localTest = EpaUtils.getBooleanProperty(LOCAL_TEST, false);
         if (this.localTest) {
             this.localTestPath = this.properties.getProperty(LOCAL_TEST);
         }
@@ -143,7 +142,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
     public String login() throws LoginError, Exception {
         String user = this.properties.getProperty(USER);
         String password = null;
-        if (this.properties.getProperty(PASSWORD_ENCRYPTED).equals(TRUE)) {
+        if (EpaUtils.getBooleanProperty(PASSWORD_ENCRYPTED, false)) {
             password = AsmAccessor.crypto.decrypt(
                 this.properties.getProperty(PASSWORD));
             if (null == password) {

@@ -17,7 +17,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class AsmLoginTest implements AsmProperties {
+public class AsmLoginTest extends FileTest {
 
     private Properties properties = null;
 
