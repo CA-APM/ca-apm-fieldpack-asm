@@ -18,6 +18,7 @@ public interface AsmProperties {
     public static final String DATE_FORMAT              = "yyyy-MM-dd";
     public static final String DEFAULT_DELIMITER        = ",";
     public static final String BLANK                    = " ";
+    public static final String TRUE                     = "true";
 
     public static final String ASM_PRODUCT_NAME         = "App Synthetic Monitor";
     public static final String ASM_PRODUCT_NAME_SHORT   = "ASM";
@@ -62,18 +63,22 @@ public interface AsmProperties {
     public static final String NUM_LOGS                 = "asm.numlogs";
     public static final String IGNORE_TAGS              = "asm.ignoreTags";
     public static final String IGNORE_METRICS           = "asm.ignoreMetrics";
+    public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
+    public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
+    public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
+    public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
+    public static final String PRINT_ASM_NODE           = "asm.printAsmNode";
+    public static final String STEP_FORMAT_DIGITS       = "asm.stepFormatDigits";
+    public static final String STEP_FORMAT_URL          = "asm.stepFormatURL";
+    public static final String STEP_FORMAT_PREFIX       = "asm.stepFormatPrefix";
+    public static final String STEP_FORMAT_ALWAYS       = "asm.stepFormatAlways";
     
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";
     public static final String ALL_FOLDERS              = "all_folders";
 
     // TODO: not implemented yet!!!
-    public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
-    public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
-    public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
-    public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
     public static final String LOG_ASM_ISSUES           = "asm.logASMIssues";
-
     public static final String IGNORE_TAGS_MONITOR      = "asm.ignoreTags.monitor";
     public static final String IGNORE_METRICS_MONITOR   = "asm.ignoreMetrics.monitor";
     public static final String INCLUDE_TAGS             = "asm.includeTags";

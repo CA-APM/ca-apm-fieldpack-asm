@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Report metrics to APM via {@link MetricWriter}.
@@ -47,8 +48,12 @@ public class AsmMetricReporter implements AsmProperties {
                 thisMetricType = MetricWriter.kIntCounter;
             }
 
-            metricWriter.writeMetric(thisMetricType, METRIC_TREE + METRIC_PATH_SEPARATOR
-                + metricPairs.getKey(), metricPairs.getValue());
+            String metricPath = metricPairs.getKey();
+            if (EpaUtils.getBooleanProperty(PRINT_ASM_NODE, true)) {
+                metricPath = METRIC_TREE + METRIC_PATH_SEPARATOR + metricPairs.getKey();
+            }
+
+            metricWriter.writeMetric(thisMetricType, metricPath, metricPairs.getValue());
         }
     }
 

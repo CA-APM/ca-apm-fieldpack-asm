@@ -18,12 +18,12 @@ import com.wily.introscope.epagent.EpaUtils;
  */
 public class Formatter implements AsmProperties {
 
-    private static Formatter  instance = null;
+    private static Formatter instance = null;
     
-    HashMap<String, String> responseCodeMap = null;
-    HashSet<String> ignoreTags = null;
-    HashSet<String> ignoreTagsMonitor = null;
-    HashSet<Integer> suppressStepResponseCodes = null;
+    private HashMap<String, String> responseCodeMap = null;
+    private HashSet<String> ignoreTags = null;
+    private HashSet<String> ignoreTagsMonitor = null;
+    private HashSet<Integer> suppressStepResponseCodes = null;
     
     private NumberFormat stepNumberFormat = null;
     private String stepPrefix = EMPTY_STRING;
@@ -45,6 +45,37 @@ public class Formatter implements AsmProperties {
         getInstance().createResponseCodeMappings(properties);
         getInstance().createIgnoreTags(properties);
         getInstance().createSuppressStepsWithCodes(properties);
+        getInstance().setStepConfiguration(properties);
+    }
+
+    private void setStepConfiguration(Properties properties) {
+        // set number of digits in step number
+        String digits = properties.getProperty(STEP_FORMAT_DIGITS);
+        if ((null != digits) && (!EMPTY_STRING.equals(digits))) {
+            try {
+                int digit = Integer.parseInt(digits);
+                this.stepNumberFormat.setMinimumIntegerDigits(digit);
+            } catch (NumberFormatException e) {
+                EpaUtils.getFeedback().warn("non-integer value found in "
+                        + STEP_FORMAT_DIGITS + ": " + digits);
+            }  
+        }
+
+        // set step prefix
+        String prefix = properties.getProperty(STEP_FORMAT_PREFIX, EMPTY_STRING);
+        if (null != digits) {
+            setStepPrefix(prefix);
+        }
+
+        // print URL in step?
+        String printUrl= properties.getProperty(STEP_FORMAT_URL, TRUE);
+        if (null != printUrl) {
+            if (TRUE.equalsIgnoreCase(printUrl)) {
+                setPrintStepUrl(true);
+            } else {
+                setPrintStepUrl(false);
+            }
+        }
     }
 
     /**
@@ -213,7 +244,13 @@ public class Formatter implements AsmProperties {
      */
     public String formatStep(int step, String url) {
         StringBuffer buf = new StringBuffer(stepPrefix);
+        
+        if ((null != stepPrefix) && (stepPrefix.length() > 0)) {
+            buf.append(BLANK);
+        }
+        
         buf.append(stepNumberFormat.format(step));
+        
         if (printStepUrl) {
             buf.append(BLANK).append(url);
         }
