@@ -2,6 +2,7 @@
 <TypeViewerSet xmlns="wily.typeviews" xmlns:its="http://www.w3.org/2005/11/its"
 	namespace="asm.monitor" version="2.0">
 	<!-- Component Definitions - Start -->
+	<!-- Deactivate because Management Moduel is not yet updated to ASM naming
 	<ComponentDefinition id="alert-panel">
 		<Panel columns="3" constraint="Center" layout="GridLayout" rows="1">
 			<TrafficLight
@@ -30,6 +31,7 @@
 			</TrafficLight>
 		</Panel>
 	</ComponentDefinition>
+	-->
 	<ComponentDefinition id="folder-table">
 		<MetricDataTable>
 			<Column content-type="LastPrefixSegment" relative-width="3">
@@ -421,7 +423,7 @@
 		</SplitPane>
 	</ComponentDefinition>
 	<!-- Component Definitions - End -->
-	<TypeViewer id="agent_node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+	<TypeViewer id="agent_node" supported-agents=".*\|ASM\|.*"
 		supported-type="com.wily.introscope.spec.server.types.AgentItemType.kAgentItemType"
 		tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
@@ -435,7 +437,7 @@
 		<!-- </SplitPane> -->
 	</TypeViewer>
 	<!-- App Synthetic Monitor node -->
-	<TypeViewer id="asm-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
+	<TypeViewer id="asm-node" supported-agents=".*\|ASM\|.*"
 		supported-items-specifier="App Synthetic Monitor" tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
@@ -448,8 +450,8 @@
 		<!-- </SplitPane> -->
 	</TypeViewer>
 	<!-- Monitors node -->
-	<TypeViewer id="monitors-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors" tab-order="1">
+	<TypeViewer id="monitors-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors" tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
 		<Title xml:lang="zh">App Synthetic Monitor</Title>
@@ -461,8 +463,8 @@
 		<!-- </SplitPane> -->
 	</TypeViewer>
 	<!-- Credits node -->
-	<TypeViewer id="credits-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Credits" tab-order="1">
+	<TypeViewer id="credits-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Credits" tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
 		<Title xml:lang="zh">App Synthetic Monitor</Title>
@@ -471,8 +473,8 @@
 		<Component id="credit-graphs" />
 	</TypeViewer>
 	<!-- Folder node -->
-	<TypeViewer id="folder-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)"
+	<TypeViewer id="folder-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors\|([^\|]*)"
 		tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
@@ -482,8 +484,8 @@
 		<Component id="monitor-table" specifier-prepend="\|([^\|]*)" />
 	</TypeViewer>
 	<!-- Monitor node -->
-	<TypeViewer id="monitor-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)"
+	<TypeViewer id="monitor-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors\|([^\|]*)\|([^\|]*)"
 		tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
@@ -498,8 +500,8 @@
 		</SplitPane>
 	</TypeViewer>
 	<!-- Region node -->
-	<TypeViewer id="region-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+	<TypeViewer id="region-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)"
 		tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
@@ -509,8 +511,8 @@
 		<Component id="station-table" specifier-prepend="\|([^\|]*)\|([^\|]*)" />
 	</TypeViewer>
 	<!-- Country node -->
-	<TypeViewer id="country-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+	<TypeViewer id="country-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)"
 		tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
@@ -520,8 +522,8 @@
 		<Component id="station-table" specifier-prepend="\|([^\|]*)" />
 	</TypeViewer>
 	<!-- station node -->
-	<TypeViewer id="station-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+	<TypeViewer id="station-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)\|([^\|]*)"
 		tab-order="2">
 		<Title its:translate="yes">App Synthetic Monitor</Title>
 		<Title xml:lang="zh-TW">App Synthetic Monitor</Title>
@@ -531,8 +533,8 @@
 		<Component id="station-graphs" />
 	</TypeViewer>
 	<!-- step node -->
-	<TypeViewer id="step-node" supported-agents=".*\|AppSyntheticMonitor\|.*"
-		supported-items-specifier="App Synthetic Monitor\|Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)"
+	<TypeViewer id="step-node" supported-agents=".*\|ASM\|.*"
+		supported-items-specifier="(App Synthetic Monitor\|)?Monitors\|([^\|]*)\|([^\|]*)\|([^\|]*)"
 		tab-order="1">
 		<Title its:translate="yes">App Synthetic Monitor Steps</Title>
 		<Component id="step-graphs" />
