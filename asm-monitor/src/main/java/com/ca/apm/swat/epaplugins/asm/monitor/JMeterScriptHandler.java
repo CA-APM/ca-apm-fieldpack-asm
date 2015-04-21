@@ -97,6 +97,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         Node stepNode) {
         int assertionFailures = 0;
         int assertionErrors = 0;
+        Formatter format = Formatter.getInstance();
+        MetricMap metricMap = new MetricMap();
 
         if (EpaUtils.getFeedback().isDebugEnabled()) {
             EpaUtils.getFeedback().debug("reportJMeterStep " + step + ": "
@@ -105,8 +107,15 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         //First the attributes
         NamedNodeMap attributes = stepNode.getAttributes();
+        
         int responseCode = Integer.parseInt(
             attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue());
+
+        // return if we should suppress this response code
+        if (format.suppressResponseCode(responseCode)) {
+            return metricMap;
+        }
+        
         String responseMessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
         //String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
         final int errorCount = Integer.parseInt(attributes.getNamedItem(ERROR_COUNT_TAG)
@@ -147,37 +156,49 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         //Collect results
         String statusMessage = null;
-        int statusCode = 1;
+        int statusCode = STATUS_CODE_OK;
         boolean assertionFailed = false;
         if (assertionAvailable) {
             if (assertionFailure) {
                 assertionFailed = true;
                 statusMessage = /* monitor + */ ASSERTION_FAILURE;
-                statusCode = 3;
+                statusCode = STATUS_CODE_ASSERTION_ERROR;
                 assertionFailures++;
             }
             if (assertionError) {
                 assertionFailed = true;
                 statusMessage = /* monitor + */ ASSERTION_ERROR;
-                statusCode = 3;
+                statusCode = STATUS_CODE_ASSERTION_ERROR;
                 assertionErrors++;
             }
         }
+        
+        // set status message
         if (!assertionFailed) {
             statusMessage = responseCode + " - " + responseMessage;
         }
 
-        // always map responseCode
-        Formatter format = Formatter.getInstance();
-        statusCode = format.mapResponseToStatusCode(responseCode);
+        // set status code for assertion failure 
+        if (STATUS_CODE_ASSERTION_ERROR == statusCode) {
+            String reportAs = EpaUtils.getProperty(REPORT_ASSERTION_FAILURES_AS, EMPTY_STRING);
 
+            if (!EMPTY_STRING.equals(reportAs)) {
+                try {
+                    statusCode = Integer.parseInt(reportAs);
+                } catch (NumberFormatException e) {
+                    EpaUtils.getFeedback().warn("non-integer value found in "
+                            + REPORT_ASSERTION_FAILURES_AS + ": " + reportAs);
+                }
+            }
+        } else {
+            // map responseCode
+            statusCode = format.mapResponseToStatusCode(responseCode);
+        }
+        
         // report metrics
         String metric = EpaUtils.fixMetric(metricTree + METRIC_PATH_SEPARATOR
             + EpaUtils.fixMetric(format.formatStep(step, url)));
         
-        MetricMap metricMap = new MetricMap();
-        metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE,
-            statusMessage);
         metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE_VALUE,
             Integer.toString(statusCode));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + RESPONSE_CODE,
@@ -190,6 +211,12 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             Integer.toString(assertionErrors));
         metricMap.put(metric + METRIC_NAME_SEPARATOR + TEST_URL,
             EpaUtils.fixMetric(url));
+
+        if (TRUE.equals(EpaUtils.getProperty(REPORT_STRING_RESULTS, TRUE))) {
+            metricMap.put(metric + METRIC_NAME_SEPARATOR + STATUS_MESSAGE,
+                statusMessage);
+        }
+
         return metricMap;
     }
 

@@ -191,7 +191,7 @@
 				<Title its:translate="yes">Errors</Title>
 			</TrafficLight>
 			</Panel>
-			<Graph relative-specifier=":Result Code">
+			<Graph relative-specifier=":Total Time \(ms\)">
 				<Title its:translate="yes">Average Response Time (ms)</Title>
 			</Graph>
 			<Graph relative-specifier=":Status Message Value">

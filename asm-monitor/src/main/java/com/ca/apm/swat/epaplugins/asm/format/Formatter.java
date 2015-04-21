@@ -23,6 +23,7 @@ public class Formatter implements AsmProperties {
     HashMap<String, String> responseCodeMap = null;
     HashSet<String> ignoreTags = null;
     HashSet<String> ignoreTagsMonitor = null;
+    HashSet<Integer> suppressStepResponseCodes = null;
     
     private NumberFormat stepNumberFormat = null;
     private String stepPrefix = EMPTY_STRING;
@@ -37,14 +38,47 @@ public class Formatter implements AsmProperties {
     }
 
     /**
-     * Set the properties used for formatting.
+     * Set the properties used for formatting and initialize internal data structures.
      * @param properties the properties
      */
     public static void setProperties(Properties properties) {
         getInstance().createResponseCodeMappings(properties);
         getInstance().createIgnoreTags(properties);
+        getInstance().createSuppressStepsWithCodes(properties);
     }
 
+    /**
+     * Creates a lookup map for JMeter response codes to ignore from the properties.
+     * @param properties settings
+     */
+    private void createSuppressStepsWithCodes(Properties properties) {
+        this.suppressStepResponseCodes = new HashSet<Integer>();
+
+        String tag = properties.getProperty(SUPPRESS_STEP_WITH_CODES, EMPTY_STRING);
+
+        if (EMPTY_STRING.equals(tag)) {
+            return;
+        }
+        
+        String[] tags = tag.split(",");
+        
+        // add to set
+        for (int i = 0; i < tags.length;  ++i) {
+            try {
+                int responseCode = Integer.parseInt(tags[i]);
+                this.suppressStepResponseCodes.add(new Integer(responseCode));
+            } catch (NumberFormatException e) {
+                EpaUtils.getFeedback().warn("non-integer value found in "
+                        + SUPPRESS_STEP_WITH_CODES + ": " + tags[i]);
+            }
+        }
+    }
+
+    /**
+     * Creates a lookup map for tags to ignore from the properties.
+     * 
+     * @param properties settings
+     */
     private void createIgnoreTags(Properties properties) {
         this.ignoreTags = new HashSet<String>();
         this.ignoreTagsMonitor = new HashSet<String>();
@@ -226,5 +260,14 @@ public class Formatter implements AsmProperties {
      */
     public boolean ignoreTagForMonitor(String tag) {
         return ignoreTagsMonitor.contains(tag);
+    }
+    
+    /**
+     * Ignore a response code for a JMeter step? I.e. don't generate a metric for it.
+     * @param responseCode response code to test
+     * @return true if it should be suppressed
+     */
+    public boolean suppressResponseCode(int responseCode) {
+        return suppressStepResponseCodes.contains(new Integer(responseCode));
     }
 }

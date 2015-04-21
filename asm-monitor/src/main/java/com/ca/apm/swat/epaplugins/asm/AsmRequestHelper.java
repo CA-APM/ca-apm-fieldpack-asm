@@ -517,7 +517,13 @@ public class AsmRequestHelper implements AsmProperties {
 
         EpaUtils.getFeedback().verbose("getLogs: folder = " + folder);
 
-        Monitor monitor = MonitorFactory.getMonitor("dummy", SCRIPT_MONITOR, folderStr, null);
+        // report JMeter steps?
+        String monitorType = SCRIPT_MONITOR;
+        if (FALSE.equals(EpaUtils.getProperty(REPORT_JMETER_STEPS, TRUE))) {
+            monitorType = HTTP_MONITOR;
+        }
+        
+        Monitor monitor = MonitorFactory.getMonitor("dummy", monitorType, folderStr, null);
         return monitor.generateMetrics(logRequest, metricPrefix);
     }
 

@@ -109,6 +109,10 @@ public interface AsmProperties {
     public static final int    RESULT_OPERATION_TIMEOUT     = 7011;
     public static final int    RESULT_ASSERTION_NOT_MATCHED = 9501;
 
+    // status codes
+    public static final int    STATUS_CODE_OK               = 1;
+    public static final int    STATUS_CODE_ASSERTION_ERROR  = 3;
+
     // retries
     public static final int    INIT_RETRIES             = 10;
     public static final int    THREAD_RETRIES           = 10;
