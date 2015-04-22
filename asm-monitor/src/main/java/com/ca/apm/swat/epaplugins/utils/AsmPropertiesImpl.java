@@ -44,6 +44,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("elapsed", "API Call Time (ms)");
         ASM_METRICS.put("end", "Check End Time");
         ASM_METRICS.put("errors", "Errors Per Interval");
+        ASM_METRICS.put("errorsince", "Error Since");
         ASM_METRICS.put(GMT_OFFSET_TAG, "Agent GMT Offset");
         ASM_METRICS.put("info", "Info");
         ASM_METRICS.put("ipaddr", "IP Address");
