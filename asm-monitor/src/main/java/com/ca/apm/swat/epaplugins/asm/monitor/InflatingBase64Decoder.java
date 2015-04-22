@@ -59,10 +59,12 @@ public class InflatingBase64Decoder implements Handler {
                     // call next handler in chain
                     return successor.generateMetrics(decodedString, metricTree);
                 } else {
-                    EpaUtils.getFeedback().warn("InflatingBase64Decoder decompress == null!");
+                    EpaUtils.getFeedback().warn(
+                        "InflatingBase64Decoder decompress == null! metricTree = " + metricTree);
                 }
             } else {
-                EpaUtils.getFeedback().warn("InflatingBase64Decoder decoded == null!");
+                EpaUtils.getFeedback().warn(
+                    "InflatingBase64Decoder decoded == null! metricTree = " + metricTree);
             }
         } else {
             EpaUtils.getFeedback().warn("InflatingBase64Decoder has no sucessor!");
