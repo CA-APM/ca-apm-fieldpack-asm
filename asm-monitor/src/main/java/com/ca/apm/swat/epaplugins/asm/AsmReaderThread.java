@@ -182,7 +182,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             // get logs for all monitors of this folder
             if (EpaUtils.getBooleanProperty(METRICS_LOGS, false)) {
                 resultMetricMap.putAll(
-                    requestHelper.getLogs(folder, folderMonitors.size() - 1, folderPrefix));
+                    requestHelper.getLogs(folder, folderMonitors.size(), folderPrefix));
             }
             // get public metrics for all monitors of this folder
             if (EpaUtils.getBooleanProperty(METRICS_PUBLIC, false)) {

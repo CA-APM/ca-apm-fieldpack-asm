@@ -496,7 +496,11 @@ public class AsmRequestHelper implements AsmProperties {
 
         String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
-        int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS)) * numMonitors;
+        int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
+        if (numMonitors > 0) {
+            numLogs =  numLogs * numMonitors;
+        }
+        
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
             folderStr = FOLDER_PARAM + folder;
         } else {
