@@ -111,24 +111,27 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         // append monitoring station to metric tree
-        if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
-            if (jsonObject.optString(LOCATION_TAG, null) != null) {
-                metricTree = metricTree + METRIC_PATH_SEPARATOR
-                        + AsmRequestHelper.getMonitoringStationMap().get(
-                            jsonObject.getString(LOCATION_TAG));
+        if (jsonObject.optString(LOCATION_TAG, null) != null) {
+            if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
+                String location = AsmRequestHelper.getMonitoringStationMap().get(
+                    jsonObject.getString(LOCATION_TAG));
+                if (null == location) {
+                    location = AsmRequestHelper.getMonitoringStationMap().get(OPMS);
+                }
+                metricTree = metricTree + METRIC_PATH_SEPARATOR + location;
             }
-        }
 
-        // add a step node if STEP_FORMAT_ALWAYS is true
-        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)) {
-            if (null != name) {  
-                // find the monitor
-                Monitor monitor = MonitorFactory.findMonitor(name);
+            // add a step node if STEP_FORMAT_ALWAYS is true
+            if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)) {
+                if (null != name) {  
+                    // find the monitor
+                    Monitor monitor = MonitorFactory.findMonitor(name);
 
-                // add step node if not a script monitor
-                if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
-                    metricTree = metricTree + METRIC_PATH_SEPARATOR
-                            + format.formatStep(1, EMPTY_STRING);
+                    // add step node if not a script monitor
+                    if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
+                        metricTree = metricTree + METRIC_PATH_SEPARATOR
+                                + format.formatStep(1, EMPTY_STRING);
+                    }
                 }
             }
         }
