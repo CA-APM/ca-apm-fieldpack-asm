@@ -1,5 +1,8 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 /**
@@ -13,6 +16,8 @@ public class MonitorFactory implements AsmProperties {
 
     private static Monitor ALL_MONITORS_MONITOR = null;
 
+    private static Map<String, Monitor> monitorMap = null;
+
     /**
      * Factory method returning a {@link Monitor} based on its type.
      * @param name monitor name
@@ -21,20 +26,28 @@ public class MonitorFactory implements AsmProperties {
      * @param tags list of tags
      * @return a new <code>Monitor</code> object
      */
-    public static Monitor getMonitor(String name, String type, String folder, String[] tags) {
+    public static Monitor createMonitor(String name, String type, String folder, String[] tags) {
         if (type == null) {
             return null;
         }
-        
+
+        Monitor monitor = null;
         // TODO make configurable
         if (type.equalsIgnoreCase(SCRIPT_MONITOR)
                 /* don't handle here until we figured out what to do with har data
                 || type.equalsIgnoreCase(REAL_BROWSER_MONITOR)
                 || type.equalsIgnoreCase(FULL_PAGE_MONITOR)*/) {
-            return new ScriptMonitor(name, folder, tags);
+            monitor = new ScriptMonitor(name, folder, tags);
+        } else {
+            monitor = new BaseMonitor(name, type, folder, tags);
         }
-
-        return new BaseMonitor(name, type, folder, tags);
+     
+        if (null == monitorMap) {
+            monitorMap = new HashMap<String, Monitor>();
+         }
+        monitorMap.put(name, monitor);
+        
+        return monitor;
     }
 
     /**
@@ -48,4 +61,17 @@ public class MonitorFactory implements AsmProperties {
         }
         return ALL_MONITORS_MONITOR;
     }
+    
+    /**
+     * Find a monitor by its name.
+     * @param name
+     * @return the monitor or null if no monitor with that name was found.
+     */
+    public static Monitor findMonitor(String name) {
+        if (null == monitorMap) {
+            return null;
+         }
+        return monitorMap.get(name); 
+    }
+  
 }

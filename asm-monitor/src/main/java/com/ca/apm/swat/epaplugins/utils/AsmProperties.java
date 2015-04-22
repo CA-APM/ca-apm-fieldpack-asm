@@ -202,13 +202,16 @@ public interface AsmProperties {
     public static final String TYPE_TAG                 = "type";
     public static final String VERSION_TAG              = "version";
     public static final String OUTPUT_TAG               = "output";
-    public static final String TAGS_TAG                 = "tags";   
+    public static final String TAGS_TAG                 = "tags";
+    public static final String IPADDRESS_TAG            = "ipaddr";
     public static final String HAR_OR_LOG_TAG           = "{\"har\""; //"{\"har\": {\"log\"";
     public static final String UNDEFINED                = "Undefined";
 
     // monitor types
     public static final String HTTP_MONITOR             = "http";
     public static final String HTTPS_MONITOR            = "https";
+    public static final String FTP_MONITOR              = "ftp";
+    public static final String DNS_MONITOR              = "dns";
     public static final String SCRIPT_MONITOR           = "script";
     public static final String FULL_PAGE_MONITOR        = "browser";
     public static final String REAL_BROWSER_MONITOR     = "script_firefox";

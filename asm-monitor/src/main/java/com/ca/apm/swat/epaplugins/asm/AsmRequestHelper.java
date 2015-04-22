@@ -371,7 +371,7 @@ public class AsmRequestHelper implements AsmProperties {
                 }
                 continue;
             }
-            monitors.add(MonitorFactory.getMonitor(
+            monitors.add(MonitorFactory.createMonitor(
                 monitorJsonObject.getString(NAME_TAG),
                 monitorJsonObject.getString(TYPE_TAG),
                 monitorJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
@@ -523,7 +523,7 @@ public class AsmRequestHelper implements AsmProperties {
             monitorType = HTTP_MONITOR;
         }
         
-        Monitor monitor = MonitorFactory.getMonitor("dummy", monitorType, folderStr, null);
+        Monitor monitor = MonitorFactory.createMonitor("dummy", monitorType, folderStr, null);
         return monitor.generateMetrics(logRequest, metricPrefix);
     }
 

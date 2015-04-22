@@ -68,7 +68,7 @@ public class Formatter implements AsmProperties {
         }
 
         // print URL in step?
-        String printUrl= properties.getProperty(STEP_FORMAT_URL, TRUE);
+        String printUrl = properties.getProperty(STEP_FORMAT_URL, TRUE);
         if (null != printUrl) {
             if (TRUE.equalsIgnoreCase(printUrl)) {
                 setPrintStepUrl(true);

@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
+import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.wily.introscope.epagent.EpaUtils;
 
@@ -39,7 +40,7 @@ public class LayoutTest extends FileTest {
     /**
      * Test if asm.printAsmNode is handled correctly.
      */
-    //@Test
+    @Test
     public void printAsmNode() {
 
         try {
@@ -343,6 +344,12 @@ public class LayoutTest extends FileTest {
         return null;
     }
 
+    /**
+     * Check metrics returned from MetricWriter for a metric map.
+     * @param metricMap map of metrics to write
+     * @param expectedMetrics array of expected metric name
+     * @param notExpectedMetrics array of not expected metric name
+     */
     private void checkMetricWriter(HashMap<String, String> metricMap,
                                    String[] expectedMetrics,
                                    String[] notExpectedMetrics) {
@@ -391,7 +398,7 @@ public class LayoutTest extends FileTest {
     /**
      * Test if asm.reportStringResults is handled correctly.
      */
-    //@Test
+    @Test
     public void reportStringResults() {
 
         try {
@@ -460,15 +467,18 @@ public class LayoutTest extends FileTest {
     }
 
     /**
-     * Test getLog() for a script monitor.
+     * Test if asm.stepFormatAlways is handled correctly.
      */
-    //@Test
-    public void getLogFolder() {
+    @Test
+    public void stepFormatAlways() {
 
         try {
             // set properties
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
             EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            EpaUtils.getProperties().setProperty(STEP_FORMAT_ALWAYS, TRUE);
+            EpaUtils.getProperties().setProperty(STEP_FORMAT_URL, FALSE);
+            Formatter.setProperties(EpaUtils.getProperties());
 
             String folder = "Tests";
 //            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
@@ -479,47 +489,52 @@ public class LayoutTest extends FileTest {
             // load file
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_all.json");
 
+            MonitorFactory.createMonitor("Simple HTTP validation test", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("Simple HTTP validation test - fail", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("DNS test", DNS_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("FTP test", FTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("Bad request test http://ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
             // call API
             HashMap<String, String> metricMap =
                     requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
-
             String[] expectedMetrics = {
                                         "Monitors|Tests:Agent Time Zone",
-                                        "Monitors|Tests|Simple HTTP validation test:Alerts Per Interval",
-                                        "Monitors|Tests|Simple HTTP validation test:Check End Time",
-                                        "Monitors|Tests|Simple HTTP validation test:Check Start Time",
-                                        "Monitors|Tests|Simple HTTP validation test:Connect Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test:Download Size (kB)",
-                                        "Monitors|Tests|Simple HTTP validation test:Download Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test:IP Address",
-                                        "Monitors|Tests|Simple HTTP validation test:Location Code",
-                                        "Monitors|Tests|Simple HTTP validation test:Processing Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test:Repeat",
-                                        "Monitors|Tests|Simple HTTP validation test:Resolve Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test:Result Code",
-                                        "Monitors|Tests|Simple HTTP validation test:Monitor ID",
-                                        "Monitors|Tests|Simple HTTP validation test:Monitor Name",
-                                        "Monitors|Tests|Simple HTTP validation test:Total Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test:Type",
-                                        "Monitors|Tests|Simple HTTP validation test:Monitor ID",
-                                        "Monitors|Tests|DNS test:Alerts Per Interval",
-                                        "Monitors|Tests|DNS test:Check End Time",
-                                        "Monitors|Tests|DNS test:Check Start Time",
-                                        "Monitors|Tests|DNS test:Download Size (kB)",
-                                        "Monitors|Tests|DNS test:Download Time (ms)",
-                                        "Monitors|Tests|FTP test:IP Address",
-                                        "Monitors|Tests|FTP test:Location Code",
-                                        "Monitors|Tests|FTP test:Processing Time (ms)",
-                                        "Monitors|Tests|FTP test:Repeat",
-                                        "Monitors|Tests|FTP test:Result Code",
-                                        "Monitors|Tests|FTP test:Monitor ID",
-                                        "Monitors|Tests|FTP test:Monitor Name",
-                                        "Monitors|Tests|Custom page ping:Total Time (ms)",
-                                        "Monitors|Tests|Custom page ping:Type",
-                                        "Monitors|Tests|Custom page ping:Monitor ID",
-                                        "Monitors|Tests|Custom page ping:Connect Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Alerts Per Interval",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Check End Time",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Check Start Time",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Connect Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Download Size (kB)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Download Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:IP Address",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Location Code",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Processing Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Repeat",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Resolve Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Result Code",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Monitor ID",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Monitor Name",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Total Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Type",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Monitor ID",
+                                        "Monitors|Tests|DNS test|001:Alerts Per Interval",
+                                        "Monitors|Tests|DNS test|001:Check End Time",
+                                        "Monitors|Tests|DNS test|001:Check Start Time",
+                                        "Monitors|Tests|DNS test|001:Download Size (kB)",
+                                        "Monitors|Tests|DNS test|001:Download Time (ms)",
+                                        "Monitors|Tests|FTP test|001:IP Address",
+                                        "Monitors|Tests|FTP test|001:Location Code",
+                                        "Monitors|Tests|FTP test|001:Processing Time (ms)",
+                                        "Monitors|Tests|FTP test|001:Repeat",
+                                        "Monitors|Tests|FTP test|001:Result Code",
+                                        "Monitors|Tests|FTP test|001:Monitor ID",
+                                        "Monitors|Tests|FTP test|001:Monitor Name",
+                                        "Monitors|Tests|Custom page ping|001:Total Time (ms)",
+                                        "Monitors|Tests|Custom page ping|001:Type",
+                                        "Monitors|Tests|Custom page ping|001:Monitor ID",
+                                        "Monitors|Tests|Custom page ping|001:Connect Time (ms)",
             };
 
             if (DEBUG) {
@@ -540,49 +555,56 @@ public class LayoutTest extends FileTest {
     }
 
     /**
-     * Test getLog() for a http monitor.
+     * Test if asm.stepFormatAlways is handled correctly.
      */
-    //@Test
-    public void getLogHttp() {
+    @Test
+    public void stepFormatAlwaysScript() {
 
         try {
             // set properties
             EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
-            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, "true");
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            EpaUtils.getProperties().setProperty(STEP_FORMAT_ALWAYS, TRUE);
+            EpaUtils.getProperties().setProperty(STEP_FORMAT_URL, TRUE);
+            boolean stations = false;
+
+            Formatter.setProperties(EpaUtils.getProperties());
 
             String folder = "Tests";
-//            Monitor monitor = MonitorFactory.getMonitor("Simple HTTP validation test",
-//                HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-
+            
             // load file
-            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_http.json");
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
 
             // call API
             HashMap<String, String> metricMap =
                     requestHelper.getLogs(folder, numMonitors, metricPrefix);
 
             // metricMap should contain those entries
+            final String CALGARY    = "|america-north|Canada|Calgary";
+            final String TORONTO    = "|america-north|Canada|Toronto";
+            final String VANCOUVER  = "|america-north|Canada|Vancouver";
+            final String PHOENIX    = "|america-north|United States|Phoenix";
+            
             String[] expectedMetrics = {
-                                        "Monitors|Tests:Agent Time Zone",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Alerts Per Interval",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check End Time",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|Charlotte:Check Start Time",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Connect Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Size (kB)",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|New York:Download Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:IP Address",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Location Code",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|Phoenix:Processing Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Repeat",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Resolve Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Result Code",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor Name",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Total Time (ms)",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Type",
-                                        "Monitors|Tests|Simple HTTP validation test|america-north|United States|San Diego:Monitor ID"
+                "Monitors|Tests:Agent Time Zone",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Alerts Per Interval",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Resolve Time (ms)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + ":Processing Time (ms)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + ":Download Size (kB)",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Error Count",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
             if (DEBUG) {
@@ -592,7 +614,7 @@ public class LayoutTest extends FileTest {
                     System.out.println(key + " = " + metricMap.get(key));
                 }
             }
-
+            
             // check
             checkMetrics(expectedMetrics, metricMap);
 
@@ -601,4 +623,5 @@ public class LayoutTest extends FileTest {
             Assert.fail(e.getMessage());
         }
     }
+
 }

@@ -92,17 +92,17 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
         MetricMap metricMap = new MetricMap();
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose("generateMetrics(" + metricTree + ", " 
+        if (EpaUtils.getFeedback().isDebugEnabled()) {
+            EpaUtils.getFeedback().debug("generateMetrics(" + metricTree + ", " 
                 + jsonString + ")");
         }
         
         JSONObject jsonObject = new JSONObject(jsonString);
-
+        String name = jsonObject.optString(NAME_TAG, null);
+        
         // if we find a name append it to metric tree
-        if (jsonObject.optString(NAME_TAG, null) != null) {
-            // TODO: check if monitor is active
-            metricTree = metricTree + METRIC_PATH_SEPARATOR + jsonObject.getString(NAME_TAG);
+        if (name != null) {
+            metricTree = metricTree + METRIC_PATH_SEPARATOR + name;
         }
 
         // return if this monitor is inactive
@@ -116,6 +116,20 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 metricTree = metricTree + METRIC_PATH_SEPARATOR
                         + AsmRequestHelper.getMonitoringStationMap().get(
                             jsonObject.getString(LOCATION_TAG));
+            }
+        }
+
+        // add a step node if STEP_FORMAT_ALWAYS is true
+        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)) {
+            if (null != name) {  
+                // find the monitor
+                Monitor monitor = MonitorFactory.findMonitor(name);
+
+                // add step node if not a script monitor
+                if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
+                    metricTree = metricTree + METRIC_PATH_SEPARATOR
+                            + format.formatStep(1, EMPTY_STRING);
+                }
             }
         }
 
