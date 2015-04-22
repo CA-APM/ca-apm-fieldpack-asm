@@ -234,7 +234,7 @@ public interface AsmProperties {
     public static final String STATUS_MESSAGE           = "Status Message";
     public static final String STATUS_MESSAGE_VALUE     = "Status Message Value";
     public static final String RESPONSE_CODE            = "Response Code";
-    public static final String ERROR_COUNT              = "Error Count";
+    public static final String ERROR_COUNT              = "Errors Per Interval";
     public static final String ASSERTION_FAILURES       = "Assertion Failures";
     public static final String ASSERTION_ERRORS         = "Assertion Errors";
     public static final String TEST_URL                 = "URL";
