@@ -115,6 +115,7 @@ public interface AsmProperties {
     // status codes
     public static final int    STATUS_CODE_OK               = 1;
     public static final int    STATUS_CODE_ASSERTION_ERROR  = 3;
+    public static final int    RESULT_HTTP_CLIENT_ERROR     = 400;
 
     // retries
     public static final int    INIT_RETRIES             = 10;
@@ -225,7 +226,8 @@ public interface AsmProperties {
     public static final String TEST_URL_TAG             = "lb";
     public static final String UNDEFINED_ASSERTION      = "Undefined Assertion";
     public static final String ASSERTION_RESULT         = "assertionResult";
-    public static final String FAILURE                  = "failure";
+    public static final String FAILURE_TAG              = "failure";
+    public static final String FAILURE__MESSAGE_TAG     = "failureMessage";
     public static final String STEP                     = "Step ";
     public static final String ASSERTION_FAILURE        = " - Assertion Failure";
     public static final String ASSERTION_ERROR          = " - Assertion Error";

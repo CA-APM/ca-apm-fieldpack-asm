@@ -13,7 +13,7 @@
 			<fileset dir="target/test-classes" includes="*.properties"/>
 		</copy>
 		<copy todir="${em.dir}/ext/xmltv">
-			<fileset dir="target/classes" includes="*.typeviewers.xml"/>
+			<fileset dir="target/classes" includes="AmFam.typeviewers.xml"/>
 		</copy>
 	</target>
 	<target name = "clean">

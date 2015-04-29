@@ -124,7 +124,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         boolean assertionAvailable = false;
         boolean assertionFailure = false;
         boolean assertionError = false;
-        // String assertionName = UNDEFINED_ASSERTION;
+        String failureMessage = UNDEFINED_ASSERTION;
 
         NodeList stepChildren = stepNode.getChildNodes();
 
@@ -140,13 +140,14 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 //                    if (assertionResultEntry.getNodeName().equals(NAME_TAG)) {
 //                        assertionName = assertionResultEntry.getFirstChild().getNodeValue();
 //                    }
-                    if (assertionResultEntry.getNodeName().equals(FAILURE)) {
+                    if (assertionResultEntry.getNodeName().equals(FAILURE_TAG)) {
                         assertionFailure = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());
-                    }
-                    if (assertionResultEntry.getNodeName().equals(ERROR_TAG)) {
+                    } else if (assertionResultEntry.getNodeName().equals(ERROR_TAG)) {
                         assertionError = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());
+                    } else if (assertionResultEntry.getNodeName().equals(FAILURE__MESSAGE_TAG)) {
+                        failureMessage = assertionResultEntry.getFirstChild().getNodeValue();
                     }
                 }
             }
@@ -154,45 +155,37 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         
         url = EpaUtils.fixMetric(url);
 
-        //Collect results
-        String statusMessage = null;
-        int statusCode = STATUS_CODE_OK;
-        boolean assertionFailed = false;
-        if (assertionAvailable) {
+        // first map responseCode
+        int statusCode = format.mapResponseToStatusCode(responseCode);
+        String statusMessage = responseCode + " - " + responseMessage;
+
+        // don't report assertion if we already have a http error
+        if (assertionAvailable && (responseCode < RESULT_HTTP_CLIENT_ERROR)) {
             if (assertionFailure) {
-                assertionFailed = true;
-                statusMessage = /* monitor + */ ASSERTION_FAILURE;
+                statusMessage = failureMessage /* monitor + ASSERTION_FAILURE */;
                 statusCode = STATUS_CODE_ASSERTION_ERROR;
                 assertionFailures++;
             }
             if (assertionError) {
-                assertionFailed = true;
-                statusMessage = /* monitor + */ ASSERTION_ERROR;
+                statusMessage = failureMessage /* monitor + ASSERTION_ERROR */;
                 statusCode = STATUS_CODE_ASSERTION_ERROR;
                 assertionErrors++;
             }
-        }
         
-        // set status message
-        if (!assertionFailed) {
-            statusMessage = responseCode + " - " + responseMessage;
-        }
+            // set status code for assertion failure 
+            if (STATUS_CODE_ASSERTION_ERROR == statusCode) {
 
-        // set status code for assertion failure 
-        if (STATUS_CODE_ASSERTION_ERROR == statusCode) {
-            String reportAs = EpaUtils.getProperty(REPORT_ASSERTION_FAILURES_AS, EMPTY_STRING);
+                String reportAs = EpaUtils.getProperty(REPORT_ASSERTION_FAILURES_AS, EMPTY_STRING);
 
-            if (!EMPTY_STRING.equals(reportAs)) {
-                try {
-                    statusCode = Integer.parseInt(reportAs);
-                } catch (NumberFormatException e) {
-                    EpaUtils.getFeedback().warn("non-integer value found in "
-                            + REPORT_ASSERTION_FAILURES_AS + ": " + reportAs);
+                if (!EMPTY_STRING.equals(reportAs)) {
+                    try {
+                        statusCode = Integer.parseInt(reportAs);
+                    } catch (NumberFormatException e) {
+                        EpaUtils.getFeedback().warn("non-integer value found in "
+                                + REPORT_ASSERTION_FAILURES_AS + ": " + reportAs);
+                    }
                 }
             }
-        } else {
-            // map responseCode
-            statusCode = format.mapResponseToStatusCode(responseCode);
         }
         
         // report metrics
