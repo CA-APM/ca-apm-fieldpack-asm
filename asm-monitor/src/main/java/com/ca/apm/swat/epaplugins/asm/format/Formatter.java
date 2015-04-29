@@ -251,7 +251,7 @@ public class Formatter implements AsmProperties {
         
         buf.append(stepNumberFormat.format(step));
         
-        if (printStepUrl) {
+        if (printStepUrl && (null != url) && (url.length() > 0)) {
             buf.append(BLANK).append(url);
         }
         
