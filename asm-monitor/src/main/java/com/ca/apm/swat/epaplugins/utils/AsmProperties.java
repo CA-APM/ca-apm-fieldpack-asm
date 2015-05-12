@@ -72,6 +72,7 @@ public interface AsmProperties {
     public static final String STEP_FORMAT_URL          = "asm.stepFormatURL";
     public static final String STEP_FORMAT_PREFIX       = "asm.stepFormatPrefix";
     public static final String STEP_FORMAT_ALWAYS       = "asm.stepFormatAlways";
+    public static final String TIMEOUT_REPORT_ALWAYS    = "asm.alwaysReportTimeout";
     
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";

@@ -60,14 +60,17 @@ public class InflatingBase64Decoder implements Handler {
                     return successor.generateMetrics(decodedString, metricTree);
                 } else {
                     EpaUtils.getFeedback().warn(
-                        "InflatingBase64Decoder decompress == null! metricTree = " + metricTree);
+                        "InflatingBase64Decoder: Could not decompress additional data for monitor "
+                                + metricTree);
                 }
             } else {
                 EpaUtils.getFeedback().warn(
-                    "InflatingBase64Decoder decoded == null! metricTree = " + metricTree);
+                    "InflatingBase64Decoder: Could not decode additional data for monitor "
+                            + metricTree);
             }
         } else {
-            EpaUtils.getFeedback().warn("InflatingBase64Decoder has no sucessor!");
+            EpaUtils.getFeedback().warn(
+                "Invalid handler chain: InflatingBase64Decoder has no sucessor!");
         }
         return new MetricMap();
     }

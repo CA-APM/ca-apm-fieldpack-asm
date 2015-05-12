@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.error.LoginError;
-import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 
 
 /**

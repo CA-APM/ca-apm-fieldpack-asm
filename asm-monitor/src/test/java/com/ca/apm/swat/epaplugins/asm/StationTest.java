@@ -43,8 +43,8 @@ public class StationTest extends FileTest {
             // check
             checkMetrics(expectedMetrics, expectedValues, stationMap);
 
-            // must have 95 + 1 (OPMS) entries
-            int expectedCount = 96;
+            // must have 95 entries
+            int expectedCount = 95;
             Assert.assertEquals("expected " + expectedCount + " monitoring stations",
                 expectedCount, stationMap.size());
 
