@@ -116,7 +116,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 String location = AsmRequestHelper.getMonitoringStationMap().get(
                     jsonObject.getString(LOCATION_TAG));
                 if (null == location) {
-                    location = AsmRequestHelper.getMonitoringStationMap().get(OPMS);
+                    location = OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR
+                            + jsonObject.getString(LOCATION_TAG);
                 }
                 metricTree = metricTree + METRIC_PATH_SEPARATOR + location;
             }
@@ -135,7 +136,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 }
             }
         }
-
+        
+        MetricMap outputMap = null;
+        int result = 0;
+        
         // iterate over JSON object
         Iterator jsonObjectKeys = jsonObject.keys();
         while (jsonObjectKeys.hasNext()) {
@@ -175,7 +179,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if (null != thisValue) {
-                                metricMap.putAll(successor.generateMetrics(thisValue, metricTree));
+                                outputMap = successor.generateMetrics(thisValue, metricTree);
                             }
                         } catch (Exception e) {
                             //Don't throw. Some formats are not yet supported
@@ -216,6 +220,11 @@ public class BaseMonitor implements Monitor, AsmProperties {
                     }
                 // map result code
                 } else if (thisKey.equals(RESULT_TAG)) {
+                    try {
+                        result = Integer.parseInt(thisValue);
+                    } catch (NumberFormatException e) {
+                        // ignore
+                    }
                     metricMap.put(EpaUtils.fixMetric(metricTree + METRIC_NAME_SEPARATOR
                         + STATUS_MESSAGE_VALUE), 
                         format.mapResponseToStatusCode(thisValue));
@@ -223,7 +232,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
                 // map metric key
                 if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
-                    thisKey = ((String) AsmPropertiesImpl.ASM_METRICS.get(thisKey)).toString();
+                    thisKey = AsmPropertiesImpl.ASM_METRICS.get(thisKey);
                 }
              
                 // put metric into map
@@ -236,12 +245,45 @@ public class BaseMonitor implements Monitor, AsmProperties {
             }
         }
 
+        // if monitor result is timeout set step status message value to timeout, too
+        if (null != outputMap) {
+            if (EpaUtils.getBooleanProperty(TIMEOUT_REPORT_ALWAYS, true) && isTimeout(result)) {
+                for (Iterator<String> it = outputMap.keySet().iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    if (key.endsWith(STATUS_MESSAGE_VALUE)) {
+                        metricMap.put(key, format.mapResponseToStatusCode(Integer.toString(result)));
+                    } else {
+                        metricMap.put(key, outputMap.get(key));
+                    }
+                }
+            } else {
+                metricMap.putAll(outputMap);
+            }
+        }
+        
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose("BaseMonitor returning " + metricMap.size()
                 + " metrics for monitor " + getName() + " in metric tree " + metricTree);
         }
         
         return metricMap;
+    }
+
+    /**
+     * Check if the supplied result code is a timeout. 
+     * @param result the result code to check
+     * @return true if it is a timeout, e.g. 7011 or 1042.
+     */
+    public boolean isTimeout(int result) {
+        switch (result) {
+          case RESULT_CONNECT_TIMEOUT:
+          case RESULT_EXECUTION_TIMEOUT:
+          case RESULT_PAGE_LOAD_TIMEOUT:
+          case RESULT_OPERATION_TIMEOUT:
+              return true;
+          default:
+              return false;
+        }
     }
 
     public void setSuccessor(Handler successor) {

@@ -29,8 +29,8 @@ public class AsmRequestHelper implements AsmProperties {
     private String nkey;
     private String user;
     private static HashMap<String, String> stationMap;
-    private static HashMap<String, Integer> apiCallMap = null;
-    private static HashMap<String, HashMap<String, Integer>> objectApiCallMap = null;
+    private static HashMap<String, Long> apiCallMap = null;
+    private static HashMap<String, HashMap<String, Long>> objectApiCallMap = null;
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
     
@@ -43,11 +43,11 @@ public class AsmRequestHelper implements AsmProperties {
         this.user = EpaUtils.getProperty(USER);
 
         if (null == apiCallMap) {
-            apiCallMap = new HashMap<String, Integer>();
+            apiCallMap = new HashMap<String, Long>();
         }
 
         if (null == objectApiCallMap) {
-            objectApiCallMap = new HashMap<String, HashMap<String, Integer>>();
+            objectApiCallMap = new HashMap<String, HashMap<String, Long>>();
         }
     }
 
@@ -73,11 +73,11 @@ public class AsmRequestHelper implements AsmProperties {
      * @param cmd API command called
      */
     private void countApiCall(String cmd) {
-        Integer count = apiCallMap.get(cmd);
+        Long count = apiCallMap.get(cmd);
         if (null == count) {
-            apiCallMap.put(cmd, new Integer(1));
+            apiCallMap.put(cmd, new Long(1));
         } else {
-            apiCallMap.put(cmd, new Integer(count.intValue() + 1));
+            apiCallMap.put(cmd, new Long(count.longValue() + 1));
         }
     }
 
@@ -87,18 +87,18 @@ public class AsmRequestHelper implements AsmProperties {
      * @param name of the object (folder or monitor)
      */
     private void countApiCall(String cmd, String name) {
-        HashMap<String, Integer> map = objectApiCallMap.get(name);
+        HashMap<String, Long> map = objectApiCallMap.get(name);
 
         if (null == map) {
-            map = new HashMap<String, Integer>();
-            map.put(cmd, new Integer(1));
+            map = new HashMap<String, Long>();
+            map.put(cmd, new Long(1));
             objectApiCallMap.put(name, map);
         } else {
-            Integer count = map.get(cmd);
+            Long count = map.get(cmd);
             if (null == count) {
-                map.put(cmd, new Integer(1));
+                map.put(cmd, new Long(1));
             } else {
-                map.put(cmd, new Integer(count.intValue() + 1));
+                map.put(cmd, new Long(count.intValue() + 1));
             }
         }
     }
@@ -111,6 +111,8 @@ public class AsmRequestHelper implements AsmProperties {
 
             final Date now = new Date();
             long timeElapsed = now.getTime() - lastPrintApiTimestamp;
+            long sum = 0;
+            long count = 0;
             
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
@@ -119,22 +121,27 @@ public class AsmRequestHelper implements AsmProperties {
 
                 for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
                     String cmd = it.next();
-                    EpaUtils.getFeedback().info("  " + cmd + " = " + apiCallMap.get(cmd));
+                    count = apiCallMap.get(cmd);
+                    sum += count;
+                    EpaUtils.getFeedback().info("  " + cmd + " = " + count);
                 }
 
                 for (Iterator<String> it = objectApiCallMap.keySet().iterator(); it.hasNext(); ) {
                     String name = it.next();
-                    HashMap<String, Integer> map = objectApiCallMap.get(name);
+                    HashMap<String, Long> map = objectApiCallMap.get(name);
 
                     StringBuffer buf = new StringBuffer();
-                    int count = 0;
+                    count = 0;
                     for (Iterator<String> mit = map.keySet().iterator(); mit.hasNext(); ) {
                         String cmd = mit.next();
                         buf.append(map.get(cmd)).append(' ').append(cmd).append(',');
                         count += map.get(cmd);
                     }
+                    sum += count;
                     EpaUtils.getFeedback().info("  " + name + " = " + count + " (" + buf + ")");
                 }
+                
+                EpaUtils.getFeedback().info("  sum = " + sum);
             }
         }
     }
@@ -318,9 +325,6 @@ public class AsmRequestHelper implements AsmProperties {
             }
         }
         
-        // put an entry for OPMS in the map
-        stationMap.put(OPMS, OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR + OPMS);
-
         AsmRequestHelper.stationMap = stationMap;
         return stationMap;
     }
