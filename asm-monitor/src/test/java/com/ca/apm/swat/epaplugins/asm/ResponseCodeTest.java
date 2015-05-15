@@ -97,9 +97,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 TestService:Response Code",
-                    metricTree + "|001 TestService:Status Message",
-                    metricTree + "|001 TestService:Status Message Value"};
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 
@@ -152,7 +152,7 @@ public class ResponseCodeTest extends FileTest {
                     + "Connection: keep-alive"
                     + "Content-Type: text/xml; charset=utf-8"
                     + "</requestHeader>"
-                    + "  <java.net.URL>https://testservices.ca.com/TestService/"
+                    + "  <java.net.URL>https://test.ca.com/TestService/"
                     + "services/TestServicePort</java.net.URL>"
                     + "</httpSample>"
                     + "</testResults>";
@@ -171,9 +171,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 TestService:Response Code",
-                    metricTree + "|001 TestService:Status Message",
-                    metricTree + "|001 TestService:Status Message Value"};
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
             
@@ -228,7 +228,7 @@ public class ResponseCodeTest extends FileTest {
                     + "Connection: keep-alive"
                     + "Content-Type: text/xml; charset=utf-8"
                     + "</requestHeader>"
-                    + "  <java.net.URL>https://testservices.ca.com/TestService/"
+                    + "  <java.net.URL>https://test.ca.com/TestService/"
                     + "services/TestServicePort</java.net.URL>"
                     + "</httpSample>"
                     + "</testResults>";
@@ -247,9 +247,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 TestService:Response Code",
-                    metricTree + "|001 TestService:Status Message",
-                    metricTree + "|001 TestService:Status Message Value"};
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
             
@@ -323,9 +323,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 TestService:Response Code",
-                    metricTree + "|001 TestService:Status Message",
-                    metricTree + "|001 TestService:Status Message Value"};
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
+                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 

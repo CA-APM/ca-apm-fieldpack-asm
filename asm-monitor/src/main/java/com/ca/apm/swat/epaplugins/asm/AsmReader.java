@@ -227,11 +227,11 @@ public class AsmReader implements AsmProperties {
 
                 // TODO: remove or convert to message
                 //if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    StringBuffer buf = new StringBuffer("read folders: ");
-                    for (int i = 0; i < folders.length; ++i) {
-                        buf.append(folders[i] + ", ");
-                    }
-                    EpaUtils.getFeedback().info(buf.toString());
+                StringBuffer buf = new StringBuffer("read folders: ");
+                for (int i = 0; i < folders.length; ++i) {
+                    buf.append(folders[i] + ", ");
+                }
+                EpaUtils.getFeedback().info(buf.toString());
                 //}
 
                 // read monitors
@@ -239,17 +239,17 @@ public class AsmReader implements AsmProperties {
 
                 // TODO: remove or convert to message
                 //if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().info("read monitors: ");
-                    Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
-                    for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
-                        String folder = (String) fit.next();
-                        buf = new StringBuffer("  " + folder + " = ");
-                        List<Monitor> monitors = folderMap.get(folder);
-                        for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
-                            buf.append(mit.next().getName() + ", ");
-                        }
-                        EpaUtils.getFeedback().info(buf.toString());
+                EpaUtils.getFeedback().info("read monitors: ");
+                Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
+                for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
+                    String folder = (String) fit.next();
+                    buf = new StringBuffer("  " + folder + " = ");
+                    List<Monitor> monitors = folderMap.get(folder);
+                    for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
+                        buf.append(mit.next().getName() + ", ");
                     }
+                    EpaUtils.getFeedback().info(buf.toString());
+                }
                 //}
 
                 // read monitoring stations

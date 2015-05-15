@@ -251,7 +251,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 for (Iterator<String> it = outputMap.keySet().iterator(); it.hasNext(); ) {
                     String key = it.next();
                     if (key.endsWith(STATUS_MESSAGE_VALUE)) {
-                        metricMap.put(key, format.mapResponseToStatusCode(Integer.toString(result)));
+                        metricMap.put(key,
+                            format.mapResponseToStatusCode(Integer.toString(result)));
                     } else {
                         metricMap.put(key, outputMap.get(key));
                     }

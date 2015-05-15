@@ -67,13 +67,13 @@ public class LayoutTest extends FileTest {
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Errors Per Interval",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
             String[] notExpectedMetrics = {
@@ -84,13 +84,13 @@ public class LayoutTest extends FileTest {
                                            METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                                            METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                                            METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Errors Per Interval",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
-                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
+                                           METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
             HashMap<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
@@ -138,13 +138,13 @@ public class LayoutTest extends FileTest {
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|01 /index.html:Assertion Errors",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|01 /index.html:Assertion Failures",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|02 /usermanual/index.html:Errors Per Interval",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|02 /usermanual/index.html:Response Code",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|03 /usermanual/build-test-plan.html:Status Message",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|03 /usermanual/build-test-plan.html:Status Message Value",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|04 /foundation/thanks.html:URL"
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|01 http_//jmeter.apache.org/index.html:Assertion Errors",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|01 http_//jmeter.apache.org/index.html:Assertion Failures",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|02 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|02 http_//jmeter.apache.org/usermanual/index.html:Response Code",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|03 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|03 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|04 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
             String[] notExpectedMetrics = {
@@ -206,13 +206,13 @@ public class LayoutTest extends FileTest {
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|Test 001 /index.html:Assertion Errors",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|Test 001 /index.html:Assertion Failures",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|Test 002 /usermanual/index.html:Errors Per Interval",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|Test 002 /usermanual/index.html:Response Code",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|Test 003 /usermanual/build-test-plan.html:Status Message",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|Test 003 /usermanual/build-test-plan.html:Status Message Value",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|Test 004 /foundation/thanks.html:URL"
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|Test 001 http_//jmeter.apache.org/index.html:Assertion Errors",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|Test 001 http_//jmeter.apache.org/index.html:Assertion Failures",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|Test 002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|Test 002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|Test 003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|Test 003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|Test 004 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
             String[] notExpectedMetrics = {
@@ -436,12 +436,12 @@ public class LayoutTest extends FileTest {
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                                         "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Errors Per Interval",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
-                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
+                                        "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
             String[] notExpectedMetrics = {
@@ -494,7 +494,7 @@ public class LayoutTest extends FileTest {
             MonitorFactory.createMonitor("DNS test", DNS_MONITOR, folder, EMPTY_STRING_ARRAY);
             MonitorFactory.createMonitor("FTP test", FTP_MONITOR, folder, EMPTY_STRING_ARRAY);
             MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
-            MonitorFactory.createMonitor("Bad request test http://ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("Bad request test http_//ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
             // call API
             HashMap<String, String> metricMap =
                     requestHelper.getLogs(folder, numMonitors, metricPrefix);
@@ -598,13 +598,13 @@ public class LayoutTest extends FileTest {
                 "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 /usermanual/index.html:Errors Per Interval",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
             if (DEBUG) {

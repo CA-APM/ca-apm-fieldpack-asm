@@ -150,11 +150,17 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                         failureMessage = assertionResultEntry.getFirstChild().getNodeValue();
                     }
                 }
+            } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
+                    .equals(JAVA_NET_URL)) {
+                String text = stepChild.getTextContent();
+                EpaUtils.getFeedback().info("lb was '" + url + "', " + JAVA_NET_URL + " = '" + text + "'");
+                
+                if ((null != text) && (0 < text.length())) {
+                    url = text;
+                }
             }
         }
         
-        url = EpaUtils.fixMetric(url);
-
         // first map responseCode
         int statusCode = format.mapResponseToStatusCode(responseCode);
         String statusMessage = responseCode + " - " + responseMessage;

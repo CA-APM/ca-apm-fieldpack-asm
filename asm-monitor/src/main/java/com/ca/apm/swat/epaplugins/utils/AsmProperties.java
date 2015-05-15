@@ -227,6 +227,8 @@ public interface AsmProperties {
     public static final String TEST_URL_TAG             = "lb";
     public static final String UNDEFINED_ASSERTION      = "Undefined Assertion";
     public static final String ASSERTION_RESULT         = "assertionResult";
+    public static final String HTTP_SAMPLE              = "httpSample";
+    public static final String JAVA_NET_URL              = "java.net.URL";
     public static final String FAILURE_TAG              = "failure";
     public static final String FAILURE__MESSAGE_TAG     = "failureMessage";
     public static final String STEP                     = "Step ";

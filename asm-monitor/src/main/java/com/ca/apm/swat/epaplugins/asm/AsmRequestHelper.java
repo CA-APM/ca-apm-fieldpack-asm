@@ -498,7 +498,6 @@ public class AsmRequestHelper implements AsmProperties {
         int numMonitors,
         String metricPrefix) throws Exception {
 
-        String logRequest = EMPTY_STRING;
         String folderStr = EMPTY_STRING;
         int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
         if (numMonitors > 0) {
@@ -521,7 +520,7 @@ public class AsmRequestHelper implements AsmProperties {
         //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
         //        + "&num=" + numLogs + "&reverse=y&full=y";
 
-        logRequest = accessor.executeApi(LOGS_CMD, logStr);
+        String logResponse = accessor.executeApi(LOGS_CMD, logStr);
 
         EpaUtils.getFeedback().verbose("getLogs: folder = " + folder);
 
@@ -532,7 +531,7 @@ public class AsmRequestHelper implements AsmProperties {
         }
         
         Monitor monitor = MonitorFactory.createMonitor("dummy", monitorType, folderStr, null);
-        return monitor.generateMetrics(logRequest, metricPrefix);
+        return monitor.generateMetrics(logResponse, metricPrefix);
     }
 
     /**

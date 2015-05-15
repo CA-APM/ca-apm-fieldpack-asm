@@ -44,7 +44,7 @@ public class MonitorFactory implements AsmProperties {
      
         if (null == monitorMap) {
             monitorMap = new HashMap<String, Monitor>();
-         }
+        }
         monitorMap.put(name, monitor);
         
         return monitor;
@@ -64,13 +64,13 @@ public class MonitorFactory implements AsmProperties {
     
     /**
      * Find a monitor by its name.
-     * @param name
+     * @param name name of the monitor
      * @return the monitor or null if no monitor with that name was found.
      */
     public static Monitor findMonitor(String name) {
         if (null == monitorMap) {
             return null;
-         }
+        }
         return monitorMap.get(name); 
     }
   
