@@ -102,6 +102,7 @@ public interface AsmProperties {
 
     // result codes
     public static final int    RESULT_CONNECT_TIMEOUT       = 110;
+    public static final int    RESULT_OK                    = 200;
     public static final int    RESULT_NOT_FOUND             = 404;
     public static final int    RESULT_EXECUTION_TIMEOUT     = 1042;
     public static final int    RESULT_PAGE_LOAD_TIMEOUT     = 1043;
@@ -229,12 +230,16 @@ public interface AsmProperties {
     public static final String UNDEFINED_ASSERTION      = "Undefined Assertion";
     public static final String ASSERTION_RESULT         = "assertionResult";
     public static final String HTTP_SAMPLE              = "httpSample";
-    public static final String JAVA_NET_URL              = "java.net.URL";
+    public static final String JAVA_NET_URL             = "java.net.URL";
     public static final String FAILURE_TAG              = "failure";
     public static final String FAILURE__MESSAGE_TAG     = "failureMessage";
     public static final String STEP                     = "Step ";
     public static final String ASSERTION_FAILURE        = " - Assertion Failure";
     public static final String ASSERTION_ERROR          = " - Assertion Error";
+    public static final String RESPONSE_CODE_NON_HTTP   = "Non HTTP response code";
+    public static final String RESPONSE_CODE_EXCEPTION  = "Exception";
+    public static final String RESPONSE_MESSAGE_NON_HTTP    = "Non HTTP response message";
+    public static final String RESPONSE_MESSAGE_TIMEOUT = "timed out";
 
     // JMeter metrics
     public static final String STATUS_MESSAGE           = "Status Message";

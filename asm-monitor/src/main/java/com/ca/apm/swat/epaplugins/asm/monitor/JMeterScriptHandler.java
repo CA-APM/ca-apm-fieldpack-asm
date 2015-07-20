@@ -108,8 +108,17 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         //First the attributes
         NamedNodeMap attributes = stepNode.getAttributes();
         
-        int responseCode = Integer.parseInt(
-            attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue());
+        int responseCode = RESULT_OK; // HTTP OK
+        try {
+            responseCode = Integer.parseInt(
+                attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue());
+        } catch (NumberFormatException e) {
+            String responseCodeText = attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue();
+            if (responseCodeText.contains(RESPONSE_CODE_EXCEPTION)
+                    || responseCodeText.contains(RESPONSE_CODE_NON_HTTP)) {
+                responseCode = RESULT_NOT_FOUND; // HTTP not found indicating an error
+            }
+        }
 
         // return if we should suppress this response code
         if (format.suppressResponseCode(responseCode)) {
@@ -117,6 +126,14 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         }
         
         String responseMessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
+        if (responseMessage.contains(RESPONSE_MESSAGE_TIMEOUT)) {
+            // timeout
+            responseCode = RESULT_OPERATION_TIMEOUT;
+        } else if (responseMessage.contains(RESPONSE_MESSAGE_NON_HTTP)) {
+            // other error
+            responseCode = RESULT_NOT_FOUND; // HTTP not found indicating an error
+        }
+        
         //String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
         final int errorCount = Integer.parseInt(attributes.getNamedItem(ERROR_COUNT_TAG)
             .getNodeValue());
