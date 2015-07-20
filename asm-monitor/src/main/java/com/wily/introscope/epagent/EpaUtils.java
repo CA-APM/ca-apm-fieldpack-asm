@@ -17,26 +17,31 @@ import com.wily.util.feedback.SystemOutFeedbackChannel;
 public class EpaUtils {
 
     private static Properties properties;
+    private static IModuleFeedbackChannel channel = null;
 
     /**
      * Cannot instantiate.
      */
     private EpaUtils() {
     }
-
     /**
      * Get the logging component.
      * @return the logging component
      */
     public static IModuleFeedbackChannel getFeedback() {
-        IModuleFeedbackChannel channel;
-        if (EPAgent.GetInstance() == null) {
-            channel = new SystemOutFeedbackChannel(AsmProperties.ASM_PRODUCT_NAME_SHORT + " EPA",
-                SeverityLevel.INFO);
-        } else {
-            channel = EPAgent.GetFeedback();
+        if (null == channel) {
+            if (EPAgent.GetInstance() == null) {
+                channel = new SystemOutFeedbackChannel(
+                    AsmProperties.ASM_PRODUCT_NAME_SHORT + " EPA",
+                    SeverityLevel.INFO);
+            } else {
+                channel = EPAgent.GetFeedback();
+            }
+            String version = getProperties().getProperty(AsmProperties.VERSION);
+            channel.info("Started field pack " + AsmProperties.ASM_PRODUCT_NAME
+                + ", version " + version);
         }
-
+        
         return channel;
     }
 

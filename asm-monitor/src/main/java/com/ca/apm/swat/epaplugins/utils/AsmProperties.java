@@ -27,6 +27,7 @@ public interface AsmProperties {
     public static final String PASSWORD_URL             =
             "https://dashboard.cloudmonitor.ca.com/en/change_passwd.php";
 
+    public static final String VERSION                  = "asm.version";
     public static final String LOCALE                   = "asm.locale";
     public static final String DEFAULT_LOCALE           = "en_US";
     public static final String ENCODING                 = "asm.encoding";
