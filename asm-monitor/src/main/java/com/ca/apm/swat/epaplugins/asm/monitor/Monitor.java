@@ -34,4 +34,10 @@ public interface Monitor extends Handler {
      * @return tags of the monitor
      */
     public String[] getTags();
+
+    /**
+     * Returns true if the monitor is active.
+     * @return true if the monitor is active
+     */
+    public boolean isActive();
 }

@@ -23,6 +23,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
     private String folder = null;
     private String[] tags = null;
     private String type = null;
+    private boolean active = false;
 
     protected Handler successor = null;
 
@@ -34,11 +35,12 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @param folder folder of the monitor
      * @param tags tags of the monitor
      */
-    protected BaseMonitor(String name, String type, String folder, String[] tags) {
+    protected BaseMonitor(String name, String type, String folder, String[] tags, boolean active) {
         this.name = name;
         this.folder = folder;
         this.tags = tags;
         this.type = type;
+        this.active = active;
     }
 
     public String getName() {
@@ -55,6 +57,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
     public String getType() {
         return type;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     /**
@@ -99,17 +105,30 @@ public class BaseMonitor implements Monitor, AsmProperties {
         
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
+        Monitor monitor = null;
         
         // if we find a name append it to metric tree
         if (name != null) {
             metricTree = metricTree + METRIC_PATH_SEPARATOR + name;
+
+            // find the monitor
+            monitor = MonitorFactory.findMonitor(name);
+
+            // return if not active
+            if ((null != monitor) && (!monitor.isActive())) {
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose("skipping metrics for inactive monitor "
+                            + name);
+                }
+                return metricMap;
+            }
         }
 
         // return if this monitor is inactive
         if (jsonObject.optString(ACTIVE_TAG, YES) == NO) {
             return metricMap;
         }
-
+        
         // append monitoring station to metric tree
         if (jsonObject.optString(LOCATION_TAG, null) != null) {
             if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
@@ -121,17 +140,18 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 }
                 metricTree = metricTree + METRIC_PATH_SEPARATOR + location;
             }
+        }
 
-            // add a step node if STEP_FORMAT_ALWAYS is true
-            if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)) {
-                if (null != name) {  
-                    // find the monitor
-                    Monitor monitor = MonitorFactory.findMonitor(name);
-
-                    // add step node if not a script monitor
-                    if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
-                        metricTree = metricTree + METRIC_PATH_SEPARATOR
-                                + format.formatStep(1, EMPTY_STRING);
+        // add a step node if STEP_FORMAT_ALWAYS is true
+        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)) {
+            if (null != name) {  
+                // add step node if not a script monitor
+                if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
+                    metricTree = metricTree + METRIC_PATH_SEPARATOR
+                            + format.formatStep(1, EMPTY_STRING);
+                    if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                        EpaUtils.getFeedback().verbose("adding a step for monitor " + name
+                            + " of type " + monitor.getType());
                     }
                 }
             }

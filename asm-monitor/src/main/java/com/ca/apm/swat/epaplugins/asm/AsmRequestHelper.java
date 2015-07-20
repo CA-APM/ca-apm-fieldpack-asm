@@ -373,15 +373,17 @@ public class AsmRequestHelper implements AsmProperties {
                         monitorJsonObject.getString(NAME_TAG),
                         folder.length() > 0 ? folder : ROOT_FOLDER));
                 }
-                continue;
+                // do not skip the inactive monitors, we need that information later!
+                // continue;
             }
             monitors.add(MonitorFactory.createMonitor(
                 monitorJsonObject.getString(NAME_TAG),
                 monitorJsonObject.getString(TYPE_TAG),
                 monitorJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
                     monitorJsonObject.getString(FOLDER_TAG),
-                    monitorJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
-                        monitorJsonObject.getString(TAGS_TAG).split(",")));
+                monitorJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
+                    monitorJsonObject.getString(TAGS_TAG).split(","),
+                YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO))));
         }
 
         if (!monitorsList.equals(ALL_MONITORS)) {
@@ -530,7 +532,8 @@ public class AsmRequestHelper implements AsmProperties {
             monitorType = HTTP_MONITOR;
         }
         
-        Monitor monitor = MonitorFactory.createMonitor("dummy", monitorType, folderStr, null);
+        Monitor monitor =
+                MonitorFactory.createMonitor("dummy", monitorType, folderStr, null, false);
         return monitor.generateMetrics(logResponse, metricPrefix);
     }
 

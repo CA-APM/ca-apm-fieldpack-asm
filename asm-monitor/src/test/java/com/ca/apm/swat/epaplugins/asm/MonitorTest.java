@@ -151,7 +151,8 @@ public class MonitorTest extends FileTest {
                 "Bad request test",
                 "Simple HTTP validation test",
                 "Simple HTTP validation test - fail",
-                "Simple JMeter recording"
+                "Simple JMeter recording",
+                "Simple JMeter 2"
             };
 
             if (DEBUG) {
@@ -167,7 +168,15 @@ public class MonitorTest extends FileTest {
             
             // check
             checkMonitors(expectedMonitors, folderMap.get(folders[0]));
-
+            
+            // assert that monitor "Simple JMeter 2" is not active
+            for (Iterator<Monitor> it = folderMap.get(folders[0]).iterator(); it.hasNext(); ) {
+                Monitor mon = it.next();
+                if (mon.getName().equals("Simple JMeter 2")) {
+                    Assert.assertFalse(mon.isActive());
+                    break;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());

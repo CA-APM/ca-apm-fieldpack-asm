@@ -153,7 +153,10 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
                     .equals(JAVA_NET_URL)) {
                 String text = stepChild.getTextContent();
-                EpaUtils.getFeedback().info("lb was '" + url + "', " + JAVA_NET_URL + " = '" + text + "'");
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose("replaced URL '" + url
+                        + "' with text '" + text + "'");
+                }
                 
                 if ((null != text) && (0 < text.length())) {
                     url = text;

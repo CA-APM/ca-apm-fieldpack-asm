@@ -489,12 +489,12 @@ public class LayoutTest extends FileTest {
             // load file
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_all.json");
 
-            MonitorFactory.createMonitor("Simple HTTP validation test", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
-            MonitorFactory.createMonitor("Simple HTTP validation test - fail", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
-            MonitorFactory.createMonitor("DNS test", DNS_MONITOR, folder, EMPTY_STRING_ARRAY);
-            MonitorFactory.createMonitor("FTP test", FTP_MONITOR, folder, EMPTY_STRING_ARRAY);
-            MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
-            MonitorFactory.createMonitor("Bad request test http_//ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY);
+            MonitorFactory.createMonitor("Simple HTTP validation test", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("Simple HTTP validation test - fail", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("DNS test", DNS_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("FTP test", FTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("Bad request test http_//ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
             // call API
             HashMap<String, String> metricMap =
                     requestHelper.getLogs(folder, numMonitors, metricPrefix);
@@ -617,6 +617,100 @@ public class LayoutTest extends FileTest {
             
             // check
             checkMetrics(expectedMetrics, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test if asm.stepFormatAlways is handled correctly.
+     */
+    @Test
+    public void inactiveMonitors() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            EpaUtils.getProperties().setProperty(STEP_FORMAT_ALWAYS, TRUE);
+            EpaUtils.getProperties().setProperty(STEP_FORMAT_URL, FALSE);
+            Formatter.setProperties(EpaUtils.getProperties());
+
+            String folder = "Tests";
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_all.json");
+
+            MonitorFactory.createMonitor("Simple HTTP validation test", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("Simple HTTP validation test - fail", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, false);
+            MonitorFactory.createMonitor("DNS test", DNS_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("FTP test", FTP_MONITOR, folder, EMPTY_STRING_ARRAY, false);
+            MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, true);
+            MonitorFactory.createMonitor("Bad request test http_//ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, false);
+            // call API
+            HashMap<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+
+            // metricMap should contain those entries
+            String[] expectedMetrics = {
+                                        "Monitors|Tests:Agent Time Zone",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Alerts Per Interval",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Check End Time",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Check Start Time",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Connect Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Download Size (kB)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Download Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:IP Address",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Location Code",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Processing Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Repeat",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Resolve Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Result Code",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Monitor ID",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Monitor Name",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Total Time (ms)",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Type",
+                                        "Monitors|Tests|Simple HTTP validation test|001:Monitor ID",
+                                        "Monitors|Tests|DNS test|001:Alerts Per Interval",
+                                        "Monitors|Tests|DNS test|001:Check End Time",
+                                        "Monitors|Tests|DNS test|001:Check Start Time",
+                                        "Monitors|Tests|DNS test|001:Download Size (kB)",
+                                        "Monitors|Tests|DNS test|001:Download Time (ms)",
+                                        "Monitors|Tests|Custom page ping|001:Total Time (ms)",
+                                        "Monitors|Tests|Custom page ping|001:Type",
+                                        "Monitors|Tests|Custom page ping|001:Monitor ID",
+                                        "Monitors|Tests|Custom page ping|001:Connect Time (ms)",
+            };
+            String[] notExpectedMetrics = {
+                                           "Monitors|Tests|FTP test|001:IP Address",
+                                           "Monitors|Tests|FTP test|001:Location Code",
+                                           "Monitors|Tests|FTP test|001:Processing Time (ms)",
+                                           "Monitors|Tests|FTP test|001:Repeat",
+                                           "Monitors|Tests|FTP test|001:Result Code",
+                                           "Monitors|Tests|FTP test|001:Monitor ID",
+                                           "Monitors|Tests|FTP test|001:Monitor Name",
+                                           "Monitors|Tests|Simple HTTP validation test - fail|001:Monitor Name",
+                                           "Monitors|Tests|Bad request test http_//ca.com/foo|001:Repeat",
+            };
+
+
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+
+            // check
+            checkMetrics(expectedMetrics, metricMap);
+            checkNotExistMetrics(notExpectedMetrics, metricMap);
 
         } catch (Exception e) {
             e.printStackTrace();

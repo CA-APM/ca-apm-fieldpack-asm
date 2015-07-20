@@ -26,7 +26,11 @@ public class MonitorFactory implements AsmProperties {
      * @param tags list of tags
      * @return a new <code>Monitor</code> object
      */
-    public static Monitor createMonitor(String name, String type, String folder, String[] tags) {
+    public static Monitor createMonitor(String name,
+                                        String type,
+                                        String folder,
+                                        String[] tags,
+                                        boolean active) {
         if (type == null) {
             return null;
         }
@@ -37,9 +41,9 @@ public class MonitorFactory implements AsmProperties {
                 /* don't handle here until we figured out what to do with har data
                 || type.equalsIgnoreCase(REAL_BROWSER_MONITOR)
                 || type.equalsIgnoreCase(FULL_PAGE_MONITOR)*/) {
-            monitor = new ScriptMonitor(name, folder, tags);
+            monitor = new ScriptMonitor(name, folder, tags, active);
         } else {
-            monitor = new BaseMonitor(name, type, folder, tags);
+            monitor = new BaseMonitor(name, type, folder, tags, active);
         }
      
         if (null == monitorMap) {
@@ -57,7 +61,11 @@ public class MonitorFactory implements AsmProperties {
     public static Monitor getAllMonitorsMonitor() {
         if (null == ALL_MONITORS_MONITOR) {
             ALL_MONITORS_MONITOR =
-                    new BaseMonitor(ALL_MONITORS, ALL_MONITORS, EMPTY_STRING, EMPTY_STRING_ARRAY);
+                    new BaseMonitor(ALL_MONITORS,
+                        ALL_MONITORS,
+                        EMPTY_STRING,
+                        EMPTY_STRING_ARRAY,
+                        false);
         }
         return ALL_MONITORS_MONITOR;
     }
