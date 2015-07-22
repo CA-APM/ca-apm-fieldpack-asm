@@ -1,6 +1,7 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -97,15 +98,20 @@ public class BaseMonitor implements Monitor, AsmProperties {
         String metricTree) {
 
         MetricMap metricMap = new MetricMap();
-
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String name = jsonObject.optString(NAME_TAG, null);
+        Monitor monitor = null;
+        String origMetricTree = null;
+        
         if (EpaUtils.getFeedback().isDebugEnabled()) {
             EpaUtils.getFeedback().debug("generateMetrics(" + metricTree + ", " 
                 + jsonString + ")");
         }
-        
-        JSONObject jsonObject = new JSONObject(jsonString);
-        String name = jsonObject.optString(NAME_TAG, null);
-        Monitor monitor = null;
+
+        // return if this monitor is inactive
+        if (jsonObject.optString(ACTIVE_TAG, YES) == NO) {
+            return metricMap;
+        }
         
         // if we find a name append it to metric tree
         if (name != null) {
@@ -124,11 +130,6 @@ public class BaseMonitor implements Monitor, AsmProperties {
             }
         }
 
-        // return if this monitor is inactive
-        if (jsonObject.optString(ACTIVE_TAG, YES) == NO) {
-            return metricMap;
-        }
-        
         // append monitoring station to metric tree
         if (jsonObject.optString(LOCATION_TAG, null) != null) {
             if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
@@ -147,6 +148,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
             if (null != name) {  
                 // add step node if not a script monitor
                 if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
+                    origMetricTree = metricTree;
                     metricTree = metricTree + METRIC_PATH_SEPARATOR
                             + format.formatStep(1, EMPTY_STRING);
                     if (EpaUtils.getFeedback().isVerboseEnabled()) {
@@ -285,6 +287,28 @@ public class BaseMonitor implements Monitor, AsmProperties {
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose("BaseMonitor returning " + metricMap.size()
                 + " metrics for monitor " + getName() + " in metric tree " + metricTree);
+        }
+
+        // if we added a step node then copy all metrics up to monitor node
+        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)
+                && (null != origMetricTree)
+                && (!metricMap.isEmpty())) {
+            // we need to copy to a new map because we cannot iterate over
+            // and modify map at the same time
+            outputMap = new MetricMap();
+            
+            Set<String> keySet = metricMap.keySet();
+            for (Iterator<String> it = keySet.iterator(); it.hasNext(); ) {
+                String key = it.next();
+                outputMap.put(key, metricMap.get(key));
+                int index = key.lastIndexOf(METRIC_NAME_SEPARATOR);
+                if (-1 < index) {
+                    outputMap.put(origMetricTree + key.substring(index, key.length()),
+                        metricMap.get(key));
+                }
+            }
+
+            metricMap = outputMap;
         }
         
         return metricMap;
