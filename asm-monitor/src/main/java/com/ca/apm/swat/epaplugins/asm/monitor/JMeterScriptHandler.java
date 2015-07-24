@@ -218,15 +218,15 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         String metric = EpaUtils.fixMetric(metricTree + METRIC_PATH_SEPARATOR
             + format.formatStep(step, url) + METRIC_NAME_SEPARATOR);
         
-        metricMap.put(metric + STATUS_MESSAGE_VALUE, Integer.toString(statusCode));
-        metricMap.put(metric + RESPONSE_CODE,        Integer.toString(responseCode));
-        metricMap.put(metric + ERROR_COUNT,          Integer.toString(errorCount));
-        metricMap.put(metric + ASSERTION_FAILURES,   Integer.toString(assertionFailures));
-        metricMap.put(metric + ASSERTION_ERRORS,     Integer.toString(assertionErrors));
-        metricMap.put(metric + TEST_URL,             url);
+        metricMap.put(EpaUtils.fixMetric(metric + STATUS_MESSAGE_VALUE), Integer.toString(statusCode));
+        metricMap.put(EpaUtils.fixMetric(metric + RESPONSE_CODE),        Integer.toString(responseCode));
+        metricMap.put(EpaUtils.fixMetric(metric + ERROR_COUNT),          Integer.toString(errorCount));
+        metricMap.put(EpaUtils.fixMetric(metric + ASSERTION_FAILURES),   Integer.toString(assertionFailures));
+        metricMap.put(EpaUtils.fixMetric(metric + ASSERTION_ERRORS),     Integer.toString(assertionErrors));
+        metricMap.put(EpaUtils.fixMetric(metric + TEST_URL),             url);
 
         if (EpaUtils.getBooleanProperty(REPORT_STRING_RESULTS, true)) {
-            metricMap.put(metric + STATUS_MESSAGE, statusMessage);
+            metricMap.put(EpaUtils.fixMetric(metric + STATUS_MESSAGE), statusMessage);
         }
 
         return metricMap;

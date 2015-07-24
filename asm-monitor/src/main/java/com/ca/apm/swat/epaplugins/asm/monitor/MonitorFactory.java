@@ -30,6 +30,7 @@ public class MonitorFactory implements AsmProperties {
                                         String type,
                                         String folder,
                                         String[] tags,
+                                        String url,
                                         boolean active) {
         if (type == null) {
             return null;
@@ -41,9 +42,9 @@ public class MonitorFactory implements AsmProperties {
                 /* don't handle here until we figured out what to do with har data
                 || type.equalsIgnoreCase(REAL_BROWSER_MONITOR)
                 || type.equalsIgnoreCase(FULL_PAGE_MONITOR)*/) {
-            monitor = new ScriptMonitor(name, folder, tags, active);
+            monitor = new ScriptMonitor(name, folder, tags, url, active);
         } else {
-            monitor = new BaseMonitor(name, type, folder, tags, active);
+            monitor = new BaseMonitor(name, type, folder, tags, url, active);
         }
      
         if (null == monitorMap) {
@@ -65,6 +66,7 @@ public class MonitorFactory implements AsmProperties {
                         ALL_MONITORS,
                         EMPTY_STRING,
                         EMPTY_STRING_ARRAY,
+                        EMPTY_STRING,
                         false);
         }
         return ALL_MONITORS_MONITOR;
@@ -81,5 +83,39 @@ public class MonitorFactory implements AsmProperties {
         }
         return monitorMap.get(name); 
     }
-  
+
+    /**
+     * Create the url of the monitor from the parameters.
+     * @param type monitor type, e.g. http, https
+     * @param host monitored host
+     * @param port monitored port
+     * @param path monitored path
+     * @return the full monitor url
+     */
+    public static String createMonitorUrl(String type, String host, String port, String path) {
+        StringBuilder sb = new StringBuilder();
+        if (type.equals(SCRIPT_MONITOR)
+                || type.equals(FULL_PAGE_MONITOR)
+                || type.equals(REAL_BROWSER_MONITOR)) {
+            if (port.equals(HTTPS_PORT)) {
+                type = HTTPS_MONITOR;
+            } else {
+                type = HTTP_MONITOR;
+            }
+        }
+        sb.append(type).append("://").append(host);
+        
+        if ((type.equals(HTTPS_MONITOR) && port.equals(HTTPS_PORT))
+                || (type.equals(HTTP_MONITOR) && port.equals(HTTP_PORT))) {
+            // don't show port
+        } else {
+            sb.append(':').append(port);
+        }
+        
+        if ((null != path) && (path.length() > 0)) {
+            sb.append(path);
+        }
+        
+        return sb.toString();
+    }
 }

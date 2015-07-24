@@ -53,7 +53,7 @@ public class TimeoutTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_timeout.json");
             String logRequest = accessor.executeApi(LOGS_CMD, null);
 
-            Monitor monitor = MonitorFactory.createMonitor("dummy", HTTP_MONITOR, folder, null, true);
+            Monitor monitor = MonitorFactory.createMonitor("dummy", HTTP_MONITOR, folder, null, EMPTY_STRING, true);
             monitor.setSuccessor(new JMeterScriptHandler());
 
             // call API
@@ -131,7 +131,7 @@ public class TimeoutTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_timeout.json");
             String logRequest = accessor.executeApi(LOGS_CMD, null);
 
-            Monitor monitor = MonitorFactory.createMonitor("dummy", HTTP_MONITOR, folder, null, true);
+            Monitor monitor = MonitorFactory.createMonitor("dummy", HTTP_MONITOR, folder, null, EMPTY_STRING, true);
             monitor.setSuccessor(new JMeterScriptHandler());
 
             // call API

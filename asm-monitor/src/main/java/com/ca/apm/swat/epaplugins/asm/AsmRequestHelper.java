@@ -383,6 +383,11 @@ public class AsmRequestHelper implements AsmProperties {
                     monitorJsonObject.getString(FOLDER_TAG),
                 monitorJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
                     monitorJsonObject.getString(TAGS_TAG).split(","),
+                MonitorFactory.createMonitorUrl(
+                    monitorJsonObject.getString(TYPE_TAG),
+                    monitorJsonObject.getString(HOST_TAG),
+                    monitorJsonObject.getString(PORT_TAG),
+                    monitorJsonObject.optString(PATH_TAG, EMPTY_STRING)),
                 YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO))));
         }
 
@@ -533,7 +538,12 @@ public class AsmRequestHelper implements AsmProperties {
         }
         
         Monitor monitor =
-                MonitorFactory.createMonitor("dummy", monitorType, folderStr, null, false);
+                MonitorFactory.createMonitor("dummy",
+                    monitorType,
+                    folderStr,
+                    null,
+                    EMPTY_STRING,
+                    false);
         return monitor.generateMetrics(logResponse, metricPrefix);
     }
 

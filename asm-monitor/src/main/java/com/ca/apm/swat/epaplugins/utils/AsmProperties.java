@@ -204,12 +204,17 @@ public interface AsmProperties {
     public static final String COLORS_TAG               = "colors";
     public static final String ELAPSED_TAG              = "elapsed";
     public static final String TYPE_TAG                 = "type";
+    public static final String HOST_TAG                 = "host";
+    public static final String PORT_TAG                 = "port";
+    public static final String PATH_TAG                 = "path";
     public static final String VERSION_TAG              = "version";
     public static final String OUTPUT_TAG               = "output";
     public static final String TAGS_TAG                 = "tags";
     public static final String IPADDRESS_TAG            = "ipaddr";
     public static final String HAR_OR_LOG_TAG           = "{\"har\""; //"{\"har\": {\"log\"";
     public static final String UNDEFINED                = "Undefined";
+    public static final String HTTP_PORT                = "80";
+    public static final String HTTPS_PORT               = "443";
 
     // monitor types
     public static final String HTTP_MONITOR             = "http";
@@ -245,6 +250,7 @@ public interface AsmProperties {
     public static final String STATUS_MESSAGE           = "Status Message";
     public static final String STATUS_MESSAGE_VALUE     = "Status Message Value";
     public static final String RESPONSE_CODE            = "Response Code";
+    public static final String RESULT_CODE              = "Result Code";
     public static final String ERROR_COUNT              = "Errors Per Interval";
     public static final String ASSERTION_FAILURES       = "Assertion Failures";
     public static final String ASSERTION_ERRORS         = "Assertion Errors";

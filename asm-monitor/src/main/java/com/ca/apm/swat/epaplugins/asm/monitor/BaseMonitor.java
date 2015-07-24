@@ -24,8 +24,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
     private String folder = null;
     private String[] tags = null;
     private String type = null;
+    private String url = null;
     private boolean active = false;
-
+    
     protected Handler successor = null;
 
     protected static Formatter format = Formatter.getInstance();
@@ -35,12 +36,14 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @param name name of the monitor
      * @param folder folder of the monitor
      * @param tags tags of the monitor
+     * @param url 
      */
-    protected BaseMonitor(String name, String type, String folder, String[] tags, boolean active) {
+    protected BaseMonitor(String name, String type, String folder, String[] tags, String url, boolean active) {
         this.name = name;
         this.folder = folder;
         this.tags = tags;
         this.type = type;
+        this.url = url;
         this.active = active;
     }
 
@@ -60,6 +63,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
         return type;
     }
 
+    public String getUrl() {
+        return url;
+    }
+    
     public boolean isActive() {
         return active;
     }
@@ -101,7 +108,6 @@ public class BaseMonitor implements Monitor, AsmProperties {
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
         Monitor monitor = null;
-        String origMetricTree = null;
         
         if (EpaUtils.getFeedback().isDebugEnabled()) {
             EpaUtils.getFeedback().debug("generateMetrics(" + metricTree + ", " 
@@ -143,22 +149,6 @@ public class BaseMonitor implements Monitor, AsmProperties {
             }
         }
 
-        // add a step node if STEP_FORMAT_ALWAYS is true
-        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)) {
-            if (null != name) {  
-                // add step node if not a script monitor
-                if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
-                    origMetricTree = metricTree;
-                    metricTree = metricTree + METRIC_PATH_SEPARATOR
-                            + format.formatStep(1, EMPTY_STRING);
-                    if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                        EpaUtils.getFeedback().verbose("adding a step for monitor " + name
-                            + " of type " + monitor.getType());
-                    }
-                }
-            }
-        }
-        
         MetricMap outputMap = null;
         int result = 0;
         
@@ -273,10 +263,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 for (Iterator<String> it = outputMap.keySet().iterator(); it.hasNext(); ) {
                     String key = it.next();
                     if (key.endsWith(STATUS_MESSAGE_VALUE)) {
-                        metricMap.put(key,
+                        metricMap.put(EpaUtils.fixMetric(key),
                             format.mapResponseToStatusCode(Integer.toString(result)));
                     } else {
-                        metricMap.put(key, outputMap.get(key));
+                        metricMap.put(EpaUtils.fixMetric(key), outputMap.get(key));
                     }
                 }
             } else {
@@ -284,31 +274,89 @@ public class BaseMonitor implements Monitor, AsmProperties {
             }
         }
         
+        // add a step node if STEP_FORMAT_ALWAYS is true
+        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)
+                && (null != name)  
+                && (!metricMap.isEmpty())) {
+            metricMap = addStep(metricMap, monitor, metricTree);
+        }
+
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose("BaseMonitor returning " + metricMap.size()
                 + " metrics for monitor " + getName() + " in metric tree " + metricTree);
         }
 
-        // if we added a step node then copy all metrics up to monitor node
-        if (EpaUtils.getBooleanProperty(STEP_FORMAT_ALWAYS, false)
-                && (null != origMetricTree)
-                && (!metricMap.isEmpty())) {
+        return metricMap;
+    }
+
+    /**
+     * Add a step node to the metric tree copying select metrics.
+     * @param metricMap original metric map
+     * @param monitor the current monitor
+     * @param metricTree the metric tree for the monitor
+     * @return the metric map with the added step node
+     */
+    protected MetricMap addStep(MetricMap metricMap, Monitor monitor, String metricTree) {
+        if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
+            String stepMetricTree = metricTree + METRIC_PATH_SEPARATOR
+                    + format.formatStep(1, EMPTY_STRING);
+            if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                EpaUtils.getFeedback().verbose("adding a step for monitor " + name
+                    + " of type " + monitor.getType());
+            }
+
             // we need to copy to a new map because we cannot iterate over
             // and modify map at the same time
-            outputMap = new MetricMap();
-            
+            MetricMap outputMap = new MetricMap();
+
+            if (EpaUtils.getFeedback().isDebugEnabled()) {
+                EpaUtils.getFeedback().debug("iterating over " + metricMap.size()
+                    + " metric map entries for metric tree " + metricTree);
+            }
+
             Set<String> keySet = metricMap.keySet();
             for (Iterator<String> it = keySet.iterator(); it.hasNext(); ) {
                 String key = it.next();
-                outputMap.put(key, metricMap.get(key));
-                int index = key.lastIndexOf(METRIC_NAME_SEPARATOR);
-                if (-1 < index) {
-                    outputMap.put(origMetricTree + key.substring(index, key.length()),
-                        metricMap.get(key));
+
+                if (key.endsWith(STATUS_MESSAGE)
+                        || key.endsWith(STATUS_MESSAGE_VALUE)
+                        || key.endsWith(RESPONSE_CODE)
+                        || key.endsWith(RESULT_CODE)
+                        || key.endsWith(TEST_URL)) {
+
+                    int index = key.lastIndexOf(METRIC_NAME_SEPARATOR);
+                    if (-1 < index) {
+                        String metricName = key.substring(index + 1, key.length());
+                        if (RESULT_CODE.equals(metricName)) {
+                            metricName = RESPONSE_CODE;
+                            if (metricMap.get(key).equals("0")) {
+                                outputMap.put(stepMetricTree + METRIC_NAME_SEPARATOR + metricName,
+                                    Integer.toString(RESULT_OK));
+                            } else {
+                                outputMap.put(stepMetricTree + METRIC_NAME_SEPARATOR + metricName,
+                                    metricMap.get(key));
+                            }
+                        } else {
+                            outputMap.put(stepMetricTree + METRIC_NAME_SEPARATOR + metricName,
+                                metricMap.get(key));
+                        }
+                        
+                        if (EpaUtils.getFeedback().isDebugEnabled()) {
+                            EpaUtils.getFeedback().debug("copied metric " + stepMetricTree
+                                + METRIC_NAME_SEPARATOR + metricName);
+                        }
+                    }
                 }
             }
+            
+            // add url from monitor if not there
+            String urlMetric = stepMetricTree + METRIC_NAME_SEPARATOR + TEST_URL;
+            if (!outputMap.containsKey(urlMetric)) {
+                outputMap.put(urlMetric, monitor.getUrl());
+            }
 
-            metricMap = outputMap;
+            // add to metric map
+            metricMap.putAll(outputMap);
         }
         
         return metricMap;

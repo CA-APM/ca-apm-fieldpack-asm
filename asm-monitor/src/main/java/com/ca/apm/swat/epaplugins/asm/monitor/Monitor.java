@@ -40,4 +40,10 @@ public interface Monitor extends Handler {
      * @return true if the monitor is active
      */
     public boolean isActive();
+
+    /**
+     * Returns the url of the monitor.
+     * @return url of the monitor
+     */
+    public String getUrl();
 }

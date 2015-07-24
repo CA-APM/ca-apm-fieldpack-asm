@@ -17,8 +17,12 @@ public class ScriptMonitor extends BaseMonitor {
      * @param folder folder of the monitor
      * @param tags tags of the monitor
      */
-    protected ScriptMonitor(String name, String folder, String[] tags, boolean active) {
-        super(name, SCRIPT_MONITOR, folder, tags, active);
+    protected ScriptMonitor(String name,
+                            String folder,
+                            String[] tags,
+                            String url,
+                            boolean active) {
+        super(name, SCRIPT_MONITOR, folder, tags, url, active);
 
         // build chain of responsibility
         Handler jmeterHandler = new JMeterScriptHandler();

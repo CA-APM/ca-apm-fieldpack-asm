@@ -86,10 +86,10 @@ public class MonitorTest extends FileTest {
             EpaUtils.getProperties().setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
             EpaUtils.getProperties().setProperty(SKIP_INACTIVE_MONITORS, FALSE);
 
-            String[] folders = {"Tests"};
+            String[] folders = {"Tests", "Customer Sites"};
 
             // load file
-            accessor.loadFile(MONITOR_GET_CMD, "target/test-classes/rule_get_folder.json");
+            accessor.loadFile(MONITOR_GET_CMD, "target/test-classes/rule_get.json");
 
             // call API
             HashMap<String, List<Monitor>> folderMap = requestHelper.getMonitors(folders);
@@ -102,7 +102,27 @@ public class MonitorTest extends FileTest {
                 "Simple HTTP validation test",
                 "Simple HTTP validation test - fail",
                 "Simple JMeter 2",
-                "Simple JMeter recording"
+                "Simple JMeter recording",
+                "all_monitors",
+                "Ecolab",
+                "Walgreens",
+                "HTTPS - Steve Braun",
+                "SalesForce login page"
+            };
+
+            String[] expectedUrls = {
+                                    "",
+                                    "http://amazon.com",
+                                    "http://ca.com/foo",
+                                    "http://jmeter.apache.org/index.html",
+                                    "http://jmeter.apache.org/index.html",
+                                    "http://jmeter.apache.org",
+                                    "http://jmeter.apache.org",
+                                    "",
+                                    "http://www.ecolab.com",
+                                    "http://www.walgreens.com",
+                                    "https://www.steve-braun.com/",
+                                    "https://login.salesforce.com/"
             };
 
             if (DEBUG) {
@@ -111,13 +131,19 @@ public class MonitorTest extends FileTest {
                     System.out.println("folder " + key);
 
                     for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
-                        System.out.println("  " + rit.next().getName());
+                        Monitor mon = rit.next();
+                        System.out.println("  " + mon.getName() + " (" + mon.getType() + ") = " + mon.getUrl());
                     }
                 }
             }
+
+            // concat lists
+            List<Monitor> list = folderMap.get(folders[0]);
+            list.addAll(folderMap.get(folders[1]));
             
             // check
-            checkMonitors(expectedMonitors, folderMap.get(folders[0]));
+            checkMonitors(expectedMonitors, list);
+            checkMonitorUrls(expectedUrls, list);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -199,7 +225,34 @@ public class MonitorTest extends FileTest {
             for (int j = 0; j < actual.size(); ++j) {
                 if (expected[i].equals(actual.get(j).getName())) {
                     match = true; // we have a match
-                    break; // jump out of actual loop
+                    break; // jump out of inner loop
+                }
+            }
+            
+            // we have no match
+            if (!match) {
+                Assert.fail(expected[i] + " not found");
+            }
+        }
+    }
+
+    /**
+     * Checks that all expected monitors exist in the list.
+     * @param expected array of expected strings
+     * @param actual list of monitors to check against
+     */
+    public void checkMonitorUrls(String[] expected, List<Monitor> actual) {
+
+        Assert.assertEquals("expected " + expected.length + " entries",
+            expected.length, actual.size());
+
+        for (int i = 0; i < expected.length; ++i) {
+            boolean match = false;
+            
+            for (int j = 0; j < actual.size(); ++j) {
+                if (expected[i].equals(actual.get(j).getUrl())) {
+                    match = true; // we have a match
+                    break; // jump out of inner loop
                 }
             }
             
