@@ -29,13 +29,10 @@
 		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/classes</directory>
-			<outputDirectory></outputDirectory>
+			<outputDirectory>config</outputDirectory>
 			<includes>
 				<include>*.properties</include>
 			</includes>
-			<excludes>
-				<exclude>APMCloudMonitor.properties</exclude>
-			</excludes>
 		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/classes</directory>
