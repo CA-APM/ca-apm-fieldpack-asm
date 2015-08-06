@@ -158,6 +158,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>**/*.properties</include>
+					<include>AppSyntheticMonitor.typeviewers.xml</include>
 				</includes>
 			</resource>
 		</resources>
