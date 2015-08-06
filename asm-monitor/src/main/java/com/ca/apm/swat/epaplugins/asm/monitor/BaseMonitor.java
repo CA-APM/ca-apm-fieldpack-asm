@@ -34,11 +34,18 @@ public class BaseMonitor implements Monitor, AsmProperties {
     /**
      * Monitor base class.
      * @param name name of the monitor
+     * @param type monitor type
      * @param folder folder of the monitor
      * @param tags tags of the monitor
-     * @param url 
+     * @param url URL that is monitored
+     * @param active if the monitor is active
      */
-    protected BaseMonitor(String name, String type, String folder, String[] tags, String url, boolean active) {
+    protected BaseMonitor(String name,
+                          String type,
+                          String folder,
+                          String[] tags,
+                          String url,
+                          boolean active) {
         this.name = name;
         this.folder = folder;
         this.tags = tags;
