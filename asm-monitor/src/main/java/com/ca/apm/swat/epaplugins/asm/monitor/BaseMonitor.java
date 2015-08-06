@@ -216,18 +216,17 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 if (thisKey.equals(DESCR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
-                    metricMap.put(EpaUtils.fixMetric(rawErrorMetric), ONE);
+                    metricMap.put(rawErrorMetric, ONE);
                 
                 // convert color to status value
                 } else if (thisKey.equals(COLOR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
                     if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
-                        metricMap.put(
-                            EpaUtils.fixMetric(rawErrorMetric),
+                        metricMap.put(rawErrorMetric,
                             (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
                     } else {
-                        metricMap.put(EpaUtils.fixMetric(rawErrorMetric), ZERO);
+                        metricMap.put(rawErrorMetric, ZERO);
                     }
 
                 // map location
@@ -244,8 +243,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                     } catch (NumberFormatException e) {
                         // ignore
                     }
-                    metricMap.put(EpaUtils.fixMetric(metricTree + METRIC_NAME_SEPARATOR
-                        + STATUS_MESSAGE_VALUE), 
+                    metricMap.put(metricTree + METRIC_NAME_SEPARATOR + STATUS_MESSAGE_VALUE,
                         format.mapResponseToStatusCode(thisValue));
                 }
 
@@ -259,7 +257,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 if ((null == rawMetric) || (null == thisValue)) {
                     EpaUtils.getFeedback().warn("null value in " + rawMetric + " = " + thisValue);
                 } else {
-                    metricMap.put(EpaUtils.fixMetric(rawMetric), thisValue);
+                    metricMap.put(rawMetric, thisValue);
                 }
             }
         }
@@ -270,10 +268,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 for (Iterator<String> it = outputMap.keySet().iterator(); it.hasNext(); ) {
                     String key = it.next();
                     if (key.endsWith(STATUS_MESSAGE_VALUE)) {
-                        metricMap.put(EpaUtils.fixMetric(key),
+                        metricMap.put(key,
                             format.mapResponseToStatusCode(Integer.toString(result)));
                     } else {
-                        metricMap.put(EpaUtils.fixMetric(key), outputMap.get(key));
+                        metricMap.put(key, outputMap.get(key));
                     }
                 }
             } else {

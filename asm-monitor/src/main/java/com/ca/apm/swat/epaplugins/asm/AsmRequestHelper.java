@@ -289,7 +289,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             String rawMetric = CREDITS_CATEGORY + METRIC_NAME_SEPARATOR + key;
-            metricMap.put(EpaUtils.fixMetric(rawMetric), value);
+            metricMap.put(rawMetric, value);
         }
 
         return metricMap;

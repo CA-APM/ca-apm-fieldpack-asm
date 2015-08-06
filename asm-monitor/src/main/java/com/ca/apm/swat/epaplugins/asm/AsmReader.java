@@ -158,7 +158,7 @@ public class AsmReader implements AsmProperties {
                     //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
                 }
                 requestHelper.printApiCallStatistics();
-                
+
                 // TODO: read config and folders again
 
                 Thread.sleep(epaWaitTime);
@@ -238,19 +238,19 @@ public class AsmReader implements AsmProperties {
                 folderMap = requestHelper.getMonitors(folders);
 
                 // TODO: remove or convert to message
-                //if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                EpaUtils.getFeedback().info("read monitors: ");
-                Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
-                for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
-                    String folder = (String) fit.next();
-                    buf = new StringBuffer("  " + folder + " = ");
-                    List<Monitor> monitors = folderMap.get(folder);
-                    for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
-                        buf.append(mit.next().getName() + ", ");
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    EpaUtils.getFeedback().verbose("read monitors: ");
+                    Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
+                    for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
+                        String folder = (String) fit.next();
+                        buf = new StringBuffer("  " + folder + " = ");
+                        List<Monitor> monitors = folderMap.get(folder);
+                        for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
+                            buf.append(mit.next().getName() + ", ");
+                        }
+                        EpaUtils.getFeedback().verbose(buf.toString());
                     }
-                    EpaUtils.getFeedback().info(buf.toString());
                 }
-                //}
 
                 // read monitoring stations
                 requestHelper.getMonitoringStations();
@@ -293,7 +293,7 @@ public class AsmReader implements AsmProperties {
         if (!EMPTY_STRING.equals(ignoreMetric)) {
             metricWriter = new MetricNameFilter(metricWriter, ignoreMetric.split(","));
         }
-        
+
         return metricWriter;
     }
 

@@ -50,7 +50,7 @@ public class EpaUtils {
      * @param rawMetric raw metric name
      * @return cleansed metric name
      */
-    public static String fixMetric(String rawMetric) {
+    public static String fixMetricName(String rawMetric) {
         /*
         StringFilter normalizer = null;
         try {
@@ -84,11 +84,29 @@ public class EpaUtils {
             }
         }
         
-        return fixedMetric.toString().replace("\\", "-")
+        return fixedMetric.replace("\\", "-")
                 //.replace("/", "-")
                 .replace(",", "_")
                 .replace(";", "-")
-                .replace("&", "and");
+                .replace("&", "_");
+    }
+
+    /**
+     * Replace unsupported characters in metric value.
+     * @param rawMetric raw metric name
+     * @return cleansed metric name
+     */
+    public static String fixMetricValue(String rawMetric) {
+        if (null == rawMetric) {
+            return null;
+        }
+        
+        return rawMetric.replace("\\", "-")
+                //.replace("/", "-")
+                .replace(",", "_")
+                .replace(";", "-")
+                .replace("&", "_")
+                .replace(":", "_");
     }
 
     /**

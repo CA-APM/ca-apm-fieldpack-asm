@@ -54,7 +54,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             Document document = builder.parse(is);
 
             NodeList testResults = document.getElementsByTagName(TEST_RESULTS);
-            
+
             int step = 1; // start from 1, business not engineering
             if (testResults.getLength() > 0) {
 
@@ -62,7 +62,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     EpaUtils.getFeedback().debug("JMeterScriptHandler: "
                             + testResults.toString());
                 }
-                
+
                 //We have Jmeter scripts
                 Node httpTestNode = testResults.item(0);
 
@@ -93,8 +93,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * @return metricMap map containing the metrics
      */
     private MetricMap reportJMeterStep(String metricTree,
-        int step,
-        Node stepNode) {
+                                       int step,
+                                       Node stepNode) {
         int assertionFailures = 0;
         int assertionErrors = 0;
         Formatter format = Formatter.getInstance();
@@ -107,7 +107,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         //First the attributes
         NamedNodeMap attributes = stepNode.getAttributes();
-        
+
         int responseCode = RESULT_OK; // HTTP OK
         try {
             responseCode = Integer.parseInt(
@@ -124,7 +124,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         if (format.suppressResponseCode(responseCode)) {
             return metricMap;
         }
-        
+
         String responseMessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
         if (responseMessage.contains(RESPONSE_MESSAGE_TIMEOUT)) {
             // timeout
@@ -133,7 +133,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             // other error
             responseCode = RESULT_NOT_FOUND; // HTTP not found indicating an error
         }
-        
+
         //String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
         final int errorCount = Integer.parseInt(attributes.getNamedItem(ERROR_COUNT_TAG)
             .getNodeValue());
@@ -174,13 +174,13 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     EpaUtils.getFeedback().verbose("replaced URL '" + url
                         + "' with text '" + text + "'");
                 }
-                
+
                 if ((null != text) && (0 < text.length())) {
                     url = text;
                 }
             }
         }
-        
+
         // first map responseCode
         int statusCode = format.mapResponseToStatusCode(responseCode);
         String statusMessage = responseCode + " - " + responseMessage;
@@ -197,7 +197,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 statusCode = STATUS_CODE_ASSERTION_ERROR;
                 assertionErrors++;
             }
-        
+
             // set status code for assertion failure 
             if (STATUS_CODE_ASSERTION_ERROR == statusCode) {
 
@@ -213,26 +213,20 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 }
             }
         }
-        
+
         // report metrics
-        String metric = EpaUtils.fixMetric(metricTree + METRIC_PATH_SEPARATOR
+        String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
             + format.formatStep(step, url) + METRIC_NAME_SEPARATOR);
-        
-        metricMap.put(EpaUtils.fixMetric(metric + STATUS_MESSAGE_VALUE),
-            Integer.toString(statusCode));
-        metricMap.put(EpaUtils.fixMetric(metric + RESPONSE_CODE),
-            Integer.toString(responseCode));
-        metricMap.put(EpaUtils.fixMetric(metric + ERROR_COUNT),
-            Integer.toString(errorCount));
-        metricMap.put(EpaUtils.fixMetric(metric + ASSERTION_FAILURES),
-            Integer.toString(assertionFailures));
-        metricMap.put(EpaUtils.fixMetric(metric + ASSERTION_ERRORS),
-            Integer.toString(assertionErrors));
-        metricMap.put(EpaUtils.fixMetric(metric + TEST_URL),
-            url);
+
+        metricMap.put(metric + STATUS_MESSAGE_VALUE,    Integer.toString(statusCode));
+        metricMap.put(metric + RESPONSE_CODE,           Integer.toString(responseCode));
+        metricMap.put(metric + ERROR_COUNT,             Integer.toString(errorCount));
+        metricMap.put(metric + ASSERTION_FAILURES,      Integer.toString(assertionFailures));
+        metricMap.put(metric + ASSERTION_ERRORS,        Integer.toString(assertionErrors));
+        metricMap.put(metric + TEST_URL,                url);
 
         if (EpaUtils.getBooleanProperty(REPORT_STRING_RESULTS, true)) {
-            metricMap.put(EpaUtils.fixMetric(metric + STATUS_MESSAGE), statusMessage);
+            metricMap.put(metric + STATUS_MESSAGE, statusMessage);
         }
 
         return metricMap;

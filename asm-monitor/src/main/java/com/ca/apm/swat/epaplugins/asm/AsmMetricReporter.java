@@ -35,25 +35,37 @@ public class AsmMetricReporter implements AsmProperties {
     public void printMetrics(HashMap<String, String> metricMap) throws Exception {
         Iterator<Map.Entry<String, String>> metricIt = metricMap.entrySet().iterator();
         while (metricIt.hasNext()) {
-            Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
+            Map.Entry<String, String> metricPair = (Map.Entry<String, String>) metricIt.next();
 
-            if (((String) metricPairs.getValue()).length() == 0) {
+            if (((String) metricPair.getValue()).length() == 0) {
                 continue;
             }
 
-            String thisMetricType = returnMetricType((String) metricPairs.getValue());
+            String thisMetricType = returnMetricType((String) metricPair.getValue());
 
             if (thisMetricType.equals(MetricWriter.kFloat)) {
-                metricPairs.setValue(((String) metricPairs.getValue()).split(SEPARATOR)[0]);
+                metricPair.setValue(((String) metricPair.getValue()).split(SEPARATOR)[0]);
                 thisMetricType = MetricWriter.kIntCounter;
             }
 
-            String metricPath = metricPairs.getKey();
+            String metricPath = metricPair.getKey();
+            String metricValue = metricPair.getValue();
+            
             if (EpaUtils.getBooleanProperty(PRINT_ASM_NODE, true)) {
-                metricPath = METRIC_TREE + METRIC_PATH_SEPARATOR + metricPairs.getKey();
+                metricPath = METRIC_TREE + METRIC_PATH_SEPARATOR + metricPair.getKey();
             }
 
-            metricWriter.writeMetric(thisMetricType, metricPath, metricPairs.getValue());
+            metricPath = EpaUtils.fixMetricName(metricPath);
+            if (MetricWriter.kStringEvent.equals(thisMetricType)) {
+                metricValue = EpaUtils.fixMetricValue(metricValue);
+            
+//                if (EpaUtils.getFeedback().isDebugEnabled()) {
+//                    EpaUtils.getFeedback().debug("writing metric of type " + thisMetricType + " '"
+//                            + metricPath + "' = " + metricValue);
+//                }
+            }
+            
+            metricWriter.writeMetric(thisMetricType, metricPath, metricValue);
         }
     }
 
