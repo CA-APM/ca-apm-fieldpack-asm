@@ -128,6 +128,11 @@
 									verbose="true" failonerror="true">
 									<fileset dir="${project.basedir}/src/main/bin" includes="*.sh" />
 								</copy>
+								<mkdir dir="${project.build.directory}/docs"/>
+								<copy todir="${project.build.directory}/docs" flatten="true" overwrite="true"
+									verbose="true" failonerror="true">
+									<fileset dir="${project.basedir}/src/main/docs" includes="*" />
+								</copy>
 							</tasks>
 						</configuration>
 						<goals>

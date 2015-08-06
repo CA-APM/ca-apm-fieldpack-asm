@@ -54,5 +54,15 @@
 				<include>*.sh</include>
 			</includes>
 		</fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/docs</directory>
+			<outputDirectory>docs</outputDirectory>
+			<includes>
+				<include>*</include>
+			</includes>
+			<excludes>
+				<exclude>~$*</exclude>
+			</excludes>
+		</fileSet>
 	</fileSets>
 </assembly>

@@ -42,10 +42,15 @@ HP-UX)
     fi
     ;;
 esac
+
+if [ ! -d "${WILYHOME}/logs" ]; then
+    mkdir -p "${WILYHOME}/logs";
+fi;
+
 # The logfile
-LOGFILE="${WILYHOME}/asm.log"
+LOGFILE="${WILYHOME}/logs/asm.log"
 # the path to your PID file
-PIDFILE="${WILYHOME}/asm.pid"
+PIDFILE="${WILYHOME}/logs/asm.pid"
 
 
 # changes for passing heap values in arguments
