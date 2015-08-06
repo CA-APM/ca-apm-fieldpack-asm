@@ -31,12 +31,28 @@
 			<directory>${project.build.directory}/classes</directory>
 			<outputDirectory></outputDirectory>
 			<includes>
-				<include>*.xml</include>
 				<include>*.properties</include>
 			</includes>
 			<excludes>
 				<exclude>APMCloudMonitor.properties</exclude>
 			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/classes</directory>
+			<outputDirectory>typeviewers</outputDirectory>
+			<includes>
+				<include>*.xml</include>
+			</includes>
+			<excludes>
+				<exclude>APMCloudMonitor.properties</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.build.directory}/bin</directory>
+			<outputDirectory>bin</outputDirectory>
+			<includes>
+				<include>*.sh</include>
+			</includes>
 		</fileSet>
 	</fileSets>
 </assembly>
