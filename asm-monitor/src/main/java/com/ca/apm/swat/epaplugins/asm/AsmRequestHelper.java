@@ -247,7 +247,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @return reduced list matching <code>comparisonString</code>
      */
     private <T> List<T> matchList(List<T> masterList, String comparisonString) {
-        List<String> checkList = Arrays.asList(comparisonString.split(","));
+        List<String> checkList = Arrays.asList(comparisonString.split(", *"));
         masterList.retainAll(checkList);
         return masterList;
     }
@@ -260,7 +260,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @return reduced list
      */
     private List<String> removeList(List<String> masterList, String removeString) {
-        List<String> checkList = Arrays.asList(removeString.split(","));
+        List<String> checkList = Arrays.asList(removeString.split(", *"));
         masterList.removeAll(checkList);
         return masterList;
     }

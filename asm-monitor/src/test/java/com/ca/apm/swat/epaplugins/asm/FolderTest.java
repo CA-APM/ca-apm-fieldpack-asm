@@ -125,6 +125,9 @@ public class FolderTest extends FileTest {
             for (int i = 0; i < excludedFolders.length; ++i) {
                 if (i > 0) {
                     buf.append(',');
+                    for (int j = 0; j < i; ++j) {
+                        buf.append(' '); // append varying number of blanks
+                    }
                 }
                 buf.append(excludedFolders[i]);
             }
@@ -139,6 +142,18 @@ public class FolderTest extends FileTest {
 
             // check
             checkMetrics(expectedFolders, folderList);
+            checkNotExistMetrics(excludedFolders, folderList);
+
+            if (DEBUG) {
+                buf = new StringBuffer();
+                for (int i = 0; i < folderList.length; ++i) {
+                    if (i > 0) {
+                        buf.append(',');
+                    }
+                    buf.append(folderList[i]);
+                }
+                System.out.println("folderList = " + buf.toString());             
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
