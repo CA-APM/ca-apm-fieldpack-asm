@@ -27,7 +27,7 @@ public class TextNormalizer {
                 return new Java5Normalizer();
             } catch (Exception ex) {
                 throw new ClassNotFoundException(
-                    AsmMessages.getMessage(AsmMessages.TEXT_NORMALIZER_NOT_FOUND));
+                    AsmMessages.getMessage(AsmMessages.TEXT_NORMALIZER_NOT_FOUND_918));
             }
         }
     }

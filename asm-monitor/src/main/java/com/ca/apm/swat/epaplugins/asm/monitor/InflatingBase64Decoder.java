@@ -33,7 +33,10 @@ public class InflatingBase64Decoder implements Handler {
         // doesn't make sense if nobody handles the result
         if (null != successor) {
             if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                EpaUtils.getFeedback().verbose("InflatingBase64Decoder start");
+                EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+                    AsmMessages.METHOD_FOR_FOLDER_306,
+                    this.getClass().getSimpleName(),
+                    metricTree));
             }
             // decode base64
             byte[] decoded = Base64.decodeBase64(encodedString);
@@ -48,7 +51,7 @@ public class InflatingBase64Decoder implements Handler {
                             bytesDecompressed.length, EpaUtils.getEncoding());
                     } catch (UnsupportedEncodingException e) {
                         // should not happen: UTF8 should be supported
-                        String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR,
+                        String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
                             AsmProperties.ASM_PRODUCT_NAME,
                             this.getClass(),
                             e.getMessage());
@@ -59,18 +62,21 @@ public class InflatingBase64Decoder implements Handler {
                     // call next handler in chain
                     return successor.generateMetrics(decodedString, metricTree);
                 } else {
-                    EpaUtils.getFeedback().warn(
-                        "InflatingBase64Decoder: Could not decompress additional data for monitor "
-                                + metricTree);
+                    EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                        AsmMessages.DECOMPRESS_ERROR_911,
+                        this.getClass().getSimpleName(),
+                        metricTree));
                 }
             } else {
-                EpaUtils.getFeedback().warn(
-                    "InflatingBase64Decoder: Could not decode additional data for monitor "
-                            + metricTree);
+                EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                    AsmMessages.DECODE_ERROR_912,
+                    this.getClass().getSimpleName(),
+                    metricTree));
             }
         } else {
-            EpaUtils.getFeedback().warn(
-                "Invalid handler chain: InflatingBase64Decoder has no sucessor!");
+            EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                AsmMessages.INVALID_HANDLER_CHAIN_910,
+                this.getClass().getSimpleName()));
         }
         return new MetricMap();
     }

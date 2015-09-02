@@ -13,6 +13,7 @@ import org.xml.sax.InputSource;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 
@@ -170,8 +171,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
                     .equals(JAVA_NET_URL)) {
                 String text = stepChild.getTextContent();
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("replaced URL '" + url
+                if (EpaUtils.getFeedback().isDebugEnabled()) {
+                    EpaUtils.getFeedback().debug("replaced URL '" + url
                         + "' with text '" + text + "'");
                 }
 
@@ -207,8 +208,10 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     try {
                         statusCode = Integer.parseInt(reportAs);
                     } catch (NumberFormatException e) {
-                        EpaUtils.getFeedback().warn("non-integer value found in "
-                                + REPORT_ASSERTION_FAILURES_AS + ": " + reportAs);
+                        EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                            AsmMessages.NON_INT_PROPERTY_WARN_701,
+                            REPORT_ASSERTION_FAILURES_AS,
+                            reportAs));
                     }
                 }
             }

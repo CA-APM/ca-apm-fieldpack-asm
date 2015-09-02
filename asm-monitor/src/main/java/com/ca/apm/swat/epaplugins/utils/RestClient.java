@@ -71,7 +71,7 @@ public class RestClient {
     public String request(String method, URL url, String params) throws IOException {
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST, method, url, params));
+                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url, params));
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -108,7 +108,7 @@ public class RestClient {
         String response = responseBody.toString();
 
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE,
+            EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE_311,
                 response.length(), time));
         }
 

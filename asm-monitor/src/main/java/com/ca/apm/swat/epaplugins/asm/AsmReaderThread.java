@@ -55,7 +55,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
     public void run() {
 
         EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
-            AsmMessages.THREAD_STARTED, this.folder));
+            AsmMessages.THREAD_STARTED_312, this.folder));
 
         while (this.keepRunning) {
             try {
@@ -78,7 +78,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     Thread.sleep(timeToSleep);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
-                        AsmMessages.FOLDER_THREAD_TIMEOUT,
+                        AsmMessages.FOLDER_THREAD_TIMEOUT_905,
                         this.folder, new Long(epaWaitTime)));
                     Thread.sleep(60000L);
                 }
@@ -87,7 +87,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     this.numRetriesLeft = retryConnection(this.numRetriesLeft, this.folder);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
-                        AsmMessages.FOLDER_THREAD_ERROR,
+                        AsmMessages.FOLDER_THREAD_ERROR_906,
                         ASM_PRODUCT_NAME, this.folder, e.getMessage()));
                     try {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -112,11 +112,11 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * @return number of retries left
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
-        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR,
+        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR_902,
             ASM_PRODUCT_NAME,apmcmInfo));
 
         if (numRetriesLeft > 0) {
-            EpaUtils.getFeedback().debug(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY,
+            EpaUtils.getFeedback().debug(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_501,
                 numRetriesLeft));
 
             numRetriesLeft--;
@@ -127,7 +127,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             }
         } else {
             EpaUtils.getFeedback().error(
-                AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR));
+                AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR_903));
         }
         return numRetriesLeft;
     }
@@ -146,9 +146,11 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             return resultMetricMap;
         }
 
-        EpaUtils.getFeedback().verbose(
-            AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA, folderMonitors.size(), folder));
-
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose(
+                AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA_301,
+                    folderMonitors.size(), folder));
+        }
 
         // prefix for metric name
         String folderPrefix = MONITOR_METRIC_PREFIX + folder;
@@ -161,14 +163,17 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         
         // get stats for folder
         if (EpaUtils.getBooleanProperty(METRICS_STATS_FOLDER, false)) {
-            EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.GET_STATS_DATA, folderMonitors.size(), folder));
-
+            if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                EpaUtils.getFeedback().verbose(
+                    AsmMessages.getMessage(AsmMessages.GET_STATS_DATA_302,
+                        folderMonitors.size(), folder));
+            }
+            
             // get aggregated folder stats
             resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, true));
         } else {
             EpaUtils.getFeedback().verbose(
-                AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA, folder));
+                AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA_303, folder));
         }
 
         // don't get aggregate metrics for root folder
@@ -190,9 +195,11 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             }
         }
         
-        EpaUtils.getFeedback().verbose("getFolderMetrics finished for folder " + folder
-            + ", returning " + resultMetricMap.size() + " metrics");
-
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose(
+                AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                    folder, resultMetricMap.size()));
+        }
         return resultMetricMap;
     }
 }

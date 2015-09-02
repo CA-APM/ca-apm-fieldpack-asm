@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 
@@ -56,8 +57,11 @@ public class Formatter implements AsmProperties {
                 int digit = Integer.parseInt(digits);
                 this.stepNumberFormat.setMinimumIntegerDigits(digit);
             } catch (NumberFormatException e) {
-                EpaUtils.getFeedback().warn("non-integer value found in "
-                        + STEP_FORMAT_DIGITS + ": " + digits);
+                EpaUtils.getFeedback().warn(
+                    AsmMessages.getMessage(AsmMessages.NON_INT_PROPERTY_WARN_700,
+                        STEP_FORMAT_DIGITS,
+                        digits,
+                        this.stepNumberFormat.getMinimumIntegerDigits()));
             }  
         }
 
@@ -91,7 +95,7 @@ public class Formatter implements AsmProperties {
             return;
         }
         
-        String[] tags = tag.split(",");
+        String[] tags = tag.split(", *");
         
         // add to set
         for (int i = 0; i < tags.length;  ++i) {
@@ -99,8 +103,9 @@ public class Formatter implements AsmProperties {
                 int responseCode = Integer.parseInt(tags[i]);
                 this.suppressStepResponseCodes.add(new Integer(responseCode));
             } catch (NumberFormatException e) {
-                EpaUtils.getFeedback().warn("non-integer value found in "
-                        + SUPPRESS_STEP_WITH_CODES + ": " + tags[i]);
+                EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                    AsmMessages.NON_INT_PROPERTY_WARN_701,
+                    STEP_FORMAT_DIGITS, tags[i]));
             }
         }
     }
@@ -158,7 +163,7 @@ public class Formatter implements AsmProperties {
             return;
         }
         
-        String[] codes = responseCode.split(",");
+        String[] codes = responseCode.split(", *");
         
         for (int i = 0; i < codes.length;  ++i) {
 
@@ -166,15 +171,16 @@ public class Formatter implements AsmProperties {
             try {
                 Integer.parseInt(codes[i]);
             } catch (NumberFormatException e) {
-                EpaUtils.getFeedback().warn("error in " + RESPONSE_CODES + ": "
-                        + codes[i] + " is not an integer! mapping will be ignored");
+                EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                    AsmMessages.NON_INT_PROPERTY_WARN_701,
+                    RESPONSE_CODES, codes[i]));
                 continue;
             }
             
             String map = properties.getProperty(RESPONSE_CODES + "." + codes[i], EMPTY_STRING);
 
             if (!EMPTY_STRING.equals(map)) {
-                String[] mappings = map.split(",");
+                String[] mappings = map.split(", *");
 
                 for (int j = 0; j < mappings.length;  ++j) {
                                         
@@ -182,8 +188,9 @@ public class Formatter implements AsmProperties {
                     try {
                         Integer.parseInt(mappings[j]);
                     } catch (NumberFormatException e) {
-                        EpaUtils.getFeedback().warn("error in " + RESPONSE_CODES + ": "
-                                + mappings[j] + " is not an integer! mapping will be ignored");
+                        EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                            AsmMessages.NON_INT_PROPERTY_WARN_701,
+                            RESPONSE_CODES, mappings[i]));
                         continue;
                     }
 

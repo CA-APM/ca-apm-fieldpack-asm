@@ -59,7 +59,7 @@ public class AsmReader implements AsmProperties {
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
-                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
+                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR_900,
                     ASM_PRODUCT_NAME, e.getMessage()));
             System.exit(1);
         } catch (Error e) {
@@ -87,7 +87,7 @@ public class AsmReader implements AsmProperties {
 
         } catch (Exception e) {
             EpaUtils.getFeedback().error(
-                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
+                AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR_900,
                     ASM_PRODUCT_NAME, e.getMessage()));
             // e.printStackTrace();
             System.exit(1);
@@ -159,7 +159,7 @@ public class AsmReader implements AsmProperties {
                 }
                 requestHelper.printApiCallStatistics();
 
-                // TODO: read config and folders again
+                // TODO: read config and folders again to avoid restart
 
                 Thread.sleep(epaWaitTime);
             } catch (Exception e) {
@@ -169,7 +169,7 @@ public class AsmReader implements AsmProperties {
                         AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
                 } else {
                     EpaUtils.getFeedback().error(
-                        AsmMessages.getMessage(AsmMessages.RUN_ERROR,
+                        AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
                             ASM_PRODUCT_NAME,
                             AsmMessages.PARENT_THREAD,
                             e.getMessage()));
@@ -188,10 +188,10 @@ public class AsmReader implements AsmProperties {
      * @return number of retries left
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo) {
-        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR,
+        EpaUtils.getFeedback().error(AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR_902,
             ASM_PRODUCT_NAME, apmcmInfo));
         if (numRetriesLeft > 0) {
-            EpaUtils.getFeedback().info(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY,
+            EpaUtils.getFeedback().info(AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_501,
                 numRetriesLeft));
             numRetriesLeft--;
             try {
@@ -201,7 +201,7 @@ public class AsmReader implements AsmProperties {
             }
         } else {
             EpaUtils.getFeedback().error(
-                AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR));
+                AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR_903));
         }
         return numRetriesLeft;
     }
@@ -225,25 +225,23 @@ public class AsmReader implements AsmProperties {
                 // read folders
                 folders = requestHelper.getFolders();
 
-                // TODO: remove or convert to message
-                //if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                StringBuffer buf = new StringBuffer("read folders: ");
-                for (int i = 0; i < folders.length; ++i) {
-                    buf.append(folders[i] + ", ");
+                if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                    StringBuffer buf = new StringBuffer("read folders: ");
+                    for (int i = 0; i < folders.length; ++i) {
+                        buf.append(folders[i] + ", ");
+                    }
+                    EpaUtils.getFeedback().verbose(buf.toString());
                 }
-                EpaUtils.getFeedback().info(buf.toString());
-                //}
 
                 // read monitors
                 folderMap = requestHelper.getMonitors(folders);
 
-                // TODO: remove or convert to message
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
                     EpaUtils.getFeedback().verbose("read monitors: ");
                     Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
                     for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
                         String folder = (String) fit.next();
-                        buf = new StringBuffer("  " + folder + " = ");
+                        StringBuffer buf = new StringBuffer("  " + folder + " = ");
                         List<Monitor> monitors = folderMap.get(folder);
                         for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
                             buf.append(mit.next().getName() + ", ");
@@ -264,7 +262,7 @@ public class AsmReader implements AsmProperties {
                         AsmMessages.getMessage(AsmMessages.AGENT_INITIALIZATION));
                 } else {
                     EpaUtils.getFeedback().error(
-                        AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR,
+                        AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR_900,
                             ASM_PRODUCT_NAME, e.getMessage()));
                     // e.printStackTrace();
                     keepTrying = false;
@@ -274,7 +272,7 @@ public class AsmReader implements AsmProperties {
         }
 
         EpaUtils.getFeedback().info(AsmMessages.getMessage(
-            AsmMessages.CONNECTED, EpaUtils.getProperty(URL)));
+            AsmMessages.CONNECTED_503, EpaUtils.getProperty(URL)));
 
         return folderMap;
     }
@@ -312,7 +310,7 @@ public class AsmReader implements AsmProperties {
             properties.load(inStream);
         } catch (IOException e) {
             EpaUtils.getFeedback().error(AsmMessages.getMessage(
-                AsmMessages.READING_PROPERTIES_ERROR, filename, e.getMessage()));
+                AsmMessages.READING_PROPERTIES_ERROR_901, filename, e.getMessage()));
             throw e;
         }
         inStream.close();
@@ -320,7 +318,7 @@ public class AsmReader implements AsmProperties {
 
         if (EpaUtils.getFeedback().isVerboseEnabled()) {
             EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
-                AsmMessages.READING_PROPERTIES, filename));
+                AsmMessages.READING_PROPERTIES_300, filename));
             // use TreeSet so we get output alphabetically sorted
             Set<Object> copy = new TreeSet<Object>(properties.keySet());
             for (Iterator<Object> it = copy.iterator(); it.hasNext(); ) {
@@ -330,7 +328,7 @@ public class AsmReader implements AsmProperties {
         }
 
         EpaUtils.getFeedback().info(AsmMessages.getMessage(
-            AsmMessages.READING_PROPERTIES_FINISHED, filename));
+            AsmMessages.READING_PROPERTIES_FINISHED_500, filename));
         return properties;
     }
 }

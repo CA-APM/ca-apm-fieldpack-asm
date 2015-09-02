@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.wily.introscope.epagent.EpaUtils;
 
 /**
@@ -24,8 +25,11 @@ public class MetricMap extends HashMap<String, String> {
     public String put(String metricPath, String value) {
         if (this.containsKey(metricPath)) {
             if (EpaUtils.getFeedback().isDebugEnabled()) {
-                EpaUtils.getFeedback().debug("not putting " + metricPath + "=" + value
-                    + " in map, original value =" + this.get(metricPath));
+                EpaUtils.getFeedback().debug(AsmMessages.getMessage(
+                    AsmMessages.DUPLICATE_METRIC_200,
+                    metricPath,
+                    value,
+                    this.get(metricPath)));
             }
             // don't insert
             return null;
@@ -45,8 +49,11 @@ public class MetricMap extends HashMap<String, String> {
                 super.put(key, map.get(key));
             } else {
                 if (EpaUtils.getFeedback().isDebugEnabled()) {
-                    EpaUtils.getFeedback().debug("not putting " + key + "=" + map.get(key)
-                        + " in map, original value =" + this.get(key));
+                    EpaUtils.getFeedback().debug(AsmMessages.getMessage(
+                        AsmMessages.DUPLICATE_METRIC_200,
+                        key,
+                        map.get(key),
+                        this.get(key)));
                 }
             }
         }

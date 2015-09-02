@@ -119,14 +119,12 @@ public class AsmAccessor extends Accessor implements AsmProperties {
 
         if (ERROR_OK != errorCode) {
             String errorStr = jsonObject.optString(ERROR_TAG,
-                AsmMessages.getMessage(AsmMessages.NO_ERROR));
+                AsmMessages.getMessage(AsmMessages.NO_ERROR_916));
             String errorInfo = jsonObject.optString(INFO_TAG,
-                AsmMessages.getMessage(AsmMessages.NO_INFO));
+                AsmMessages.getMessage(AsmMessages.NO_INFO_917));
 
-            String errorMessage = AsmMessages.getMessage(AsmMessages.API_ERROR,
-                ASM_PRODUCT_NAME, errorCode, errorStr, errorInfo, command);
-
-            EpaUtils.getFeedback().warn(errorMessage);
+            EpaUtils.getFeedback().warn(AsmMessages.getMessage(AsmMessages.API_ERROR_914,
+                ASM_PRODUCT_NAME, errorCode, errorStr, errorInfo, command));
             
             //TODO: decide if to throw Error
         }
@@ -146,7 +144,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             password = AsmAccessor.crypto.decrypt(
                 this.properties.getProperty(PASSWORD));
             if (null == password) {
-                throw new LoginError(AsmMessages.getMessage(AsmMessages.DECRYPT_ERROR));
+                throw new LoginError(AsmMessages.getMessage(AsmMessages.DECRYPT_ERROR_915));
             }
         } else {
             password = this.properties.getProperty(PASSWORD);
@@ -167,17 +165,17 @@ public class AsmAccessor extends Accessor implements AsmProperties {
         }
 
         String errorStr = entireJsonObject.optString(ERROR_TAG,
-            AsmMessages.getMessage(AsmMessages.NO_ERROR));
+            AsmMessages.getMessage(AsmMessages.NO_ERROR_916));
         int errorCode = entireJsonObject.optInt(CODE_TAG, -1);
         String errorInfo = entireJsonObject.optString(INFO_TAG,
-            AsmMessages.getMessage(AsmMessages.NO_INFO));
+            AsmMessages.getMessage(AsmMessages.NO_INFO_917));
 
-        String errorMessage = AsmMessages.getMessage(AsmMessages.LOGIN_ERROR,
+        String errorMessage = AsmMessages.getMessage(AsmMessages.LOGIN_ERROR_907,
             errorStr, errorCode, errorInfo);
 
         if (errorCode == ERROR_AUTHORIZATION) {
             EpaUtils.getFeedback().error(errorMessage);
-            throw new LoginError(AsmMessages.getMessage(AsmMessages.LOGIN_INFO,
+            throw new LoginError(AsmMessages.getMessage(AsmMessages.LOGIN_INFO_908,
                 this.properties.getProperty(URL),
                 LOGIN_CMD,
                 ASM_PRODUCT_NAME,

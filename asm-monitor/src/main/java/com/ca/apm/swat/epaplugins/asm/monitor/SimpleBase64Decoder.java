@@ -32,7 +32,9 @@ public class SimpleBase64Decoder implements Handler {
         // doesn't make sense if nobody handles the result
         if (null != successor) {
             if (EpaUtils.getFeedback().isDebugEnabled()) {
-                EpaUtils.getFeedback().debug("SimpleBase64Decoder start");
+                EpaUtils.getFeedback().debug(AsmMessages.getMessage(
+                    AsmMessages.METHOD_FOR_FOLDER_306,
+                    this.getClass().getSimpleName()));
             }
             // decode base64
             byte[] decoded = Base64.decodeBase64(encodedString);
@@ -44,7 +46,7 @@ public class SimpleBase64Decoder implements Handler {
                         decoded.length, EpaUtils.getEncoding());
                 } catch (UnsupportedEncodingException e) {
                     // should not happen: UTF8 should be supported
-                    String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR,
+                    String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
                         AsmProperties.ASM_PRODUCT_NAME,
                         this.getClass(),
                         e.getMessage());
@@ -55,10 +57,15 @@ public class SimpleBase64Decoder implements Handler {
                 // call next handler in chain
                 return successor.generateMetrics(decodedString, metricTree);
             } else {
-                EpaUtils.getFeedback().warn("SimpleBase64Decoder decoded == null!");
+                EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                    AsmMessages.BYTES_DECODED_NULL_909,
+                    this.getClass().getSimpleName(),
+                    metricTree));
             }
         } else {
-            EpaUtils.getFeedback().warn("SimpleBase64Decoder has no sucessor!");
+            EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                AsmMessages.INVALID_HANDLER_CHAIN_910,
+                this.getClass().getSimpleName()));
         }
         return new MetricMap();
     }

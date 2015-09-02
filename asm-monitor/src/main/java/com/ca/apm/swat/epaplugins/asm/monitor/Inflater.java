@@ -37,11 +37,14 @@ public class Inflater implements Handler {
                         bytesDecompressed.length, EpaUtils.getEncoding());
                     return successor.generateMetrics(decompressedString, metricTree);
                 } else {
-                    EpaUtils.getFeedback().error("bytesDecompressed is null!");
+                    EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                        AsmMessages.BYTES_DECODED_NULL_909,
+                        this.getClass().getSimpleName(),
+                        metricTree));
                 }
             } catch (UnsupportedEncodingException e) {
                 // should not happen: UTF8 should be supported
-                String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR,
+                String errorMessage = AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
                     AsmProperties.ASM_PRODUCT_NAME,
                     this.getClass(),
                     e.getMessage());
@@ -49,7 +52,9 @@ public class Inflater implements Handler {
                 throw new Error(errorMessage, e);
             }
         } else {
-            EpaUtils.getFeedback().error("Inflater has no sucessor!");
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.INVALID_HANDLER_CHAIN_910,
+                this.getClass().getSimpleName()));
         }
         return new MetricMap();
     }

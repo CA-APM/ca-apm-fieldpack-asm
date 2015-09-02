@@ -25,7 +25,7 @@ public interface AsmProperties {
 
     public static final String PROPERTY_FILE_NAME       = "config/AppSyntheticMonitor.properties";
     public static final String PASSWORD_URL             =
-            "https://dashboard.cloudmonitor.ca.com/en/change_passwd.php";
+            "https://asm.ca.com/en/change_passwd.php";
 
     public static final String VERSION                  = "asm.version";
     public static final String LOCALE                   = "asm.locale";

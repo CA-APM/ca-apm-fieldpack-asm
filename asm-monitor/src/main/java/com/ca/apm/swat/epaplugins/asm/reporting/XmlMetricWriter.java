@@ -3,6 +3,7 @@ package com.ca.apm.swat.epaplugins.asm.reporting;
 import java.io.PrintStream;
 import java.util.Date;
 
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.wily.introscope.agent.AgentNotAvailableException;
 import com.wily.introscope.agent.AgentShim;
 import com.wily.introscope.agent.IAgent;
@@ -51,7 +52,12 @@ public class XmlMetricWriter implements MetricWriter {
             recorder = DataRecorderFactory.createPerIntervalCounterDataRecorder(name);
             recorder.recordMultipleIncidents(metric);
         } catch (Exception e) {
-            EpaUtils.getFeedback().error(e);
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.METRIC_WRITE_ERROR_913,
+                this.getClass().getSimpleName(),
+                name,
+                Integer.toString(metric),
+                e.getMessage()));
         }
     }
 
@@ -107,13 +113,19 @@ public class XmlMetricWriter implements MetricWriter {
      * @param name metric name
      * @param date timestamp value
      */
+    @SuppressWarnings("deprecation")
     public void writeTimestamp(String name, Date date) {
         TimestampDataRecorder recorder;
         try {
             recorder = DataRecorderFactory.createTimestampDataRecorder(name);
             recorder.recordTimestamp(date.getTime());
         } catch (Exception e) {
-            EpaUtils.getFeedback().error(e);
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.METRIC_WRITE_ERROR_913,
+                this.getClass().getSimpleName(),
+                name,
+                date.toLocaleString(),
+                e.getMessage()));
         }
     }
 
@@ -128,7 +140,12 @@ public class XmlMetricWriter implements MetricWriter {
             recorder = DataRecorderFactory.createLongAverageDataRecorder(name);
             recorder.recordDataPoint(metric);
         } catch (Exception e) {
-            EpaUtils.getFeedback().error(e);
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.METRIC_WRITE_ERROR_913,
+                this.getClass().getSimpleName(),
+                name,
+                Long.toString(metric),
+                e.getMessage()));
         }
     }
 
@@ -143,7 +160,12 @@ public class XmlMetricWriter implements MetricWriter {
             recorder = DataRecorderFactory.createLongCounterDataRecorder(name);
             recorder.add(metric);
         } catch (Exception e) {
-            EpaUtils.getFeedback().error(e);
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.METRIC_WRITE_ERROR_913,
+                this.getClass().getSimpleName(),
+                name,
+                Long.toString(metric),
+                e.getMessage()));
         }
     }
 
@@ -159,8 +181,13 @@ public class XmlMetricWriter implements MetricWriter {
                     .safeGetLongIntervalCounterDataAccumulator(name);
             counterDataAccumulator.forceMetricToExist(null);
             counterDataAccumulator.ILongIntervalCounterDataAccumulator_addBatchIncidents(metric);
-        } catch (Exception ex) {
-            EpaUtils.getFeedback().error(ex);
+        } catch (Exception e) {
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.METRIC_WRITE_ERROR_913,
+                this.getClass().getSimpleName(),
+                name,
+                Integer.toString(metric),
+                e.getMessage()));
         }
     }
 

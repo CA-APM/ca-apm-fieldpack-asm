@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
@@ -85,8 +86,6 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @return true if the monitor name equals anotherName
      */
     public boolean equals(String anotherName) {
-        EpaUtils.getFeedback().debug("equals(String s) called for Monitor " + name
-            + " with s = anotherName"); 
         return this.name.equals(anotherName);
     }
 
@@ -202,8 +201,12 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             }
                         } catch (Exception e) {
                             //Don't throw. Some formats are not yet supported
-                            EpaUtils.getFeedback().warn(e.getMessage() + "\n monitor " + getName()
-                                + ", metric tree  =" + metricTree + "\njsonString = " + jsonString);
+                            EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                                AsmMessages.OUTPUT_HANDLE_WARN_702,
+                                e.getMessage(),
+                                getName(),
+                                metricTree,
+                                jsonString));
                         }
                     }
                     // anyway don't write metric
@@ -255,7 +258,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 // put metric into map
                 String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
                 if ((null == rawMetric) || (null == thisValue)) {
-                    EpaUtils.getFeedback().warn("null value in " + rawMetric + " = " + thisValue);
+                    EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                        AsmMessages.METRIC_NULL_WARN_703,
+                        rawMetric,
+                        thisValue));
                 } else {
                     metricMap.put(rawMetric, thisValue);
                 }

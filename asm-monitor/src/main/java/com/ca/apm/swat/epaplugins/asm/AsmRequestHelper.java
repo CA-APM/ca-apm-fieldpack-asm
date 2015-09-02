@@ -117,7 +117,8 @@ public class AsmRequestHelper implements AsmProperties {
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
             
-                EpaUtils.getFeedback().info("API Call Statistics  ");
+                EpaUtils.getFeedback().info(
+                    AsmMessages.getMessage(AsmMessages.API_CALL_STATS_502));
 
                 for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
                     String cmd = it.next();
@@ -189,7 +190,8 @@ public class AsmRequestHelper implements AsmProperties {
             if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_FOLDERS, false))
                     && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_FOLDER,
+                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+                        AsmMessages.SKIP_FOLDER_305,
                         folderJsonObject.getString(NAME_TAG)));
                 }
                 continue;
@@ -360,16 +362,18 @@ public class AsmRequestHelper implements AsmProperties {
 
             if (EpaUtils.getFeedback().isVerboseEnabled()) {
                 EpaUtils.getFeedback().verbose(
-                    "found monitor '" + monitorJsonObject.getString(NAME_TAG)
-                    + "' of type " + monitorJsonObject.getString(TYPE_TAG)
-                    + " in folder " + (monitorJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
-                        monitorJsonObject.getString(FOLDER_TAG)));
+                    AsmMessages.getMessage(AsmMessages.READ_MONITOR_307, 
+                    monitorJsonObject.getString(NAME_TAG),
+                    monitorJsonObject.getString(TYPE_TAG),
+                    (monitorJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
+                        monitorJsonObject.getString(FOLDER_TAG))));
             }
 
             if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))
                     && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
                 if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.SKIP_MONITOR,
+                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+                        AsmMessages.SKIP_MONITOR_308,
                         monitorJsonObject.getString(NAME_TAG),
                         folder.length() > 0 ? folder : ROOT_FOLDER));
                 }
@@ -460,8 +464,9 @@ public class AsmRequestHelper implements AsmProperties {
                 + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
         String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
-        EpaUtils.getFeedback().verbose("getStats: folder = " + folder
-            + ", monitor = " + monitor.getName() + " of type " + monitor.getType());
+        EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+            AsmMessages.METHOD_FOR_FOLDER_MONITOR_309,
+            "getStats", folder, monitor.getName(), monitor.getType()));
 
         return monitor.generateMetrics(statsRequest, metricPrefix);
     }
@@ -488,7 +493,11 @@ public class AsmRequestHelper implements AsmProperties {
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
             + folderStr + monitorStr);
 
-        EpaUtils.getFeedback().verbose("getPsp: folder = " + folder);
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose(
+                AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
+                    "getPsp", folder));
+        }
         
         Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
         return monitor.generateMetrics(pspRequest, metricPrefix);
@@ -529,8 +538,12 @@ public class AsmRequestHelper implements AsmProperties {
 
         String logResponse = accessor.executeApi(LOGS_CMD, logStr);
 
-        EpaUtils.getFeedback().verbose("getLogs: folder = " + folder);
-
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose(
+                AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
+                    "getLogs", folder));
+        }
+        
         // report JMeter steps?
         String monitorType = SCRIPT_MONITOR;
         if (!EpaUtils.getBooleanProperty(REPORT_JMETER_STEPS, true)) {
