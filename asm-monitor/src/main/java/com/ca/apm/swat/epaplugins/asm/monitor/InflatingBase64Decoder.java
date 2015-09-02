@@ -63,18 +63,18 @@ public class InflatingBase64Decoder implements Handler {
                     return successor.generateMetrics(decodedString, metricTree);
                 } else {
                     EpaUtils.getFeedback().warn(AsmMessages.getMessage(
-                        AsmMessages.DECOMPRESS_ERROR_911,
+                        AsmMessages.DECOMPRESS_ERROR_711,
                         this.getClass().getSimpleName(),
                         metricTree));
                 }
             } else {
                 EpaUtils.getFeedback().warn(AsmMessages.getMessage(
-                    AsmMessages.DECODE_ERROR_912,
+                    AsmMessages.DECODE_ERROR_712,
                     this.getClass().getSimpleName(),
                     metricTree));
             }
         } else {
-            EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
                 AsmMessages.INVALID_HANDLER_CHAIN_910,
                 this.getClass().getSimpleName()));
         }

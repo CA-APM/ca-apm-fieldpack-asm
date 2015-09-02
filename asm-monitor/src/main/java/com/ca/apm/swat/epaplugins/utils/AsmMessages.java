@@ -46,7 +46,9 @@ public class AsmMessages {
     public static final String NON_INT_PROPERTY_WARN_701    = "701_nonIntegerWarningIgnore";
     public static final String OUTPUT_HANDLE_WARN_702       = "702_outputHandleWarning";
     public static final String METRIC_NULL_WARN_703         = "703_metricNullWarning";
-    
+    public static final String DECOMPRESS_ERROR_711         = "711_decompressError";
+    public static final String DECODE_ERROR_712             = "712_decodeError";
+   
     //error messages
     public static final String INITIALIZATION_ERROR_900     = "900_initializationError";
     public static final String READING_PROPERTIES_ERROR_901 = "901_readingPropertiesError";
@@ -59,8 +61,6 @@ public class AsmMessages {
     public static final String LOGIN_INFO_908               = "908_loginInfo";
     public static final String BYTES_DECODED_NULL_909       = "909_bytesDecodedNull";
     public static final String INVALID_HANDLER_CHAIN_910    = "910_invalidHandlerChain";
-    public static final String DECOMPRESS_ERROR_911         = "911_decompressError";
-    public static final String DECODE_ERROR_912             = "912_decodeError";
     public static final String METRIC_WRITE_ERROR_913       = "913_metricWriteError";
     public static final String API_ERROR_914                = "914_apiError";
     public static final String DECRYPT_ERROR_915            = "915_decryptError";

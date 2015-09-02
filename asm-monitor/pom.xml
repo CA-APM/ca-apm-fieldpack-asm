@@ -10,6 +10,7 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
 		<!-- default is: yyyyMMdd-HHmm -->
+		<wiki.page.id>732790862</wiki.page.id>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -50,6 +51,16 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>ca.apm.fieldpacks</groupId>
+				<artifactId>wikipublish-maven-plugin</artifactId>
+				<configuration>
+					<wikiPageId>${wiki.page.id}</wikiPageId>
+					<pmfKey>${ca.pmfkey}</pmfKey>
+					<pmfPassword>${ca.password}</pmfPassword>
+					<maximumAttachmentsPerPage>15</maximumAttachmentsPerPage>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
