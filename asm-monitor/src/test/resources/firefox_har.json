@@ -1,0 +1,17 @@
+{"har": {
+	"uri": "http://chgva01.watchmouse.net/assets/rbtm/103102/379099/02742fac-f5da-4650-854d-9408edab9583/HAR/0.har"},
+	"messages": [],
+	"snapshots": [
+		{"proxy_path": "/chgva01/assets/rbtm/103102/379099/02742fac-f5da-4650-854d-9408edab9583/image/1.jpeg",
+		"seq": 1,
+		"timestamp": 1428560796.0,
+		"elapsed": 29593.564987182617,
+		"waittime": 2.2092299461364746,
+		"step": "4",
+		"height": 600,
+		"title": "Cat | 789C Mining Truck | Caterpillar",
+		"url": "http://chgva01.watchmouse.net/assets/rbtm/103102/379099/02742fac-f5da-4650-854d-9408edab9583/image/1.jpeg",
+		"filename": "/var/www/smartpop/prod/assets/rbtm/103102/379099/02742fac-f5da-4650-854d-9408edab9583/image/1.jpeg",
+		"width": 543}
+	]
+}
