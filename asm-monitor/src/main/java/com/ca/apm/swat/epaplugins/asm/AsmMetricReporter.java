@@ -113,7 +113,7 @@ public class AsmMetricReporter implements AsmProperties {
     }
 
     /**
-     * Reset all metrisc in <code>metricMap</code> to 0 or "".
+     * Reset all metrics in <code>metricMap</code> to 0 or "".
      * @param metricMap map containing the metrics
      * @return the reset map
      * @throws Exception errors

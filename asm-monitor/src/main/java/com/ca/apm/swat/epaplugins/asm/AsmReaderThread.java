@@ -20,7 +20,7 @@ import com.wily.introscope.epagent.EpaUtils;
 public class AsmReaderThread extends Thread implements AsmProperties {
     private String folder;
     private HashMap<String, String> metricMap = new HashMap<String, String>();
-    private boolean keepRunning = true;
+    private volatile boolean keepRunning = true;
     private int numRetriesLeft;
     private AsmRequestHelper requestHelper;
     private HashMap<String, List<Monitor>> folderMap;
@@ -82,13 +82,17 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                         this.folder, new Long(epaWaitTime)));
                     Thread.sleep(60000L);
                 }
+            } catch (InterruptedException e) {
+                // We've been interrupted: exit run loop
+                return;
             } catch (Exception e) {
                 if (JAVA_NET_EXCEPTION_REGEX.matches(e.toString()) && (this.numRetriesLeft > 0)) {
                     this.numRetriesLeft = retryConnection(this.numRetriesLeft, this.folder);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                         AsmMessages.FOLDER_THREAD_ERROR_906,
-                        ASM_PRODUCT_NAME, this.folder, e.getMessage()));
+                        ASM_PRODUCT_NAME, this.folder,
+                        e.getMessage() == null ? e.toString() : e.getMessage()));
                     try {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
                         PrintStream stream = new PrintStream(out);
@@ -201,5 +205,9 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                     folder, resultMetricMap.size()));
         }
         return resultMetricMap;
+    }
+    
+    public void stopThread() {
+        this.keepRunning = false;
     }
 }

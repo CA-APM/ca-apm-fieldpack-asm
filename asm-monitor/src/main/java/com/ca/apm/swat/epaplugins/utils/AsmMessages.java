@@ -40,7 +40,9 @@ public class AsmMessages {
     public static final String API_CALL_STATS_502           = "502_apiCallStats";
     public static final String CONNECTED_503                = "503_connected";
     public static final String PUT_PW_IN_PROPERTIES_504     = "504_putInProperties";
-    
+    public static final String READ_CONFIGURATION_505       = "505_readConfiguration";
+    public static final String PROPERTY_FILE_CHANGED_506    = "506_propertyFileChanged";
+
     // warning messages
     public static final String NON_INT_PROPERTY_WARN_700    = "700_nonIntegerWarningDefault";
     public static final String NON_INT_PROPERTY_WARN_701    = "701_nonIntegerWarningIgnore";

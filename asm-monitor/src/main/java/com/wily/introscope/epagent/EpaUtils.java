@@ -18,7 +18,8 @@ public class EpaUtils {
 
     private static Properties properties;
     private static IModuleFeedbackChannel channel = null;
-
+    private static boolean started = false;
+    
     /**
      * Cannot instantiate.
      */
@@ -37,11 +38,14 @@ public class EpaUtils {
             } else {
                 channel = EPAgent.GetFeedback();
             }
-            String version = getProperties().getProperty(AsmProperties.VERSION);
-            channel.info("Started field pack " + AsmProperties.ASM_PRODUCT_NAME
-                + ", version " + version);
+            if (!started && (null != getProperties())) {
+                String version = getProperties().getProperty(AsmProperties.VERSION);
+                channel.info("Started field pack " + AsmProperties.ASM_PRODUCT_NAME
+                    + ", version " + version);
+                started = true;
+            }
         }
-        
+
         return channel;
     }
 

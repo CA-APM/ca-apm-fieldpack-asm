@@ -32,6 +32,7 @@ public interface AsmProperties {
     public static final String DEFAULT_LOCALE           = "en_US";
     public static final String ENCODING                 = "asm.encoding";
     public static final String WAIT_TIME                = "asm.waittime";
+    public static final String CONFIG_UPDATE_INTERVAL   = "asm.configUpdateInterval";
     public static final String DISPLAY_STATIONS         = "asm.displayMonitoringStations";
     public static final String PRINT_API_STATISTICS     = "asm.printApiStatistics";
     

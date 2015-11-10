@@ -187,7 +187,8 @@ public class MonitorTest extends FileTest {
                     System.out.println("folder " + key);
 
                     for (Iterator<Monitor> rit = folderMap.get(key).iterator(); rit.hasNext(); ) {
-                        System.out.println("  " + rit.next().getName());
+                        Monitor mon = rit.next();
+                        System.out.println("  " + mon.getName() + ", active = " + mon.isActive());
                     }
                 }
             }

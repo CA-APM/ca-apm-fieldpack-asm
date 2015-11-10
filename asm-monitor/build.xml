@@ -9,9 +9,9 @@
 		<copy todir="${epagent.dir}/lib">
 			<fileset dir="target" includes="ca.apm.swat.asm-monitor.jar"/>
 		</copy>
-		<copy todir="${epagent.dir}/">
+		<!-- copy todir="${epagent.dir}/config/">
 			<fileset dir="target/test-classes" includes="*.properties"/>
-		</copy>
+		</copy -->
 		<copy todir="${em.dir}/ext/xmltv">
 			<fileset dir="target/classes" includes="AmFam.typeviewers.xml"/>
 		</copy>

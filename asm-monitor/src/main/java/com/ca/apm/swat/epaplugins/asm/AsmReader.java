@@ -1,15 +1,19 @@
 package com.ca.apm.swat.epaplugins.asm;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeSet;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
@@ -20,6 +24,7 @@ import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XmlMetricWriter;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.FileWatcher;
 import com.wily.introscope.epagent.EpaUtils;
 
 
@@ -28,10 +33,19 @@ import com.wily.introscope.epagent.EpaUtils;
  */
 public class AsmReader implements AsmProperties {
 
+    private static final long DEFAULT_UPDATE_INTERVAL = 60L; // 60 minutes
+
     private HashMap<String, String> creditsMap = new HashMap<String, String>();
     private boolean keepRunning;
     private int numRetriesLeft;
+    private long configUpdateInterval = DEFAULT_UPDATE_INTERVAL * 60000;
+    private long lastConfigUpdateTimestamp = 0;
+    private AsmRequestHelper requestHelper = null;
+    private AsmMetricReporter metricReporter = null;
+    private HashMap<String, List<Monitor>> folderMap = null;
+    private HashMap<String, AsmReaderThread> threadMap = null;
 
+    private static String propertyFileName = PROPERTY_FILE_NAME;
     private static AsmReader instance;
 
     /**
@@ -42,14 +56,20 @@ public class AsmReader implements AsmProperties {
      */
     public static void main(String[] args, PrintStream psEpa) throws Exception {
         try {
-            Properties properties = readPropertiesFromFile((args.length != 0) ? args[0] :
-                PROPERTY_FILE_NAME);
+            propertyFileName = (args.length != 0) ? args[0] : PROPERTY_FILE_NAME;
+            if (null == propertyFileName) {
+                System.out.println("propertyFileName = null"); 
+            } else {
+                System.out.println("propertyFileName = " + propertyFileName /* + ", args[0] = " + args[0]*/); 
+            }
+
+            Properties properties = readPropertiesFromFile(propertyFileName);
 
             String locale = properties.getProperty(LOCALE, DEFAULT_LOCALE);
             AsmMessages.setLocale(new Locale(locale.substring(0, 2),
                 locale.substring(3,5)));
 
-            AsmReader thisReader = new AsmReader();
+            AsmReader thisReader = AsmReader.getInstance();
             int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
 
             MetricWriter metricWriter = getMetricWriter(psEpa);
@@ -76,8 +96,8 @@ public class AsmReader implements AsmProperties {
     public static void main(String[] args) {
 
         try {
-            Properties properties = readPropertiesFromFile(args.length != 0 ? args[0] :
-                PROPERTY_FILE_NAME);
+            propertyFileName = (args.length != 0) ? args[0] : PROPERTY_FILE_NAME;
+            Properties properties = readPropertiesFromFile(propertyFileName);
 
             AsmReader reader = AsmReader.getInstance();
             int epaWaitTime = Integer.parseInt(properties.getProperty(WAIT_TIME));
@@ -114,6 +134,25 @@ public class AsmReader implements AsmProperties {
     protected static void setProperties(Properties properties) {
         EpaUtils.setProperties(properties);
         Formatter.setProperties(properties);
+
+        // set AsmReader instance configUpdateInterval 
+        String interval = EpaUtils.getProperty(CONFIG_UPDATE_INTERVAL,
+            Long.toString(DEFAULT_UPDATE_INTERVAL));
+        if (interval != null) {
+            try {
+                // convert from minutes to ms
+                getInstance().configUpdateInterval = Long.parseLong(interval) * 60000;
+            } catch (NumberFormatException e) {
+                EpaUtils.getFeedback().warn(
+                    AsmMessages.getMessage(AsmMessages.NON_INT_PROPERTY_WARN_700,
+                        CONFIG_UPDATE_INTERVAL,
+                        interval,
+                        getInstance().configUpdateInterval));
+
+            }
+        }
+
+
     }
 
     /**
@@ -127,26 +166,105 @@ public class AsmReader implements AsmProperties {
     private void work(int epaWaitTime, MetricWriter metricWriter) {
 
         AsmAccessor accessor = new AsmAccessor();
-        AsmRequestHelper requestHelper = new AsmRequestHelper(accessor);
+        requestHelper = new AsmRequestHelper(accessor);
+        metricReporter = new AsmMetricReporter(metricWriter);
 
         this.keepRunning = true;
         this.numRetriesLeft = 10;
 
+        Date now = new Date();
+        lastConfigUpdateTimestamp = now.getTime();
+
         // connect and read folders, monitors and monitoring stations.
-        HashMap<String, List<Monitor>> folderMap = initialize(requestHelper);
+        folderMap = initialize(requestHelper);
+        threadMap = startThreads(folderMap);
 
-        AsmMetricReporter metricReporter = new AsmMetricReporter(metricWriter);
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            if (null == threadMap) {
+                EpaUtils.getFeedback().verbose("work(): threadMap is null");
+            } else {
+                StringBuffer buf = new StringBuffer("work(): threadMap has ");
+                buf.append(threadMap.size());
+                buf.append(" folders: ");
+                boolean first = true;
+                for (Iterator<String> it = threadMap.keySet().iterator(); it.hasNext(); ) {
+                    if (!first) {
+                        buf.append(", ");
+                    } else {
+                        first = false;
+                    }
+                    buf.append(it.next());
+                }
 
-        // TODO: have a thread pool with a fixed number of threads that pick folders from a queue
-        // start a thread per folder
-        for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
-            AsmReaderThread rt = new AsmReaderThread(
-                it.next(),
-                requestHelper,
-                folderMap,
-                metricReporter);
-            rt.start();
-        }
+                EpaUtils.getFeedback().verbose(buf.toString());
+            }
+        }  
+
+        // create task to watch for property file changes
+        TimerTask fileWatchTask = new FileWatcher(new File(AsmReader.propertyFileName)) {
+            protected void onChange(File file) {
+                // here we code the action on a change
+                EpaUtils.getFeedback().info(AsmMessages.getMessage(
+                    AsmMessages.PROPERTY_FILE_CHANGED_506, file.getName()));
+                
+                int state = 0;
+                try {
+                    AsmReader.setProperties(readPropertiesFromFile(file.getName()));
+                    state = 1;
+                    stopThreads(AsmReader.getInstance().threadMap);
+                    state = 2;
+                    AsmReader.getInstance().folderMap = readConfiguration();
+                    state = 3;
+                    AsmReader.getInstance().threadMap = startThreads(AsmReader.getInstance().folderMap);
+                    state = 4;
+                } catch (Exception e) {
+                    if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
+                            && (numRetriesLeft > 0)) {
+                        numRetriesLeft = retryConnection(numRetriesLeft,
+                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
+                    } else {
+                        EpaUtils.getFeedback().error(
+                            AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
+                                ASM_PRODUCT_NAME,
+                                AsmMessages.PARENT_THREAD,
+                                e.getMessage() == null ? e.toString() : e.getMessage() ));
+                        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                            String message = "AsmReader.setProperties()";
+                            switch (state) {
+                            case 0:
+                            default:
+                                message = "AsmReader.setProperties()";
+                                break;
+                            case 1:
+                                message = "stopThreads()";
+                                break;
+                            case 2:
+                                message = "readConfiguration()";
+                                break;
+                            case 3:
+                                message = "startThreads()";
+                                break;
+                            case 4:
+                                message = "all good";
+                                break;
+                            }
+                            EpaUtils.getFeedback().verbose(message);
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            PrintStream stream = new PrintStream(out);
+                            e.printStackTrace(stream);
+                            EpaUtils.getFeedback().verbose(out.toString());
+                        }
+                        keepRunning = Boolean.valueOf(false);
+                        System.exit(2);
+                    }
+                }
+            }
+        };
+
+        Timer timer = new Timer();
+        // repeat the check every minute
+        timer.schedule(fileWatchTask, new Date(), 60000);
+
 
         while (keepRunning) {
             try {
@@ -157,10 +275,20 @@ public class AsmReader implements AsmProperties {
                     metricReporter.printMetrics(creditsMap);
                     //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
                 }
+                
+                // print API stats
                 requestHelper.printApiCallStatistics();
 
-                // TODO: read config and folders again to avoid restart
+                // check if we need to reread the configuration
+                now = new Date();
+                long timeElapsed = now.getTime() - lastConfigUpdateTimestamp;
+                if ((configUpdateInterval > 0) && (configUpdateInterval < timeElapsed)) {
+                    lastConfigUpdateTimestamp = now.getTime();
 
+                    stopThreads(threadMap);
+                    folderMap = readConfiguration();
+                    threadMap = startThreads(folderMap);
+                }
                 Thread.sleep(epaWaitTime);
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
@@ -179,6 +307,125 @@ public class AsmReader implements AsmProperties {
                 }
             }
         }
+    }
+
+    /**
+     * Start reader threads for folders.
+     * @param folderMap map of the folders
+     * @return map of threads
+     */
+    private HashMap<String, AsmReaderThread> startThreads(HashMap<String, List<Monitor>> folderMap) {
+
+        HashMap<String, AsmReaderThread> threadMap = new HashMap<String, AsmReaderThread>();        
+
+        // TODO: have a thread pool with a fixed number of threads that pick folders from a queue
+        // start a thread per folder
+        for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
+            String folder = it.next();
+            AsmReaderThread rt = new AsmReaderThread(
+                folder,
+                requestHelper,
+                folderMap,
+                metricReporter);
+            threadMap.put(folder, rt);
+            rt.start();
+        }
+
+        return threadMap;
+    }
+
+    /**
+     * Stop reader threads for folders.
+     * @param threadMap map of threads
+     */
+    private void stopThreads(HashMap<String, AsmReaderThread> threadMap) {
+
+        if (null == threadMap) {
+            EpaUtils.getFeedback().warn("threadmap is null");
+            throw new IllegalStateException("threadmap is null");
+        } else if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            StringBuffer buf = new StringBuffer("work(): threadMap has ");
+            buf.append(threadMap.size());
+            buf.append(" folders: ");
+            boolean first = true;
+            for (Iterator<String> it = threadMap.keySet().iterator(); it.hasNext(); ) {
+                if (!first) {
+                    buf.append(" ,");
+                } else {
+                    first = false;
+                }
+                buf.append(it.next());
+            }
+
+            EpaUtils.getFeedback().verbose(buf.toString());
+        }
+
+        // tell threads to stop
+        for (Iterator<AsmReaderThread> it = threadMap.values().iterator(); it.hasNext(); ) {
+            AsmReaderThread thread = it.next();
+            thread.stopThread();
+            thread.interrupt();
+        }
+
+        // wait for threads to stop
+        for (Iterator<AsmReaderThread> it = threadMap.values().iterator(); it.hasNext(); ) {
+            do {
+                try {
+                    it.next().join();
+                } catch (InterruptedException e) {
+                    // ignore
+                }
+            } while (Thread.interrupted());
+        }
+    }
+    
+    /**
+     * Read the configuration: update folders. monitors and stations
+     * @return map of folders and monitors
+     * @throws Exception an error occurred
+     */
+    private HashMap<String, List<Monitor>> readConfiguration() throws Exception {
+        String[] folders = null;
+        HashMap<String, List<Monitor>> folderMap = null;
+
+        // read folders
+        folders = requestHelper.getFolders();
+
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            StringBuffer buf = new StringBuffer("read folders: ");
+            for (int i = 0; i < folders.length; ++i) {
+                buf.append(folders[i] + ", ");
+            }
+            EpaUtils.getFeedback().verbose(buf.toString());
+        }
+
+        // read monitors
+        folderMap = requestHelper.getMonitors(folders);
+
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose("read monitors: ");
+            Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
+            for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
+                String folder = (String) fit.next();
+                StringBuffer buf = new StringBuffer("  " + folder + " = ");
+                List<Monitor> monitors = folderMap.get(folder);
+                for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
+                    buf.append(mit.next().getName() + ", ");
+                }
+                EpaUtils.getFeedback().verbose(buf.toString());
+            }
+        }
+
+        // read monitoring stations
+        requestHelper.getMonitoringStations();
+        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+            EpaUtils.getFeedback().verbose("read monitoring stations");
+        }
+
+        EpaUtils.getFeedback().info(AsmMessages.getMessage(
+            AsmMessages.READ_CONFIGURATION_505, EpaUtils.getProperty(URL)));
+
+        return folderMap;
     }
 
     /**
@@ -212,7 +459,6 @@ public class AsmReader implements AsmProperties {
      * @return map of folders and monitors
      */
     public HashMap<String, List<Monitor>> initialize(AsmRequestHelper requestHelper) {
-        String[] folders = null;
         HashMap<String, List<Monitor>> folderMap = null;
         boolean keepTrying = true;
         int initNumRetriesLeft = 10;
@@ -221,38 +467,11 @@ public class AsmReader implements AsmProperties {
             try {
                 // connect
                 requestHelper.connect();
+                EpaUtils.getFeedback().info(AsmMessages.getMessage(
+                    AsmMessages.CONNECTED_503, EpaUtils.getProperty(URL)));
 
-                // read folders
-                folders = requestHelper.getFolders();
-
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    StringBuffer buf = new StringBuffer("read folders: ");
-                    for (int i = 0; i < folders.length; ++i) {
-                        buf.append(folders[i] + ", ");
-                    }
-                    EpaUtils.getFeedback().verbose(buf.toString());
-                }
-
-                // read monitors
-                folderMap = requestHelper.getMonitors(folders);
-
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("read monitors: ");
-                    Set<Object> copy = new TreeSet<Object>(folderMap.keySet());
-                    for (Iterator<Object> fit = copy.iterator(); fit.hasNext(); ) {
-                        String folder = (String) fit.next();
-                        StringBuffer buf = new StringBuffer("  " + folder + " = ");
-                        List<Monitor> monitors = folderMap.get(folder);
-                        for (Iterator<Monitor> mit = monitors.iterator(); mit.hasNext(); ) {
-                            buf.append(mit.next().getName() + ", ");
-                        }
-                        EpaUtils.getFeedback().verbose(buf.toString());
-                    }
-                }
-
-                // read monitoring stations
-                requestHelper.getMonitoringStations();
-
+                folderMap = readConfiguration();
+                
                 keepTrying = false;
 
             } catch (Exception e) {
@@ -270,9 +489,6 @@ public class AsmReader implements AsmProperties {
                 }
             }
         }
-
-        EpaUtils.getFeedback().info(AsmMessages.getMessage(
-            AsmMessages.CONNECTED_503, EpaUtils.getProperty(URL)));
 
         return folderMap;
     }
