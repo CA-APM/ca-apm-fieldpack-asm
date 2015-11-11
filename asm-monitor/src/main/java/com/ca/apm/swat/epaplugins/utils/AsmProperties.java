@@ -23,7 +23,9 @@ public interface AsmProperties {
     public static final String ASM_PRODUCT_NAME         = "App Synthetic Monitor";
     public static final String ASM_PRODUCT_NAME_SHORT   = "ASM";
 
-    public static final String PROPERTY_FILE_NAME       = "config/AppSyntheticMonitor.properties";
+    public static final String PROPERTY_FILE_NAME       = "AppSyntheticMonitor.properties";
+    public static final String PROPERTY_FILE_DIR        = "config";
+    
     public static final String PASSWORD_URL             =
             "https://asm.ca.com/en/change_passwd.php";
 

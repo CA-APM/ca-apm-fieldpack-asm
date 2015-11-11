@@ -3,6 +3,7 @@ package com.ca.apm.swat.epaplugins.asm;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
@@ -56,14 +57,37 @@ public class AsmReader implements AsmProperties {
      */
     public static void main(String[] args, PrintStream psEpa) throws Exception {
         try {
-            propertyFileName = (args.length != 0) ? args[0] : PROPERTY_FILE_NAME;
+            propertyFileName = (args.length != 0) ? args[0] :
+                PROPERTY_FILE_DIR + '/' + PROPERTY_FILE_NAME;
+            
             if (null == propertyFileName) {
                 System.out.println("propertyFileName = null"); 
             } else {
-                System.out.println("propertyFileName = " + propertyFileName /* + ", args[0] = " + args[0]*/); 
+                System.out.println("propertyFileName = " + propertyFileName
+                    /* + ", args[0] = " + args[0]*/); 
             }
 
-            Properties properties = readPropertiesFromFile(propertyFileName);
+            
+            // read properties
+            Properties properties = null;
+            int retries = 2;
+            do {
+                try {
+                    properties = readPropertiesFromFile(propertyFileName);
+                } catch (FileNotFoundException e) {
+                    String oldPropertyFileName = propertyFileName;
+                    // retry with default names
+                    if (2 == retries) {
+                        propertyFileName = PROPERTY_FILE_DIR + '/' + PROPERTY_FILE_NAME;
+                    } else {
+                        propertyFileName = PROPERTY_FILE_NAME;
+                    }
+                    --retries;
+                    //EpaUtils.getFeedback().verbose(
+                    System.out.println("property file '" + oldPropertyFileName
+                        + "' not found, retrying with '" + propertyFileName + "'");
+                }
+            } while ((null == properties) && (0 < retries)); 
 
             String locale = properties.getProperty(LOCALE, DEFAULT_LOCALE);
             AsmMessages.setLocale(new Locale(locale.substring(0, 2),
@@ -200,72 +224,6 @@ public class AsmReader implements AsmProperties {
             }
         }  
 
-        // create task to watch for property file changes
-        TimerTask fileWatchTask = new FileWatcher(new File(AsmReader.propertyFileName)) {
-            protected void onChange(File file) {
-                // here we code the action on a change
-                EpaUtils.getFeedback().info(AsmMessages.getMessage(
-                    AsmMessages.PROPERTY_FILE_CHANGED_506, file.getName()));
-                
-                int state = 0;
-                try {
-                    AsmReader.setProperties(readPropertiesFromFile(file.getName()));
-                    state = 1;
-                    stopThreads(AsmReader.getInstance().threadMap);
-                    state = 2;
-                    AsmReader.getInstance().folderMap = readConfiguration();
-                    state = 3;
-                    AsmReader.getInstance().threadMap = startThreads(AsmReader.getInstance().folderMap);
-                    state = 4;
-                } catch (Exception e) {
-                    if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
-                            && (numRetriesLeft > 0)) {
-                        numRetriesLeft = retryConnection(numRetriesLeft,
-                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
-                    } else {
-                        EpaUtils.getFeedback().error(
-                            AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
-                                ASM_PRODUCT_NAME,
-                                AsmMessages.PARENT_THREAD,
-                                e.getMessage() == null ? e.toString() : e.getMessage() ));
-                        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                            String message = "AsmReader.setProperties()";
-                            switch (state) {
-                            case 0:
-                            default:
-                                message = "AsmReader.setProperties()";
-                                break;
-                            case 1:
-                                message = "stopThreads()";
-                                break;
-                            case 2:
-                                message = "readConfiguration()";
-                                break;
-                            case 3:
-                                message = "startThreads()";
-                                break;
-                            case 4:
-                                message = "all good";
-                                break;
-                            }
-                            EpaUtils.getFeedback().verbose(message);
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            PrintStream stream = new PrintStream(out);
-                            e.printStackTrace(stream);
-                            EpaUtils.getFeedback().verbose(out.toString());
-                        }
-                        keepRunning = Boolean.valueOf(false);
-                        System.exit(2);
-                    }
-                }
-            }
-        };
-
-        Timer timer = new Timer();
-        // repeat the check every minute
-        timer.schedule(fileWatchTask, new Date(), 60000);
-
-
         while (keepRunning) {
             try {
 
@@ -295,6 +253,10 @@ public class AsmReader implements AsmProperties {
                         && (numRetriesLeft > 0)) {
                     numRetriesLeft = retryConnection(numRetriesLeft,
                         AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
+                } else if (e instanceof InterruptedException) {
+                    // ignore, the config file has changed
+                    EpaUtils.getFeedback().verbose(
+                        e.getMessage() == null ? e.toString() : e.getMessage());
                 } else {
                     EpaUtils.getFeedback().error(
                         AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
@@ -314,7 +276,8 @@ public class AsmReader implements AsmProperties {
      * @param folderMap map of the folders
      * @return map of threads
      */
-    private HashMap<String, AsmReaderThread> startThreads(HashMap<String, List<Monitor>> folderMap) {
+    private HashMap<String, AsmReaderThread> startThreads(HashMap<String,
+        List<Monitor>> folderMap) {
 
         HashMap<String, AsmReaderThread> threadMap = new HashMap<String, AsmReaderThread>();        
 
@@ -331,7 +294,56 @@ public class AsmReader implements AsmProperties {
             rt.start();
         }
 
+        // watch configuration file
+        startFileWatcher();
+
         return threadMap;
+    }
+
+    /**
+     * Start file watch task for configuration file
+     */
+    private void startFileWatcher() {
+        // create task to watch for property file changes
+        TimerTask fileWatchTask = new FileWatcher(new File(AsmReader.propertyFileName)) {
+            protected void onChange(File file) {
+                // here we code the action on a change
+                EpaUtils.getFeedback().info(AsmMessages.getMessage(
+                    AsmMessages.PROPERTY_FILE_CHANGED_506, file.getPath()));
+                
+                try {
+                    stopThreads(AsmReader.getInstance().threadMap);
+                    AsmReader.setProperties(readPropertiesFromFile(file.getPath()));
+                    AsmReader.getInstance().folderMap = readConfiguration();
+                    AsmReader.getInstance().threadMap =
+                            startThreads(AsmReader.getInstance().folderMap);
+                } catch (Exception e) {
+                    if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
+                            && (numRetriesLeft > 0)) {
+                        numRetriesLeft = retryConnection(numRetriesLeft,
+                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
+                    } else {
+                        EpaUtils.getFeedback().error(
+                            AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
+                                ASM_PRODUCT_NAME,
+                                AsmMessages.PARENT_THREAD,
+                                e.getMessage() == null ? e.toString() : e.getMessage() ));
+                        if (EpaUtils.getFeedback().isVerboseEnabled()) {
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            PrintStream stream = new PrintStream(out);
+                            e.printStackTrace(stream);
+                            EpaUtils.getFeedback().verbose(out.toString());
+                        }
+                        keepRunning = Boolean.valueOf(false);
+                        System.exit(2);
+                    }
+                }
+            }
+        };
+
+        Timer timer = new Timer();
+        // repeat the check every minute
+        timer.schedule(fileWatchTask, new Date(), 60000);
     }
 
     /**
@@ -344,13 +356,13 @@ public class AsmReader implements AsmProperties {
             EpaUtils.getFeedback().warn("threadmap is null");
             throw new IllegalStateException("threadmap is null");
         } else if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            StringBuffer buf = new StringBuffer("work(): threadMap has ");
+            StringBuffer buf = new StringBuffer("stopThreads(): threadMap has ");
             buf.append(threadMap.size());
             buf.append(" folders: ");
             boolean first = true;
             for (Iterator<String> it = threadMap.keySet().iterator(); it.hasNext(); ) {
                 if (!first) {
-                    buf.append(" ,");
+                    buf.append(", ");
                 } else {
                     first = false;
                 }
@@ -365,18 +377,24 @@ public class AsmReader implements AsmProperties {
             AsmReaderThread thread = it.next();
             thread.stopThread();
             thread.interrupt();
+            EpaUtils.getFeedback().verbose("interrupted thread " + thread.getName());
         }
 
         // wait for threads to stop
         for (Iterator<AsmReaderThread> it = threadMap.values().iterator(); it.hasNext(); ) {
             do {
                 try {
-                    it.next().join();
+                    AsmReaderThread thread = it.next();
+                    EpaUtils.getFeedback().verbose("waiting for thread " + thread.getName()
+                        + " to finish");
+                    thread.join();
+                    EpaUtils.getFeedback().verbose("thread " + thread.getName() + " finished");
                 } catch (InterruptedException e) {
                     // ignore
                 }
             } while (Thread.interrupted());
         }
+        EpaUtils.getFeedback().verbose("exiting stopThread()");
     }
     
     /**
@@ -513,20 +531,21 @@ public class AsmReader implements AsmProperties {
 
     /**
      * Read properties from file.
-     * @param filename file name
+     * @param filename property file name
      * @return the properties read
      * @throws IOException error reading the file
      */
     public static Properties readPropertiesFromFile(String filename) throws IOException {
         FileInputStream inStream = new FileInputStream(new File(filename));
-
         Properties properties = new Properties();
 
         try {
             properties.load(inStream);
         } catch (IOException e) {
-            EpaUtils.getFeedback().error(AsmMessages.getMessage(
-                AsmMessages.READING_PROPERTIES_ERROR_901, filename, e.getMessage()));
+            if (null != EpaUtils.getFeedback()) {
+                EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                    AsmMessages.READING_PROPERTIES_ERROR_901, filename, e.getMessage()));
+            }
             throw e;
         }
         inStream.close();

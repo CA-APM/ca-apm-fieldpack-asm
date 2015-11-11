@@ -46,6 +46,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         this.metricReporter = metricReporter;
         this.numRetriesLeft = 10;
         this.epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
+        this.setName(folderName);
     }
 
 
