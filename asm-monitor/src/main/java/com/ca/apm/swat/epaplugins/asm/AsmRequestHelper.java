@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -105,6 +106,7 @@ public class AsmRequestHelper implements AsmProperties {
     
     /**
      * Write the API call statistics to the log.
+     * Statistics are reset to 0 each day.
      */
     public void printApiCallStatistics() {
         if (EpaUtils.getBooleanProperty(PRINT_API_STATISTICS, false)) {
@@ -113,6 +115,18 @@ public class AsmRequestHelper implements AsmProperties {
             long timeElapsed = now.getTime() - lastPrintApiTimestamp;
             long sum = 0;
             long count = 0;
+            boolean resetValues = false;
+            
+            // determine if a new day and we have to reset stats to 0
+            Calendar today = GregorianCalendar.getInstance();
+            today.setTime(now);
+
+            Calendar before = GregorianCalendar.getInstance();
+            before.setTimeInMillis(lastPrintApiTimestamp);
+
+            if (today.get(Calendar.DAY_OF_MONTH) != before.get(Calendar.DAY_OF_MONTH)) {
+                resetValues = true;
+            }
             
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
@@ -123,6 +137,9 @@ public class AsmRequestHelper implements AsmProperties {
                 for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
                     String cmd = it.next();
                     count = apiCallMap.get(cmd);
+                    if (resetValues) {
+                        apiCallMap.put(cmd, Long.valueOf(0));
+                    }
                     sum += count;
                     EpaUtils.getFeedback().info("  " + cmd + " = " + count);
                 }
@@ -137,6 +154,9 @@ public class AsmRequestHelper implements AsmProperties {
                         String cmd = mit.next();
                         buf.append(map.get(cmd)).append(' ').append(cmd).append(',');
                         count += map.get(cmd);
+                        if (resetValues) {
+                            map.put(cmd, Long.valueOf(0));
+                        }
                     }
                     sum += count;
                     EpaUtils.getFeedback().info("  " + name + " = " + count + " (" + buf + ")");
