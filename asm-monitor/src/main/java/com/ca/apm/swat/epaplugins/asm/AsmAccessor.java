@@ -113,6 +113,13 @@ public class AsmAccessor extends Accessor implements AsmProperties {
      * @param apiResponse API response
      */
     private void checkError(String command, String apiResponse) {
+        
+        if ((null == apiResponse) || (0 == apiResponse.length())) {
+            EpaUtils.getFeedback().warn(AsmMessages.getMessage(AsmMessages.NULL_RESPONSE_919,
+                command));
+            return;
+        }
+        
         JSONObject jsonObject = new JSONObject(apiResponse);
 
         int errorCode = jsonObject.optInt(CODE_TAG, -1);
