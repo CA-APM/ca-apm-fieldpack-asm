@@ -110,12 +110,10 @@ public class AsmRequestHelper implements AsmProperties {
      */
     public void printApiCallStatistics() {
         if (EpaUtils.getBooleanProperty(PRINT_API_STATISTICS, false)) {
-
-            final Date now = new Date();
-            long timeElapsed = now.getTime() - lastPrintApiTimestamp;
             long sum = 0;
             long count = 0;
             boolean resetValues = false;
+            final Date now = new Date();
             
             // determine if a new day and we have to reset stats to 0
             Calendar today = GregorianCalendar.getInstance();
@@ -128,6 +126,7 @@ public class AsmRequestHelper implements AsmProperties {
                 resetValues = true;
             }
             
+            long timeElapsed = now.getTime() - lastPrintApiTimestamp;
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
             

@@ -42,6 +42,7 @@ public class AsmMessages {
     public static final String PUT_PW_IN_PROPERTIES_504     = "504_putInProperties";
     public static final String READ_CONFIGURATION_505       = "505_readConfiguration";
     public static final String PROPERTY_FILE_CHANGED_506    = "506_propertyFileChanged";
+    public static final String CONFIG_POLLING_STARTED_507   = "507_configPollingStarted";   
 
     // warning messages
     public static final String NON_INT_PROPERTY_WARN_700    = "700_nonIntegerWarningDefault";
@@ -69,6 +70,7 @@ public class AsmMessages {
     public static final String NO_ERROR_916                 = "916_noError";
     public static final String NO_INFO_917                  = "917_noInfo";
     public static final String TEXT_NORMALIZER_NOT_FOUND_918    = "918_textNormalizerNotFound";
+    public static final String NULL_RESPONSE_919            = "919_nullResponse";
 
     public static final String PARENT_THREAD                = "parentThread";
     public static final String AGENT_INITIALIZATION         = "agentInitialization";

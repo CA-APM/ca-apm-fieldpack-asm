@@ -301,7 +301,7 @@ public class AsmReader implements AsmProperties {
     }
 
     /**
-     * Start file watch task for configuration file
+     * Start file watch task for configuration file.
      */
     private void startFileWatcher() {
         // create task to watch for property file changes
@@ -344,6 +344,9 @@ public class AsmReader implements AsmProperties {
         Timer timer = new Timer();
         // repeat the check every minute
         timer.schedule(fileWatchTask, new Date(), 60000);
+
+        EpaUtils.getFeedback().info(AsmMessages.getMessage(
+            AsmMessages.CONFIG_POLLING_STARTED_507, AsmReader.propertyFileName, 60));
     }
 
     /**
