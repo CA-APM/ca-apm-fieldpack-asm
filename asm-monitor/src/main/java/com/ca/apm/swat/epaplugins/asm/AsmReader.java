@@ -19,6 +19,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
@@ -41,15 +45,15 @@ public class AsmReader implements AsmProperties {
 
     private static final long DEFAULT_UPDATE_INTERVAL = 60L; // 60 minutes
 
-    private HashMap<String, String> creditsMap = new HashMap<String, String>();
     private boolean keepRunning;
     private int numRetriesLeft;
     private long configUpdateInterval = DEFAULT_UPDATE_INTERVAL * 60000;
     private long lastConfigUpdateTimestamp = 0;
     private AsmRequestHelper requestHelper = null;
-    private AsmMetricReporter metricReporter = null;
+    private MetricWriter metricWriter = null;
+    private ExecutorService reporterService = null;
+    private ScheduledExecutorService folderService = null;
     private HashMap<String, List<Monitor>> folderMap = null;
-    private HashMap<String, AsmReaderThread> threadMap = null;
     private static Module module = new Module("Asm.MainThread");
 
     private static String propertyFileName = PROPERTY_FILE_NAME;
@@ -202,7 +206,9 @@ public class AsmReader implements AsmProperties {
 
         AsmAccessor accessor = new AsmAccessor();
         requestHelper = new AsmRequestHelper(accessor);
-        metricReporter = new AsmMetricReporter(metricWriter);
+        this.metricWriter = metricWriter;
+
+        reporterService = Executors.newSingleThreadExecutor();
 
         this.keepRunning = true;
         this.numRetriesLeft = 10;
@@ -212,40 +218,19 @@ public class AsmReader implements AsmProperties {
 
         // connect and read folders, monitors and monitoring stations.
         folderMap = initialize(requestHelper);
-        threadMap = startThreads(folderMap);
+        startThreads(folderMap);
 
         // watch configuration file
         startFileWatcher();
-
-        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            if (null == threadMap) {
-                EpaUtils.getFeedback().verbose(module, "work(): threadMap is null");
-            } else {
-                StringBuffer buf = new StringBuffer("work(): threadMap has ");
-                buf.append(threadMap.size());
-                buf.append(" folders: ");
-                boolean first = true;
-                for (Iterator<String> it = threadMap.keySet().iterator(); it.hasNext(); ) {
-                    if (!first) {
-                        buf.append(", ");
-                    } else {
-                        first = false;
-                    }
-                    buf.append(it.next());
-                }
-
-                EpaUtils.getFeedback().verbose(module, buf.toString());
-            }
-        }  
 
         while (keepRunning) {
             try {
 
                 // get credits
                 if (EpaUtils.getBooleanProperty(METRICS_CREDITS, false)) {
-                    creditsMap = requestHelper.getCredits();
-                    metricReporter.printMetrics(creditsMap);
-                    //creditsMap.putAll(metricReporter.resetMetrics(creditsMap));
+                    HashMap<String, String> creditsMap = requestHelper.getCredits();
+                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap));
+                    creditsMap = null;
                 }
                 
                 // print API stats
@@ -257,9 +242,9 @@ public class AsmReader implements AsmProperties {
                 if ((configUpdateInterval > 0) && (configUpdateInterval < timeElapsed)) {
                     lastConfigUpdateTimestamp = now.getTime();
 
-                    stopThreads(threadMap);
+                    stopThreads();
                     folderMap = readConfiguration();
-                    threadMap = startThreads(folderMap);
+                    startThreads(folderMap);
                 }
 
                 // print our threads
@@ -332,27 +317,25 @@ public class AsmReader implements AsmProperties {
     /**
      * Start reader threads for folders.
      * @param folderMap map of the folders
-     * @return map of threads
      */
-    private HashMap<String, AsmReaderThread> startThreads(HashMap<String,
+    private void startThreads(HashMap<String,
         List<Monitor>> folderMap) {
 
-        HashMap<String, AsmReaderThread> threadMap = new HashMap<String, AsmReaderThread>();        
+        folderService = Executors.newScheduledThreadPool(Integer.parseInt(
+            EpaUtils.getProperty(FOLDER_THREADS, "10")));
 
-        // TODO: have a thread pool with a fixed number of threads that pick folders from a queue
-        // start a thread per folder
+        int epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
+        
         for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
             String folder = it.next();
             AsmReaderThread rt = new AsmReaderThread(
                 folder,
                 requestHelper,
                 folderMap,
-                metricReporter);
-            threadMap.put(folder, rt);
-            rt.start();
+                metricWriter,
+                reporterService);
+            folderService.scheduleAtFixedRate(rt, 0, epaWaitTime, TimeUnit.MILLISECONDS);
         }
-
-        return threadMap;
     }
 
     /**
@@ -370,11 +353,10 @@ public class AsmReader implements AsmProperties {
                     // print our threads
                     printThreads();
 
-                    stopThreads(AsmReader.getInstance().threadMap);
+                    stopThreads();
                     AsmReader.setProperties(readPropertiesFromFile(file.getPath()));
                     AsmReader.getInstance().folderMap = readConfiguration();
-                    AsmReader.getInstance().threadMap =
-                            startThreads(AsmReader.getInstance().folderMap);
+                    startThreads(AsmReader.getInstance().folderMap);
 
                     // print our threads
                     printThreads();
@@ -412,52 +394,20 @@ public class AsmReader implements AsmProperties {
 
     /**
      * Stop reader threads for folders.
-     * @param threadMap map of threads
      */
-    private void stopThreads(HashMap<String, AsmReaderThread> threadMap) {
-
-        if (null == threadMap) {
-            EpaUtils.getFeedback().warn(module, "threadmap is null");
-            throw new IllegalStateException("threadmap is null");
-        } else if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            StringBuffer buf = new StringBuffer("stopThreads(): threadMap has ");
-            buf.append(threadMap.size());
-            buf.append(" folders: ");
-            boolean first = true;
-            for (Iterator<String> it = threadMap.keySet().iterator(); it.hasNext(); ) {
-                if (!first) {
-                    buf.append(", ");
-                } else {
-                    first = false;
-                }
-                buf.append(it.next());
-            }
-
-            EpaUtils.getFeedback().verbose(module, buf.toString());
-        }
+    private void stopThreads() {
 
         // tell threads to stop
-        for (Iterator<AsmReaderThread> it = threadMap.values().iterator(); it.hasNext(); ) {
-            AsmReaderThread thread = it.next();
-            thread.stopThread();
-            thread.interrupt();
-            EpaUtils.getFeedback().verbose(module, "interrupted thread " + thread.getName());
-        }
+        EpaUtils.getFeedback().verbose(module, "stopping folder threads");
+        folderService.shutdown();
 
         // wait for threads to stop
-        for (Iterator<AsmReaderThread> it = threadMap.values().iterator(); it.hasNext(); ) {
-            do {
-                try {
-                    AsmReaderThread thread = it.next();
-                    EpaUtils.getFeedback().verbose(module, "waiting for thread " + thread.getName()
-                        + " to finish");
-                    thread.join();
-                    EpaUtils.getFeedback().verbose(module,
-                        "thread " + thread.getName() + " finished");
-                } catch (InterruptedException e) {
-                    // ignore
-                }
-            } while (Thread.interrupted());
+        try {
+            if (!folderService.awaitTermination(5, TimeUnit.SECONDS)) {
+                EpaUtils.getFeedback().warn(module, "not all folder threads have stopped");
+            }
+        } catch (InterruptedException e) {
+            EpaUtils.getFeedback().warn(module, "interrupted while stopping folder threads");
         }
         EpaUtils.getFeedback().verbose(module, "exiting stopThread()");
     }

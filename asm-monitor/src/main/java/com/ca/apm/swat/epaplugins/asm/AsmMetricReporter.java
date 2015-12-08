@@ -14,25 +14,25 @@ import com.wily.introscope.epagent.EpaUtils;
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class AsmMetricReporter implements AsmProperties {
+public class AsmMetricReporter implements AsmProperties, Runnable {
 
     private MetricWriter metricWriter;
+    private HashMap<String, String> metricMap = null;
     protected static final String SEPARATOR = "\\.";
 
     /**
      * Report metrics to APM via metric writer.
      * @param metricWriter the metric writer
      */
-    public AsmMetricReporter(MetricWriter metricWriter) {
+    public AsmMetricReporter(MetricWriter metricWriter, HashMap<String, String> metricMap) {
         this.metricWriter = metricWriter;
+        this.metricMap = metricMap;
     }
 
     /**
      * Write the metrics to the {@link MetricWriter}.
-     * @param metricMap map containing the metrics
-     * @throws Exception errors
      */
-    public void printMetrics(HashMap<String, String> metricMap) throws Exception {
+    public void run() {
         Iterator<Map.Entry<String, String>> metricIt = metricMap.entrySet().iterator();
         while (metricIt.hasNext()) {
             Map.Entry<String, String> metricPair = (Map.Entry<String, String>) metricIt.next();

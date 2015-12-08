@@ -2,12 +2,13 @@ package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
@@ -18,15 +19,12 @@ import com.wily.util.feedback.Module;
  * One thread per folder.
  * 
  */
-public class AsmReaderThread extends Thread implements AsmProperties {
+public class AsmReaderThread implements AsmProperties, Runnable {
     private String folder;
-    private HashMap<String, String> metricMap = new HashMap<String, String>();
-    private volatile boolean keepRunning = true;
-    private int numRetriesLeft;
     private AsmRequestHelper requestHelper;
     private HashMap<String, List<Monitor>> folderMap;
-    private AsmMetricReporter metricReporter;
-    private final int epaWaitTime;
+    private MetricWriter metricWriter;
+    private ExecutorService reporterService;
     private Module module;
 
     /**
@@ -34,23 +32,21 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * @param folderName name of the folder to monitor
      * @param requestHelper the request helper
      * @param folderMap the folder map containing all folders and monitors
-     * @param metricReporter the metric reporter
+     * @param metricWriter the metric writer
+     * @param reporterService the metric reporter service
      */
-    public AsmReaderThread(
-        String folderName,
-        AsmRequestHelper requestHelper,
-        HashMap<String, List<Monitor>> folderMap,
-        AsmMetricReporter metricReporter) {
+    public AsmReaderThread(String folderName,
+                           AsmRequestHelper requestHelper,
+                           HashMap<String, List<Monitor>> folderMap,
+                           MetricWriter metricWriter,
+                           ExecutorService reporterService) {
 
         this.folder = folderName;
         this.requestHelper = requestHelper;
         this.folderMap = folderMap;
-        this.metricReporter = metricReporter;
-        this.numRetriesLeft = 10;
-        this.epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
-        this.setName(folderName);
+        this.metricWriter = metricWriter;
+        this.reporterService = reporterService;
         this.module = new Module("Asm.Folder." + folderName);
-        setName(module.getName());
     }
 
 
@@ -58,87 +54,37 @@ public class AsmReaderThread extends Thread implements AsmProperties {
      * Run the main loop.
      */
     public void run() {
+        Thread.currentThread().setName(module.getName());
 
         EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
             AsmMessages.THREAD_STARTED_312, this.folder));
 
-        while (this.keepRunning) {
-            try {
-                final Date startTime = new Date();
-                
-                // get the metrics for this folder and all its monitors
-                this.metricMap = getFolderMetrics();
-                
-                // send the metrics to Enterprise Manager
-                metricReporter.printMetrics(this.metricMap);
-               
-                // TODO: is putAll redundant? why reset and keep all the old stuff?                
-                //this.metricMap.putAll(metricReporter.resetMetrics(this.metricMap));
-                
-                final Date endTime = new Date();
+        try {
+            // get the metrics for this folder and all its monitors
+            HashMap<String, String> metricMap = getFolderMetrics();
 
-                long timeElapsed = endTime.getTime() - startTime.getTime();
-                long timeToSleep = epaWaitTime - timeElapsed;
-                if (timeToSleep > 0L) {
-                    Thread.sleep(timeToSleep);
-                } else {
-                    EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-                        AsmMessages.FOLDER_THREAD_TIMEOUT_905,
-                        this.folder, new Long(epaWaitTime)));
-                    Thread.sleep(60000L);
-                }
-            } catch (InterruptedException e) {
-                // We've been interrupted: exit run loop
-                return;
-            } catch (Exception e) {
-                if (JAVA_NET_EXCEPTION_REGEX.matches(e.toString()) && (this.numRetriesLeft > 0)) {
-                    this.numRetriesLeft = retryConnection(this.numRetriesLeft, this.folder);
-                } else {
-                    EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-                        AsmMessages.FOLDER_THREAD_ERROR_906,
-                        ASM_PRODUCT_NAME, this.folder,
-                        e.getMessage() == null ? e.toString() : e.getMessage()));
-                    try {
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        PrintStream stream = new PrintStream(out);
-                        e.printStackTrace(stream);
-                        EpaUtils.getFeedback().error(module, this.folder + ": " + out.toString());
-                    } catch (Exception ex) {
-                        EpaUtils.getFeedback().error(module, "error in " + this.folder + ":"
-                                + ex.getMessage());
-                        EpaUtils.getFeedback().error(module, "error in " + this.folder + ": " + ex);
-                    }
-                    this.keepRunning = Boolean.valueOf(false);
-                }
+            // send the metrics to Enterprise Manager
+            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap));
+
+        } catch (InterruptedException e) {
+            // We've been interrupted: exit
+            return;
+        } catch (Exception e) {
+            EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
+                AsmMessages.FOLDER_THREAD_ERROR_906,
+                ASM_PRODUCT_NAME, this.folder,
+                e.getMessage() == null ? e.toString() : e.getMessage()));
+            try {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                PrintStream stream = new PrintStream(out);
+                e.printStackTrace(stream);
+                EpaUtils.getFeedback().error(module, this.folder + ": " + out.toString());
+            } catch (Exception ex) {
+                EpaUtils.getFeedback().error(module, "error in " + this.folder + ":"
+                        + ex.getMessage());
+                EpaUtils.getFeedback().error(module, "error in " + this.folder + ": " + ex);
             }
         }
-    }
-
-    /**
-     * Retry to connect.
-     * @param numRetriesLeft retries left
-     * @param apmcmInfo message to log
-     * @return number of retries left
-     */
-    public int retryConnection(int numRetriesLeft, String apmcmInfo) {
-        EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-            AsmMessages.CONNECTION_ERROR_902, ASM_PRODUCT_NAME,apmcmInfo));
-
-        if (numRetriesLeft > 0) {
-            EpaUtils.getFeedback().debug(module, AsmMessages.getMessage(
-                AsmMessages.CONNECTION_RETRY_501, numRetriesLeft));
-
-            numRetriesLeft--;
-            try {
-                Thread.sleep(60000L);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            EpaUtils.getFeedback().error(module, 
-                AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_ERROR_903));
-        }
-        return numRetriesLeft;
     }
 
     /**
@@ -150,7 +96,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
         MetricMap resultMetricMap = new MetricMap();
 
         List<Monitor> folderMonitors = this.folderMap.get(folder);
-       
+
         if ((null == folderMonitors) || (0 == folderMonitors.size())) {
             return resultMetricMap;
         }
@@ -169,7 +115,7 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             // remove trailing '|'
             folderPrefix = MONITOR_METRIC_PREFIX.substring(0, MONITOR_METRIC_PREFIX.length() - 1);
         }
-        
+
         // get stats for folder
         try {
             if (EpaUtils.getBooleanProperty(METRICS_STATS_FOLDER, false)) {
@@ -189,10 +135,6 @@ public class AsmReaderThread extends Thread implements AsmProperties {
             EpaUtils.getFeedback().warn(module, e.getMessage());
         }
 
-        if (!this.keepRunning) {
-            throw new InterruptedException();
-        }
-        
         // don't get aggregate metrics for root folder
         if (!EMPTY_STRING.equals(folder)) {
             // get stats for all monitors of this folder
@@ -202,10 +144,6 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 }
             } catch (Exception e) {
                 EpaUtils.getFeedback().warn(module, e.getMessage());
-            }
-            
-            if (!this.keepRunning) {
-                throw new InterruptedException();
             }
 
             // get logs for all monitors of this folder
@@ -218,10 +156,6 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 EpaUtils.getFeedback().warn(module, e.getMessage());
             }
 
-            if (!this.keepRunning) {
-                throw new InterruptedException();
-            }
-
             // get public metrics for all monitors of this folder
             try {
                 if (EpaUtils.getBooleanProperty(METRICS_PUBLIC, false)) {
@@ -231,16 +165,12 @@ public class AsmReaderThread extends Thread implements AsmProperties {
                 EpaUtils.getFeedback().warn(module, e.getMessage());
             }
         }
-        
+
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             EpaUtils.getFeedback().verbose(module, 
                 AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
                     folder, resultMetricMap.size()));
         }
         return resultMetricMap;
-    }
-    
-    public void stopThread() {
-        this.keepRunning = false;
     }
 }

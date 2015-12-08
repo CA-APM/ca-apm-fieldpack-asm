@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -374,8 +377,14 @@ public class LayoutTest extends FileTest {
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
             MetricWriter writer = AsmReader.getMetricWriter(new PrintStream(byteStream));
 
-            AsmMetricReporter reporter = new AsmMetricReporter(writer);
-            reporter.printMetrics(metricMap);
+            ExecutorService reporterService = Executors.newSingleThreadExecutor();
+            reporterService.execute(new AsmMetricReporter(writer, metricMap));
+
+            // This will make the executor accept no new threads
+            // and finish all existing threads in the queue
+            reporterService.shutdown();
+            // Wait until all threads are finish
+            reporterService.awaitTermination(5, TimeUnit.SECONDS);
 
             // get output
             String metricString = byteStream.toString();

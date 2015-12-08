@@ -63,6 +63,7 @@ public interface AsmProperties {
     public static final String PASSWORD_ENCRYPTED       = "asm.APIPasswordEncrypted";
     public static final String INCLUDE_FOLDERS          = "asm.includeFolders";
     public static final String EXCLUDE_FOLDERS          = "asm.excludeFolders";
+    public static final String FOLDER_THREADS           = "asm.folderThreads";
     public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
     public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String FOLDER_PREFIX            = "asm.folder.";
