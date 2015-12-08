@@ -214,6 +214,9 @@ public class AsmReader implements AsmProperties {
         folderMap = initialize(requestHelper);
         threadMap = startThreads(folderMap);
 
+        // watch configuration file
+        startFileWatcher();
+
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             if (null == threadMap) {
                 EpaUtils.getFeedback().verbose(module, "work(): threadMap is null");
@@ -348,9 +351,6 @@ public class AsmReader implements AsmProperties {
             threadMap.put(folder, rt);
             rt.start();
         }
-
-        // watch configuration file
-        startFileWatcher();
 
         return threadMap;
     }
