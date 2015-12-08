@@ -112,6 +112,11 @@ public class BaseMonitor implements Monitor, AsmProperties {
         String metricTree) {
 
         MetricMap metricMap = new MetricMap();
+
+        if (null == jsonString) {
+            return metricMap;
+        }
+
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
         Monitor monitor = null;
