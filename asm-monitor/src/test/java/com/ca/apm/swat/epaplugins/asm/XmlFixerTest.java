@@ -1,8 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.Iterator;
-import java.util.TreeSet;
-
 import org.junit.Assert;
 import org.junit.Test;
 
