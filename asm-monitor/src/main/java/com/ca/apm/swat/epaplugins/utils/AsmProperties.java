@@ -19,6 +19,7 @@ public interface AsmProperties {
     public static final String DEFAULT_DELIMITER        = ",";
     public static final String BLANK                    = " ";
     public static final String TRUE                     = "true";
+    public static final String FALSE                    = "false";
 
     public static final String ASM_PRODUCT_NAME         = "App Synthetic Monitor";
     public static final String ASM_PRODUCT_NAME_SHORT   = "ASM";
@@ -31,6 +32,7 @@ public interface AsmProperties {
 
     public static final String VERSION                  = "asm.version";
     public static final String LOCALE                   = "asm.locale";
+    public static final String FIX_AMPERSAND            = "asm.fixAmpersand";   
     public static final String DEFAULT_LOCALE           = "en_US";
     public static final String ENCODING                 = "asm.encoding";
     public static final String WAIT_TIME                = "asm.waittime";
@@ -218,6 +220,7 @@ public interface AsmProperties {
     public static final String UNDEFINED                = "Undefined";
     public static final String HTTP_PORT                = "80";
     public static final String HTTPS_PORT               = "443";
+    public static final String DATABASE_ERROR           = "Database error";
 
     // monitor types
     public static final String HTTP_MONITOR             = "http";

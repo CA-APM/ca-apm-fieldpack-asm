@@ -1,9 +1,7 @@
 package com.ca.apm.swat.epaplugins.utils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -77,20 +75,20 @@ public class RestClient {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
 
-        byte[] bytes = params.getBytes();
-        InputStream body = new ByteArrayInputStream(bytes);
-
+//        byte[] bytes = params.getBytes();
+//        InputStream body = new ByteArrayInputStream(bytes);
+//
         byte[] buffer = new byte[BUFFER_LENGTH];
         int read = 0;
-        if (body != null) {
-            connection.setDoOutput(true);
-
-            OutputStream output = connection.getOutputStream();
-            while ((read = body.read(buffer)) != -1) {
-                output.write(buffer, 0, read);
-            }
-
-        }
+//        if (body != null) {
+//            connection.setDoOutput(true);
+//
+//            OutputStream output = connection.getOutputStream();
+//            while ((read = body.read(buffer)) != -1) {
+//                output.write(buffer, 0, read);
+//            }
+//
+//        }
 
         final long startTime = System.currentTimeMillis();
         connection.connect();
