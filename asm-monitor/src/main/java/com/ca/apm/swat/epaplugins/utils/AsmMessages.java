@@ -71,6 +71,7 @@ public class AsmMessages {
     public static final String NO_INFO_917                  = "917_noInfo";
     public static final String TEXT_NORMALIZER_NOT_FOUND_918    = "918_textNormalizerNotFound";
     public static final String NULL_RESPONSE_919            = "919_nullResponse";
+    public static final String API_ERROR_920                = "920_apiError";
 
     public static final String PARENT_THREAD                = "parentThread";
     public static final String AGENT_INITIALIZATION         = "agentInitialization";

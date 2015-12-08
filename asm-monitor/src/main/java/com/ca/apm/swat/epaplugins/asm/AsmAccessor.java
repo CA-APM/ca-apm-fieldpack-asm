@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import org.json.JSONObject;
 
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.error.LoginError;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -99,6 +100,11 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             return LOGGED_OUT;
         }
         
+        if (DATABASE_ERROR.equals(apiResponse)) {
+            throw new AsmException(AsmMessages.getMessage(AsmMessages.API_ERROR_920,
+                ASM_PRODUCT_NAME, DATABASE_ERROR, callType));
+        }
+
         apiResponse = Accessor.unpadJson(apiResponse.trim());
 
         if (checkError) {

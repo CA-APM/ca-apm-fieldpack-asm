@@ -17,6 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricNameFilter;
@@ -257,6 +258,8 @@ public class AsmReader implements AsmProperties {
                     // ignore, the config file has changed
                     EpaUtils.getFeedback().verbose(
                         e.getMessage() == null ? e.toString() : e.getMessage());
+                } else if (e instanceof AsmException) {
+                    EpaUtils.getFeedback().warn(e.getMessage());
                 } else {
                     EpaUtils.getFeedback().error(
                         AsmMessages.getMessage(AsmMessages.RUN_ERROR_904,
