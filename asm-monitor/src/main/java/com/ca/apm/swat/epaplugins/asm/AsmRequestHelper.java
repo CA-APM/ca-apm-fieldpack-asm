@@ -1,5 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -364,7 +365,7 @@ public class AsmRequestHelper implements AsmProperties {
         if (folder.equals(ROOT_FOLDER)) {
             folder = EMPTY_STRING; // for later comparison
         } else {
-            folderStr = FOLDER_PARAM + folder;
+            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
         }
 
         String monitorRequest = accessor.executeApi(MONITOR_GET_CMD,
@@ -466,7 +467,7 @@ public class AsmRequestHelper implements AsmProperties {
         String folderStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = FOLDER_PARAM + folder;
+            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
         } else {
             folder = ROOT_FOLDER;
         }
@@ -503,7 +504,7 @@ public class AsmRequestHelper implements AsmProperties {
         String monitorStr = EMPTY_STRING;
 
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = FOLDER_PARAM + folder;
+            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
         } else {
             folder = ROOT_FOLDER;
         }
@@ -540,7 +541,7 @@ public class AsmRequestHelper implements AsmProperties {
         }
         
         if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = FOLDER_PARAM + folder;
+            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
         } else {
             folder = ROOT_FOLDER;
             //TODO: check this again

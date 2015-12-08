@@ -3,6 +3,7 @@ package com.ca.apm.swat.epaplugins.asm;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 import org.json.JSONObject;
@@ -83,9 +84,9 @@ public class AsmAccessor extends Accessor implements AsmProperties {
 
         String apiResponse = "";
         if (!localTest) {
-            URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType);
-            apiResponse = this.restClient.request(HTTP_POST, apiUrl,
-                callParams);
+            URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType
+                + "?" + callParams);
+            apiResponse = this.restClient.request(HTTP_POST, apiUrl, EMPTY_STRING);
         } else if (!callType.equals(LOGOUT_CMD)) {
             String inputLine = null;
             String inputFileName = this.localTestPath + "\\" + callType + ".txt";
@@ -157,8 +158,9 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             password = this.properties.getProperty(PASSWORD);
         }
 
-        String loginStr = "user=" + user + "&password=" + password + "&callback="
-                + DO_CALLBACK;
+        String loginStr = "user=" + user
+                + "&password=" + URLEncoder.encode(password, EpaUtils.getEncoding())
+                + "&callback=" + DO_CALLBACK;
         String loginRequest = executeApi(LOGIN_CMD, loginStr, false);
         JSONObject entireJsonObject = new JSONObject(loginRequest);
 
