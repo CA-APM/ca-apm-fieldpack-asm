@@ -1,5 +1,8 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
+import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.wily.introscope.epagent.EpaUtils;
+
 
 
 /**
@@ -27,7 +30,15 @@ public class ScriptMonitor extends BaseMonitor {
         // build chain of responsibility
         Handler jmeterHandler = new JMeterScriptHandler();
         Handler decoder = new InflatingBase64Decoder();
-        decoder.setSuccessor(jmeterHandler);
+        
+        if (EpaUtils.getBooleanProperty(AsmProperties.FIX_AMPERSAND, true)) {
+            Handler fixer = new XmlFixer();
+            decoder.setSuccessor(fixer);
+            fixer.setSuccessor(jmeterHandler);
+        } else {
+            decoder.setSuccessor(jmeterHandler);
+        }
+        
         setSuccessor(decoder);
     }
 }
