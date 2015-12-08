@@ -6,11 +6,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
@@ -255,6 +258,9 @@ public class AsmReader implements AsmProperties {
                     folderMap = readConfiguration();
                     threadMap = startThreads(folderMap);
                 }
+
+                // print our threads
+                printThreads();
                 Thread.sleep(epaWaitTime);
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
@@ -283,6 +289,38 @@ public class AsmReader implements AsmProperties {
                     e.printStackTrace();
                     keepRunning = Boolean.valueOf(false);
                     System.exit(2);
+                }
+            }
+        }
+    }
+    
+    public static Comparator<Thread> ThreadIdComparator = new Comparator<Thread>() {
+        public int compare(Thread thread1, Thread thread2) {
+            //ascending order
+            return ((int) thread1.getId()) - ((int) thread2.getId());
+        }
+    };
+
+    private void printThreads() {
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            Map<Thread,StackTraceElement[]> map = Thread.getAllStackTraces();           
+            EpaUtils.getFeedback().verbose(module, "There are " + map.size() + " threads");
+            
+            Thread[] threads = map.keySet().toArray(new Thread[map.size()]);
+            Arrays.sort(threads, ThreadIdComparator);
+            
+            for (int j = 0; j < threads.length; ++j) {
+                Thread th = threads[j];
+                EpaUtils.getFeedback().verbose(module, "  thread " + th.getId() + " = "
+                        + th.getName());
+                
+                if (th.getName().contains("Asm")) {
+                    StackTraceElement[] ste = map.get(th);
+                    if (null != ste) {
+                        for (int i = 0; i < ste.length; ++i) {
+                            EpaUtils.getFeedback().verbose(module, "    " + ste[i]);
+                        }
+                    }
                 }
             }
         }
@@ -329,11 +367,17 @@ public class AsmReader implements AsmProperties {
                     AsmMessages.PROPERTY_FILE_CHANGED_506, file.getPath()));
                 
                 try {
+                    // print our threads
+                    printThreads();
+
                     stopThreads(AsmReader.getInstance().threadMap);
                     AsmReader.setProperties(readPropertiesFromFile(file.getPath()));
                     AsmReader.getInstance().folderMap = readConfiguration();
                     AsmReader.getInstance().threadMap =
                             startThreads(AsmReader.getInstance().folderMap);
+
+                    // print our threads
+                    printThreads();
                 } catch (Exception e) {
                     if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                             && (numRetriesLeft > 0)) {
