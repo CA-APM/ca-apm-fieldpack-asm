@@ -10,6 +10,7 @@ import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.feedback.Module;
 
 public class InflatingBase64Decoder implements Handler {
 
@@ -29,11 +30,12 @@ public class InflatingBase64Decoder implements Handler {
      * @return metricMap map containing the metrics
      */
     public MetricMap generateMetrics(String encodedString, String metricTree) {
+        Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {
-            if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
                     AsmMessages.METHOD_FOR_FOLDER_306,
                     this.getClass().getSimpleName(),
                     metricTree));
@@ -55,26 +57,26 @@ public class InflatingBase64Decoder implements Handler {
                             AsmProperties.ASM_PRODUCT_NAME,
                             this.getClass(),
                             e.getMessage());
-                        EpaUtils.getFeedback().error(errorMessage);
+                        EpaUtils.getFeedback().error(module, errorMessage);
                         throw new Error(errorMessage, e);
                     }
 
                     // call next handler in chain
                     return successor.generateMetrics(decodedString, metricTree);
                 } else {
-                    EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                    EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                         AsmMessages.DECOMPRESS_ERROR_711,
                         this.getClass().getSimpleName(),
                         metricTree));
                 }
             } else {
-                EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                     AsmMessages.DECODE_ERROR_712,
                     this.getClass().getSimpleName(),
                     metricTree));
             }
         } else {
-            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+            EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
                 AsmMessages.INVALID_HANDLER_CHAIN_910,
                 this.getClass().getSimpleName()));
         }

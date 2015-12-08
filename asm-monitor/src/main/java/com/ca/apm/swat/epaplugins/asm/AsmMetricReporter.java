@@ -59,9 +59,10 @@ public class AsmMetricReporter implements AsmProperties {
             if (MetricWriter.kStringEvent.equals(thisMetricType)) {
                 metricValue = EpaUtils.fixMetricValue(metricValue);
             
-//                if (EpaUtils.getFeedback().isDebugEnabled()) {
-//                    EpaUtils.getFeedback().debug("writing metric of type " + thisMetricType + " '"
-//                            + metricPath + "' = " + metricValue);
+//                Module module = new Module(Thread.currentThread().getName());
+//                if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+//                    EpaUtils.getFeedback().debug(module, "writing metric of type "
+//                            + thisMetricType + " '" + metricPath + "' = " + metricValue);
 //                }
             }
             

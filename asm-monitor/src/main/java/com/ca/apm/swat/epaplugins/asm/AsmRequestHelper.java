@@ -21,6 +21,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.feedback.Module;
 
 /**
  * Interface to App Synthetic Monitor API.
@@ -130,8 +131,9 @@ public class AsmRequestHelper implements AsmProperties {
             long timeElapsed = now.getTime() - lastPrintApiTimestamp;
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
+                Module module = new Module(Thread.currentThread().getName());
             
-                EpaUtils.getFeedback().info(
+                EpaUtils.getFeedback().info(module,
                     AsmMessages.getMessage(AsmMessages.API_CALL_STATS_502));
 
                 for (Iterator<String> it = apiCallMap.keySet().iterator(); it.hasNext(); ) {
@@ -141,7 +143,7 @@ public class AsmRequestHelper implements AsmProperties {
                         apiCallMap.put(cmd, Long.valueOf(0));
                     }
                     sum += count;
-                    EpaUtils.getFeedback().info("  " + cmd + " = " + count);
+                    EpaUtils.getFeedback().info(module,"  " + cmd + " = " + count);
                 }
 
                 for (Iterator<String> it = objectApiCallMap.keySet().iterator(); it.hasNext(); ) {
@@ -159,10 +161,10 @@ public class AsmRequestHelper implements AsmProperties {
                         }
                     }
                     sum += count;
-                    EpaUtils.getFeedback().info("  " + name + " = " + count + " (" + buf + ")");
+                    EpaUtils.getFeedback().info(module,"  " + name + " = " + count + " (" + buf + ")");
                 }
                 
-                EpaUtils.getFeedback().info("  sum = " + sum);
+                EpaUtils.getFeedback().info(module,"  sum = " + sum);
             }
         }
     }
@@ -202,6 +204,7 @@ public class AsmRequestHelper implements AsmProperties {
         countApiCall(FOLDER_CMD);
         
         JSONArray folderJsonArray = extractJsonArray(folderRequest, FOLDERS_TAG);
+        Module module = new Module(Thread.currentThread().getName());
 
         folderQueryOutput.add(ROOT_FOLDER);
         for (int i = 0; i < folderJsonArray.length(); i++) {
@@ -209,8 +212,8 @@ public class AsmRequestHelper implements AsmProperties {
 
             if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_FOLDERS, false))
                     && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                    EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
                         AsmMessages.SKIP_FOLDER_305,
                         folderJsonObject.getString(NAME_TAG)));
                 }
@@ -373,6 +376,7 @@ public class AsmRequestHelper implements AsmProperties {
         countApiCall(MONITOR_GET_CMD, folder);
 
         JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
+        Module module = new Module(Thread.currentThread().getName());
 
         for (int i = 0; i < monitorJsonArray.length(); i++) {
             JSONObject monitorJsonObject = monitorJsonArray.getJSONObject(i);
@@ -380,8 +384,8 @@ public class AsmRequestHelper implements AsmProperties {
                 continue;
             }
 
-            if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                EpaUtils.getFeedback().verbose(
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module,
                     AsmMessages.getMessage(AsmMessages.READ_MONITOR_307, 
                     monitorJsonObject.getString(NAME_TAG),
                     monitorJsonObject.getString(TYPE_TAG),
@@ -391,8 +395,8 @@ public class AsmRequestHelper implements AsmProperties {
 
             if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))
                     && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
+                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                    EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
                         AsmMessages.SKIP_MONITOR_308,
                         monitorJsonObject.getString(NAME_TAG),
                         folder.length() > 0 ? folder : ROOT_FOLDER));
@@ -484,10 +488,12 @@ public class AsmRequestHelper implements AsmProperties {
                 + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
         String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
-        EpaUtils.getFeedback().verbose(AsmMessages.getMessage(
-            AsmMessages.METHOD_FOR_FOLDER_MONITOR_309,
-            "getStats", folder, monitor.getName(), monitor.getType()));
-
+        Module module = new Module(Thread.currentThread().getName());
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
+                AsmMessages.METHOD_FOR_FOLDER_MONITOR_309,
+                "getStats", folder, monitor.getName(), monitor.getType()));
+        }
         return monitor.generateMetrics(statsRequest, metricPrefix);
     }
 
@@ -513,8 +519,9 @@ public class AsmRequestHelper implements AsmProperties {
         pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
             + folderStr + monitorStr);
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose(
+        Module module = new Module(Thread.currentThread().getName());
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module,
                 AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
                     "getPsp", folder));
         }
@@ -558,8 +565,9 @@ public class AsmRequestHelper implements AsmProperties {
 
         String logResponse = accessor.executeApi(LOGS_CMD, logStr);
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose(
+        Module module = new Module(Thread.currentThread().getName());
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module,
                 AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
                     "getLogs", folder));
         }

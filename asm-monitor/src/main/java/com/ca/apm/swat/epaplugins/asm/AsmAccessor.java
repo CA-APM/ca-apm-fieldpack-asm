@@ -15,6 +15,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.CryptoUtils;
 import com.ca.apm.swat.epaplugins.utils.RestClient;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.feedback.Module;
 
 /**
  * Access the App Synthetic Monitor API.
@@ -120,10 +121,11 @@ public class AsmAccessor extends Accessor implements AsmProperties {
      * @param apiResponse API response
      */
     private void checkError(String command, String apiResponse) {
+        Module module = new Module(Thread.currentThread().getName());
         
         if ((null == apiResponse) || (0 == apiResponse.length())) {
-            EpaUtils.getFeedback().warn(AsmMessages.getMessage(AsmMessages.NULL_RESPONSE_919,
-                command));
+            EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
+                AsmMessages.NULL_RESPONSE_919, command));
             return;
         }
         
@@ -137,7 +139,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             String errorInfo = jsonObject.optString(INFO_TAG,
                 AsmMessages.getMessage(AsmMessages.NO_INFO_917));
 
-            EpaUtils.getFeedback().warn(AsmMessages.getMessage(AsmMessages.API_ERROR_914,
+            EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(AsmMessages.API_ERROR_914,
                 ASM_PRODUCT_NAME, errorCode, errorStr, errorInfo, command));
             
             //TODO: decide if to throw Error
@@ -189,7 +191,8 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             errorStr, errorCode, errorInfo);
 
         if (errorCode == ERROR_AUTHORIZATION) {
-            EpaUtils.getFeedback().error(errorMessage);
+            Module module = new Module(Thread.currentThread().getName());
+            EpaUtils.getFeedback().error(module, errorMessage);
             throw new LoginError(AsmMessages.getMessage(AsmMessages.LOGIN_INFO_908,
                 this.properties.getProperty(URL),
                 LOGIN_CMD,

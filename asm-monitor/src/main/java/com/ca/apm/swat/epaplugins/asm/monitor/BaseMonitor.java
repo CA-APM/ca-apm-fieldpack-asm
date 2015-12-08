@@ -13,6 +13,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.feedback.Module;
 
 /**
  * Base class for implementations of the {@link Monitor} interface.
@@ -114,9 +115,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
         Monitor monitor = null;
+        Module module = new Module(Thread.currentThread().getName());
         
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug("generateMetrics(" + metricTree + ", " 
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module, "generateMetrics(" + metricTree + ", " 
                 + jsonString + ")");
         }
 
@@ -134,9 +136,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
             // return if not active
             if ((null != monitor) && (!monitor.isActive())) {
-                if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                    EpaUtils.getFeedback().verbose("skipping metrics for inactive monitor "
-                            + name);
+                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                    EpaUtils.getFeedback().verbose(module,
+                        "skipping metrics for inactive monitor " + name);
                 }
                 return metricMap;
             }
@@ -201,7 +203,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             }
                         } catch (Exception e) {
                             //Don't throw. Some formats are not yet supported
-                            EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                            EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                 AsmMessages.OUTPUT_HANDLE_WARN_702,
                                 e.getMessage(),
                                 getName(),
@@ -258,7 +260,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 // put metric into map
                 String rawMetric = metricTree + METRIC_NAME_SEPARATOR + thisKey;
                 if ((null == rawMetric) || (null == thisValue)) {
-                    EpaUtils.getFeedback().warn(AsmMessages.getMessage(
+                    EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                         AsmMessages.METRIC_NULL_WARN_703,
                         rawMetric,
                         thisValue));
@@ -292,8 +294,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
             metricMap = addStep(metricMap, monitor, metricTree);
         }
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose("BaseMonitor returning " + metricMap.size()
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module, "BaseMonitor returning " + metricMap.size()
                 + " metrics for monitor " + getName() + " in metric tree " + metricTree);
         }
 
@@ -311,8 +313,10 @@ public class BaseMonitor implements Monitor, AsmProperties {
         if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
             String stepMetricTree = metricTree + METRIC_PATH_SEPARATOR
                     + format.formatStep(1, EMPTY_STRING);
-            if (EpaUtils.getFeedback().isVerboseEnabled()) {
-                EpaUtils.getFeedback().verbose("adding a step for monitor " + name
+            Module module = new Module(Thread.currentThread().getName());
+
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module, "adding a step for monitor " + name
                     + " of type " + monitor.getType());
             }
 
@@ -320,8 +324,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
             // and modify map at the same time
             MetricMap outputMap = new MetricMap();
 
-            if (EpaUtils.getFeedback().isDebugEnabled()) {
-                EpaUtils.getFeedback().debug("iterating over " + metricMap.size()
+            if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                EpaUtils.getFeedback().debug(module, "iterating over " + metricMap.size()
                     + " metric map entries for metric tree " + metricTree);
             }
 
@@ -352,8 +356,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
                                 metricMap.get(key));
                         }
                         
-                        if (EpaUtils.getFeedback().isDebugEnabled()) {
-                            EpaUtils.getFeedback().debug("copied metric " + stepMetricTree
+                        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                            EpaUtils.getFeedback().debug(module, "copied metric " + stepMetricTree
                                 + METRIC_NAME_SEPARATOR + metricName);
                         }
                     }

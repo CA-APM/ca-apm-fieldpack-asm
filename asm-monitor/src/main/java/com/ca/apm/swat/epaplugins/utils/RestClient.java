@@ -16,6 +16,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.feedback.Module;
 
 
 public class RestClient {
@@ -67,8 +68,10 @@ public class RestClient {
      * @throws IOException if an I/O error happened
      */
     public String request(String method, URL url, String params) throws IOException {
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose(
+        Module module = new Module(Thread.currentThread().getName());
+
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module,
                 AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url, params));
         }
 
@@ -105,12 +108,13 @@ public class RestClient {
         final long time = System.currentTimeMillis() - startTime;
         String response = responseBody.toString();
 
-        if (EpaUtils.getFeedback().isVerboseEnabled()) {
-            EpaUtils.getFeedback().verbose(AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE_311,
-                response.length(), time));
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module,
+                AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE_311,
+                    response.length(), time));
         }
 
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             String header = null;
             String headerValue = null;
             int index = 0;
@@ -118,14 +122,14 @@ public class RestClient {
                 header = connection.getHeaderFieldKey(index);
 
                 if (null == header) {
-                    EpaUtils.getFeedback().debug(headerValue);
+                    EpaUtils.getFeedback().debug(module, headerValue);
                 } else {
-                    EpaUtils.getFeedback().debug(header + ": " + headerValue);
+                    EpaUtils.getFeedback().debug(module, header + ": " + headerValue);
                 }
                 index++;
             }
-            EpaUtils.getFeedback().debug(response);
-            EpaUtils.getFeedback().debug(AsmProperties.EMPTY_STRING);
+            EpaUtils.getFeedback().debug(module, response);
+            EpaUtils.getFeedback().debug(module, AsmProperties.EMPTY_STRING);
         }
 
         return response;
