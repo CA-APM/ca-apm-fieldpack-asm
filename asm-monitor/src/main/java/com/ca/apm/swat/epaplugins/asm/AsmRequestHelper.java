@@ -161,7 +161,8 @@ public class AsmRequestHelper implements AsmProperties {
                         }
                     }
                     sum += count;
-                    EpaUtils.getFeedback().info(module,"  " + name + " = " + count + " (" + buf + ")");
+                    EpaUtils.getFeedback().info(module,"  " + name + " = " + count
+                        + " (" + buf + ")");
                 }
                 
                 EpaUtils.getFeedback().info(module,"  sum = " + sum);

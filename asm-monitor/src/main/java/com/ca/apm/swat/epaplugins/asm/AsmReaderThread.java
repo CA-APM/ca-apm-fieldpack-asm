@@ -11,6 +11,7 @@ import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.ErrorUtils;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
 
@@ -74,16 +75,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                 AsmMessages.FOLDER_THREAD_ERROR_906,
                 ASM_PRODUCT_NAME, this.folder,
                 e.getMessage() == null ? e.toString() : e.getMessage()));
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                PrintStream stream = new PrintStream(out);
-                e.printStackTrace(stream);
-                EpaUtils.getFeedback().error(module, this.folder + ": " + out.toString());
-            } catch (Exception ex) {
-                EpaUtils.getFeedback().error(module, "error in " + this.folder + ":"
-                        + ex.getMessage());
-                EpaUtils.getFeedback().error(module, "error in " + this.folder + ": " + ex);
-            }
+            EpaUtils.getFeedback().error(module, this.folder + ": " + ErrorUtils.getStackTrace(e));
         }
     }
 

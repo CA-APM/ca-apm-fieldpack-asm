@@ -33,6 +33,7 @@ import com.ca.apm.swat.epaplugins.asm.reporting.TextMetricWriter;
 import com.ca.apm.swat.epaplugins.asm.reporting.XmlMetricWriter;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.ca.apm.swat.epaplugins.utils.ErrorUtils;
 import com.ca.apm.swat.epaplugins.utils.FileWatcher;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
@@ -117,6 +118,7 @@ public class AsmReader implements AsmProperties {
             EpaUtils.getFeedback().error(module,
                 AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR_900,
                     ASM_PRODUCT_NAME, e.getMessage()));
+            EpaUtils.getFeedback().error(module, ErrorUtils.getStackTrace(e));
             System.exit(1);
         } catch (Error e) {
             EpaUtils.getFeedback().error(module,
@@ -148,7 +150,7 @@ public class AsmReader implements AsmProperties {
             EpaUtils.getFeedback().error(module,
                 AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR_900,
                     ASM_PRODUCT_NAME, e.getMessage()));
-            // e.printStackTrace();
+            EpaUtils.getFeedback().error(module, ErrorUtils.getStackTrace(e));
             System.exit(1);
         }
 
@@ -518,7 +520,7 @@ public class AsmReader implements AsmProperties {
                     EpaUtils.getFeedback().error(module,
                         AsmMessages.getMessage(AsmMessages.INITIALIZATION_ERROR_900,
                             ASM_PRODUCT_NAME, e.getMessage()));
-                    // e.printStackTrace();
+                    EpaUtils.getFeedback().error(module, ErrorUtils.getStackTrace(e));
                     keepTrying = false;
                     System.exit(1);
                 }
