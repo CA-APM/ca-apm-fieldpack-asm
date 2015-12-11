@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
@@ -206,6 +207,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             if (null != thisValue) {
                                 outputMap = successor.generateMetrics(thisValue, metricTree);
                             }
+                        } catch (AsmException e) {
+                            handleException(e, metricTree, metricMap, module);
                         } catch (Exception e) {
                             //Don't throw. Some formats are not yet supported
                             EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
@@ -305,6 +308,55 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         return metricMap;
+    }
+
+    /**
+     * Handle an exception thrown by generateMetrics().
+     * Ignore warnings if the http result code already indicates an error.
+     * @param metricTree metric tree prefix
+     * @param metricMap map containing the metrics
+     * @param module log module
+     * @param exception the exception thrown 
+     */
+    private void handleException(AsmException exception,
+                                 String metricTree,
+                                 MetricMap metricMap,
+                                 Module module) {
+ 
+        if (ERROR_900 > exception.getErrorCode()) {
+
+            // this is a warning, get http result code
+            int resultCode = 0;
+            String resultString = metricMap.get(metricTree
+                + METRIC_NAME_SEPARATOR + RESULT_CODE);
+            try {
+                Integer.parseInt(resultString);
+            } catch (NumberFormatException ex) {
+                resultCode = 99999; // assume error
+            }
+
+            // check result code 
+            if (400 > resultCode) {
+                // we already have a http error => only log if verbose
+                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                    EpaUtils.getFeedback().verbose(module,
+                        AsmMessages.getMessage(
+                            AsmMessages.GENERATE_METRICS_ERROR_710,
+                            exception.getMessage(),
+                            resultString));
+                } else {
+                    // no http error, log as warning
+                    EpaUtils.getFeedback().warn(module,
+                        AsmMessages.getMessage(
+                            AsmMessages.GENERATE_METRICS_ERROR_710,
+                            exception.getMessage(),
+                            resultString));
+                }
+            }
+        } else {
+            // this is an error so log it
+            EpaUtils.getFeedback().error(module, exception.getMessage());
+        }
     }
 
     /**

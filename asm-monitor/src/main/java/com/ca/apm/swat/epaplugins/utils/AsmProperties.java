@@ -100,11 +100,17 @@ public interface AsmProperties {
     public static final String GROUP_NONE               = "no_groups";
     public static final String RESPONSE_CODES           = "asm.responseCodes";
 
-    // error codes
+    // ASM API error codes
     public static final int    ERROR_OK                 = 0;
     public static final int    ERROR_AUTHORIZATION      = 1000;
     public static final int    ERROR_NORM               = 1001;
     public static final int    ERROR_SESSION_EXPIRED    = 1008;
+
+    // ASM monitor internal error codes 700-899 warnings, >=900 error
+    public static final int    DECOMPRESS_ERROR_711         = 711;
+    public static final int    DECODE_ERROR_712             = 712;
+    public static final int    ERROR_900                    = 900;
+    public static final int    INVALID_HANDLER_CHAIN_910    = 910;
 
     // result codes
     public static final int    RESULT_CONNECT_TIMEOUT       = 110;

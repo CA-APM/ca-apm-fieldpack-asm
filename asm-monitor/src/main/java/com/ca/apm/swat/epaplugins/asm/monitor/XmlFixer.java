@@ -1,6 +1,7 @@
 
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.wily.introscope.epagent.EpaUtils;
@@ -21,8 +22,9 @@ public class XmlFixer implements Handler {
      * @param xmlString xml string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
+     * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String xmlString, String metricTree) {
+    public MetricMap generateMetrics(String xmlString, String metricTree) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result

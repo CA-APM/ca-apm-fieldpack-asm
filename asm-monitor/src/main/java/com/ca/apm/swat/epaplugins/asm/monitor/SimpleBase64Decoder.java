@@ -6,6 +6,7 @@ import java.util.zip.Inflater;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -26,8 +27,10 @@ public class SimpleBase64Decoder implements Handler {
      * @param encodedString Base64 encoded string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
+     * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String encodedString, String metricTree) {
+    public MetricMap generateMetrics(String encodedString, String metricTree)
+            throws AsmException {
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {

@@ -3,6 +3,7 @@ package com.ca.apm.swat.epaplugins.asm.monitor;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
@@ -23,8 +24,10 @@ public class Inflater implements Handler {
      * @param compressedString compressedString
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
+     * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String compressedString, String metricTree) {
+    public MetricMap generateMetrics(String compressedString, String metricTree)
+            throws AsmException {
 
         // doesn't make sense if nobody handles the result
         if (null != successor) {

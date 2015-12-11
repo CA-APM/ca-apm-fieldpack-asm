@@ -1,5 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
+import com.ca.apm.swat.epaplugins.asm.error.AsmException;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 
 /**
@@ -22,6 +23,7 @@ public interface Handler {
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
      * @return map containing the metrics
+     * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String jsonString, String metricTree);
+    public MetricMap generateMetrics(String jsonString, String metricTree) throws AsmException;
 }
