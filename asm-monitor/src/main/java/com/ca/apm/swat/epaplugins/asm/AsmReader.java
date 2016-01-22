@@ -25,6 +25,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
+import com.ca.apm.swat.epaplugins.asm.error.InitializationError;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricNameFilter;
@@ -69,38 +70,52 @@ public class AsmReader implements AsmProperties {
     public static void main(String[] args, PrintStream psEpa) throws Exception {
         try {
             Thread.currentThread().setName(module.getName());
-            
+
             propertyFileName = (args.length != 0) ? args[0] :
                 PROPERTY_FILE_DIR + '/' + PROPERTY_FILE_NAME;
-            
+
             if (null == propertyFileName) {
-                System.out.println("propertyFileName = null"); 
+                System.out.println("propertyFileName = null");
             } else {
                 System.out.println("propertyFileName = " + propertyFileName
-                    /* + ", args[0] = " + args[0]*/); 
+                    /* + ", args[0] = " + args[0]*/);
             }
 
-            
             // read properties
             Properties properties = null;
-            int retries = 2;
+            int retries = 3;
             do {
                 try {
+                    if (null == propertyFileName) {
+                        throw new FileNotFoundException();
+                    }
+
                     properties = readPropertiesFromFile(propertyFileName);
+
                 } catch (FileNotFoundException e) {
                     String oldPropertyFileName = propertyFileName;
                     // retry with default names
-                    if (2 == retries) {
+                    if (3 == retries) {
+                        propertyFileName = System.getProperty(EpaUtils.PREFERENCES_KEY);
+                    } else if (2 == retries) {
                         propertyFileName = PROPERTY_FILE_DIR + '/' + PROPERTY_FILE_NAME;
                     } else {
                         propertyFileName = PROPERTY_FILE_NAME;
                     }
                     --retries;
-                    //EpaUtils.getFeedback().verbose(module, 
-                    System.out.println("property file '" + oldPropertyFileName
-                        + "' not found, retrying with '" + propertyFileName + "'");
+                    String msg = "property file '" + oldPropertyFileName
+                            + "' not found, retrying with '" + propertyFileName + "'";
+                    if (null != EpaUtils.getFeedback()) {
+                        EpaUtils.getFeedback().verbose(module, msg);
+                    } else {
+                        System.err.println(msg);
+                    }
                 }
-            } while ((null == properties) && (0 < retries)); 
+            } while ((null == properties) && (0 < retries));
+
+            if (null == properties) {
+                throw new InitializationError(AsmMessages.PROPERTY_FILE_NOT_FOUND_921);
+            }
 
             String locale = properties.getProperty(LOCALE, DEFAULT_LOCALE);
             AsmMessages.setLocale(new Locale(locale.substring(0, 2),
@@ -176,7 +191,7 @@ public class AsmReader implements AsmProperties {
         EpaUtils.setProperties(properties);
         Formatter.setProperties(properties);
 
-        // set AsmReader instance configUpdateInterval 
+        // set AsmReader instance configUpdateInterval
         String interval = EpaUtils.getProperty(CONFIG_UPDATE_INTERVAL,
             Long.toString(DEFAULT_UPDATE_INTERVAL));
         if (interval != null) {
@@ -234,7 +249,7 @@ public class AsmReader implements AsmProperties {
                     reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap));
                     creditsMap = null;
                 }
-                
+
                 // print API stats
                 requestHelper.printApiCallStatistics();
 
@@ -259,7 +274,7 @@ public class AsmReader implements AsmProperties {
                         AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
                 } else if (e instanceof InterruptedException) {
                     // ignore, the config file has changed
-                    EpaUtils.getFeedback().verbose(module, 
+                    EpaUtils.getFeedback().verbose(module,
                         e.getMessage() == null ? e.toString() : e.getMessage());
                     StackTraceElement[] ste = Thread.currentThread().getStackTrace();
                     if (null != ste) {
@@ -283,7 +298,7 @@ public class AsmReader implements AsmProperties {
             }
         }
     }
-    
+
     public static Comparator<Thread> ThreadIdComparator = new Comparator<Thread>() {
         public int compare(Thread thread1, Thread thread2) {
             //ascending order
@@ -293,17 +308,17 @@ public class AsmReader implements AsmProperties {
 
     private void printThreads() {
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            Map<Thread,StackTraceElement[]> map = Thread.getAllStackTraces();           
+            Map<Thread,StackTraceElement[]> map = Thread.getAllStackTraces();
             EpaUtils.getFeedback().verbose(module, "There are " + map.size() + " threads");
-            
+
             Thread[] threads = map.keySet().toArray(new Thread[map.size()]);
             Arrays.sort(threads, ThreadIdComparator);
-            
+
             for (int j = 0; j < threads.length; ++j) {
                 Thread th = threads[j];
                 EpaUtils.getFeedback().verbose(module, "  thread " + th.getId() + " = "
                         + th.getName());
-                
+
                 if (th.getName().contains("Asm")) {
                     StackTraceElement[] ste = map.get(th);
                     if (null != ste) {
@@ -327,7 +342,7 @@ public class AsmReader implements AsmProperties {
             EpaUtils.getProperty(FOLDER_THREADS, "10")));
 
         int epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
-        
+
         for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
             String folder = it.next();
             AsmReaderThread rt = new AsmReaderThread(
@@ -350,7 +365,7 @@ public class AsmReader implements AsmProperties {
                 // here we code the action on a change
                 EpaUtils.getFeedback().info(module, AsmMessages.getMessage(
                     AsmMessages.PROPERTY_FILE_CHANGED_506, file.getPath()));
-                
+
                 try {
                     // print our threads
                     printThreads();
@@ -413,7 +428,7 @@ public class AsmReader implements AsmProperties {
         }
         EpaUtils.getFeedback().verbose(module, "exiting stopThread()");
     }
-    
+
     /**
      * Read the configuration: update folders. monitors and stations
      * @return map of folders and monitors
@@ -508,7 +523,7 @@ public class AsmReader implements AsmProperties {
                     AsmMessages.CONNECTED_503, EpaUtils.getProperty(URL)));
 
                 folderMap = readConfiguration();
-                
+
                 keepTrying = false;
 
             } catch (Exception e) {

@@ -20,6 +20,8 @@ public class EpaUtils {
     private static IModuleFeedbackChannel channel = null;
     private static boolean started = false;
     
+    public static String PREFERENCES_KEY = EPAConfig.kPrefsKey2;
+    
     /**
      * Cannot instantiate.
      */
