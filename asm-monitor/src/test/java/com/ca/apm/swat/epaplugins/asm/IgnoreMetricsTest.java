@@ -110,7 +110,7 @@ public class IgnoreMetricsTest extends FileTest {
             MetricWriter writer = AsmReader.getMetricWriter(new PrintStream(byteStream));
  
             ExecutorService reporterService = Executors.newSingleThreadExecutor();
-            reporterService.execute(new AsmMetricReporter(writer, metricMap));
+            reporterService.execute(new AsmMetricReporter(writer, metricMap, true));
 
             // This will make the executor accept no new threads
             // and finish all existing threads in the queue

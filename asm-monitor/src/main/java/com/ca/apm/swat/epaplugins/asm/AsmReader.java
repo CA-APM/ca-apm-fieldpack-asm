@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,11 @@ import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.ErrorUtils;
 import com.ca.apm.swat.epaplugins.utils.FileWatcher;
+import com.wily.introscope.agent.AgentNotAvailableException;
+import com.wily.introscope.agent.AgentShim;
+import com.wily.introscope.agent.recording.MetricRecordingAdministrator;
+import com.wily.introscope.agent.recording.TimesliceMetricSnapshot;
+import com.wily.introscope.agent.stat.IDataAccumulator;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
 
@@ -246,7 +252,7 @@ public class AsmReader implements AsmProperties {
                 // get credits
                 if (EpaUtils.getBooleanProperty(METRICS_CREDITS, false)) {
                     HashMap<String, String> creditsMap = requestHelper.getCredits();
-                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap));
+                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap, true));
                     creditsMap = null;
                 }
 
@@ -335,8 +341,7 @@ public class AsmReader implements AsmProperties {
      * Start reader threads for folders.
      * @param folderMap map of the folders
      */
-    private void startThreads(HashMap<String,
-        List<Monitor>> folderMap) {
+    private void startThreads(HashMap<String, List<Monitor>> folderMap) {
 
         folderService = Executors.newScheduledThreadPool(Integer.parseInt(
             EpaUtils.getProperty(FOLDER_THREADS, "10")));
@@ -427,6 +432,34 @@ public class AsmReader implements AsmProperties {
             EpaUtils.getFeedback().warn(module, "interrupted while stopping folder threads");
         }
         EpaUtils.getFeedback().verbose(module, "exiting stopThread()");
+
+        // shut off all metrics. They will be turned on on the first run after reading the config.
+        // So monitors that have moved between folders will remain shut off.
+        shutoffMetrics();
+    }
+
+    /**
+     * Shut off all metrics.
+     */
+    private void shutoffMetrics() {
+        try {
+            MetricRecordingAdministrator admin =
+                    AgentShim.getAgent().IAgent_getMetricRecordingAdministrator();
+            
+            TimesliceMetricSnapshot snapshot = admin.getTimesliceMetricSnapshot(false);
+            
+            @SuppressWarnings("rawtypes")
+            Enumeration accs = snapshot.getAccumulators();
+            while (accs.hasMoreElements()) {
+                IDataAccumulator acc = (IDataAccumulator) accs.nextElement();
+                if (null != acc) {
+                    admin.shutMetricOff(acc.IDataAccumulator_getMetric());
+                }
+            }
+        } catch (AgentNotAvailableException e) {
+            EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
+                AsmMessages.METRIC_SHUT_OFF_ERROR_922), e);
+        }
     }
 
     /**

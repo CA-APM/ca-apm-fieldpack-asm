@@ -5,8 +5,16 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
+import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.wily.introscope.agent.AgentNotAvailableException;
+import com.wily.introscope.agent.AgentShim;
+import com.wily.introscope.agent.recording.MetricRecordingAdministrator;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.introscope.spec.metric.AgentMetric;
+import com.wily.introscope.spec.metric.BadlyFormedNameException;
+import com.wily.introscope.spec.metric.MetricTypes;
+import com.wily.util.feedback.Module;
 
 /**
  * Report metrics to APM via {@link MetricWriter}.
@@ -18,15 +26,24 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
 
     private MetricWriter metricWriter;
     private HashMap<String, String> metricMap = null;
+    private boolean turnOn = false;
+    private Module module;
+
     protected static final String SEPARATOR = "\\.";
 
     /**
      * Report metrics to APM via metric writer.
      * @param metricWriter the metric writer
+     * @param metricMap metrics to write
+     * @param turnOn turn metrics on
      */
-    public AsmMetricReporter(MetricWriter metricWriter, HashMap<String, String> metricMap) {
+    public AsmMetricReporter(MetricWriter metricWriter,
+                             HashMap<String, String> metricMap,
+                             boolean turnOn) {
         this.metricWriter = metricWriter;
         this.metricMap = metricMap;
+        this.turnOn = turnOn;
+        this.module = new Module("Asm.AsmMetricReporter");
     }
 
     /**
@@ -64,6 +81,23 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
 //                    EpaUtils.getFeedback().debug(module, "writing metric of type "
 //                            + thisMetricType + " '" + metricPath + "' = " + metricValue);
 //                }
+            }
+            
+            if (turnOn) {
+                try {
+                    MetricRecordingAdministrator admin =
+                            AgentShim.getAgent().IAgent_getMetricRecordingAdministrator();
+                    AgentMetric agentMetric =
+                            AgentMetric.getAgentMetric(metricPath, mapMetricType(thisMetricType));
+                    admin.turnMetricOn(agentMetric);
+                } catch (AgentNotAvailableException e) {
+                    EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
+                        AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
+                } catch (BadlyFormedNameException e) {
+                    EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
+                        AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
+                }
+
             }
             
             metricWriter.writeMetric(thisMetricType, metricPath, metricValue);
@@ -111,6 +145,24 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
         }
          */
         return metricType;
+    }
+
+    /**
+     * Map the metric type to the internal integer constant.
+     * @param thisMetric metric type
+     * @return corresponding integer constant
+     */
+    private int mapMetricType(String thisMetric) {
+        if (thisMetric.equals(MetricWriter.kIntCounter)) {
+            return MetricTypes.kIntegerFluctuatingCounter;
+        } else if (thisMetric.equals(MetricWriter.kLongCounter)) {
+            return MetricTypes.kLongFluctuatingCounter;
+        } else if (thisMetric.equals(MetricWriter.kStringEvent)) {
+            return MetricTypes.kStringIndividualEvents;
+        } else if (thisMetric.equals(MetricWriter.kFloat)) {
+            return MetricTypes.kFloatCounter;
+        }
+        return 0;
     }
 
     /**

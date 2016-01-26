@@ -25,6 +25,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     private MetricWriter metricWriter;
     private ExecutorService reporterService;
     private Module module;
+    private boolean firstRun;
+    
 
     /**
      * Worker thread for App Synthetic Monitor EPA plugin.
@@ -46,6 +48,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         this.metricWriter = metricWriter;
         this.reporterService = reporterService;
         this.module = new Module("Asm.Folder." + folderName);
+        this.firstRun = true;
     }
 
 
@@ -63,8 +66,9 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             HashMap<String, String> metricMap = getFolderMetrics();
 
             // send the metrics to Enterprise Manager
-            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap));
+            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap, firstRun));
 
+            firstRun = false;
         } catch (InterruptedException e) {
             // We've been interrupted: exit
             return;

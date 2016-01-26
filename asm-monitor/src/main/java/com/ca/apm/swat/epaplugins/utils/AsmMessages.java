@@ -74,7 +74,10 @@ public class AsmMessages {
     public static final String NULL_RESPONSE_919            = "919_nullResponse";
     public static final String API_ERROR_920                = "920_apiError";
     public static final String PROPERTY_FILE_NOT_FOUND_921  = "921_propertyFileNotFound";
-
+    public static final String METRIC_SHUT_OFF_ERROR_922    = "922_metricShutOffError";
+    public static final String METRIC_TURN_ON_ERROR_923     = "923_metricTurnOnError";
+    
+    
     public static final String PARENT_THREAD                = "parentThread";
     public static final String AGENT_INITIALIZATION         = "agentInitialization";
 
