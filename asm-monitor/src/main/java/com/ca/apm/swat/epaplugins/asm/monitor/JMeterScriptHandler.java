@@ -16,11 +16,18 @@ import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.feedback.Module;
 
 public class JMeterScriptHandler implements Handler, AsmProperties {
 
+    private static Module module = new Module("Asm.monitor.JMeterScriptHandler");
+
     protected Handler successor = null;  
 
+    public JMeterScriptHandler() {
+        
+    }
+    
     public void setSuccessor(Handler successor) {
         this.successor = successor;
     }
@@ -35,8 +42,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         MetricMap metricMap = new MetricMap();
 
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug("JMeterScriptHandler - xmlString = " + xmlString);
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module,
+                "JMeterScriptHandler - xmlString = " + xmlString);
         }
 
         if (!xmlString.startsWith(XML_PREFIX)) {
@@ -59,8 +67,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             int step = 1; // start from 1, business not engineering
             if (testResults.getLength() > 0) {
 
-                if (EpaUtils.getFeedback().isDebugEnabled()) {
-                    EpaUtils.getFeedback().debug("JMeterScriptHandler: "
+                if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                    EpaUtils.getFeedback().debug(module, "JMeterScriptHandler: "
                             + testResults.toString());
                 }
 
@@ -101,9 +109,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         Formatter format = Formatter.getInstance();
         MetricMap metricMap = new MetricMap();
 
-        if (EpaUtils.getFeedback().isDebugEnabled()) {
-            EpaUtils.getFeedback().debug("reportJMeterStep " + step + ": "
-                    + stepNode.toString());
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module,
+                "reportJMeterStep " + step + ": " + stepNode.toString());
         }
 
         //First the attributes
@@ -171,8 +179,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
                     .equals(JAVA_NET_URL)) {
                 String text = stepChild.getTextContent();
-                if (EpaUtils.getFeedback().isDebugEnabled()) {
-                    EpaUtils.getFeedback().debug("replaced URL '" + url
+                if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                    EpaUtils.getFeedback().debug(module, "replaced URL '" + url
                         + "' with text '" + text + "'");
                 }
 
