@@ -71,8 +71,20 @@ public class RestClient {
         Module module = new Module(Thread.currentThread().getName());
 
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            // mask password
+            String url2 = url.toString();
+            int index = url2.indexOf("password");
+            if (-1 < index) {
+                int end = url2.indexOf("&callback", index);
+                if (-1 < end) {
+                    url2 = url2.substring(0, index + 9) + "*******" + url2.substring(end);
+                } else {
+                    url2 = url2.substring(0, index + 9) + "*******" + url2.substring(end);
+                }
+            }
+
             EpaUtils.getFeedback().verbose(module,
-                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url, params));
+                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url2, params));
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
