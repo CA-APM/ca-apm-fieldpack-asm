@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.codec.binary.Base64;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -89,6 +90,14 @@ public class RestClient {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
+
+        // add authorization for staging environment
+        if (EpaUtils.getBooleanProperty(AsmProperties.STAGING, false)) {
+            String authString = EpaUtils.getProperty(AsmProperties.STAGING_AUTH);
+            byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+            String authStringEnc = new String(authEncBytes);
+            connection.setRequestProperty("Authorization", "Basic " + authStringEnc);
+        }
 
 //        byte[] bytes = params.getBytes();
 //        InputStream body = new ByteArrayInputStream(bytes);
@@ -203,7 +212,7 @@ public class RestClient {
 
     /**
      * Read an XML input stream and convert it to a DOM document.
-     * 
+     *
      * @param is XML input stream
      * @return the DOM document
      * @throws SAXException parser error, see {@link DocumentBuilder#parse(InputStream)}
@@ -233,7 +242,7 @@ public class RestClient {
 
     /**
      * Default {@link EntityResolver} that always resolves to empty string.
-     * Needed by SAXParser. 
+     * Needed by SAXParser.
      */
     class NullResolver implements EntityResolver {
         public InputSource resolveEntity(String publicId, String systemId)

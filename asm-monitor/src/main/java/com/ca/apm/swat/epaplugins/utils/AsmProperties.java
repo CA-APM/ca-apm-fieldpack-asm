@@ -56,6 +56,8 @@ public interface AsmProperties {
 
     public static final String LOCAL_TEST               = "asm.localtest";
     public static final String LOCAL_TEST_PATH          = "asm.localtestpath";
+    public static final String STAGING                  = "asm.staging";
+    public static final String STAGING_AUTH             = "asm.staging.auth";
 
     public static final String URL                      = "asm.URL";
     public static final String USER                     = "asm.userEmail";
