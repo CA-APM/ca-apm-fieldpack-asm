@@ -12,6 +12,11 @@
 		<!-- default is: yyyyMMdd-HHmm -->
 		<wiki.page.id>732790862</wiki.page.id>
 	</properties>
+	<scm>
+		<connection>scm:git:git@github-isl-01.ca.com/grogu01/fieldpack.asmmonitor.git</connection>
+		<url>scm:git:git@github-isl-01.ca.com/grogu01/fieldpack.asmmonitor.git</url>
+		<developerConnection>scm:git:git@github-isl-01.ca.com/grogu01/fieldpack.asmmonitor.git</developerConnection>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -51,6 +56,11 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.0</version>
+			</plugin>
 			<plugin>
 				<groupId>ca.apm.fieldpacks</groupId>
 				<artifactId>wikipublish-maven-plugin</artifactId>
@@ -134,15 +144,17 @@
 						<phase>prepare-package</phase>
 						<configuration>
 							<tasks>
-								<mkdir dir="${project.build.directory}/bin"/>
-								<copy todir="${project.build.directory}/bin" flatten="true" overwrite="true"
-									verbose="true" failonerror="true">
-									<fileset dir="${project.basedir}/src/main/bin" includes="*.sh" />
+								<mkdir dir="${project.build.directory}/bin" />
+								<copy todir="${project.build.directory}/bin" flatten="true"
+									overwrite="true" verbose="true" failonerror="true">
+									<fileset dir="${project.basedir}/src/main/bin"
+										includes="*.sh" />
 								</copy>
-								<mkdir dir="${project.build.directory}/docs"/>
-								<copy todir="${project.build.directory}/docs" flatten="true" overwrite="true"
-									verbose="true" failonerror="true">
-									<fileset dir="${project.basedir}/src/main/docs" includes="*" />
+								<mkdir dir="${project.build.directory}/docs" />
+								<copy todir="${project.build.directory}/docs" flatten="true"
+									overwrite="true" verbose="true" failonerror="true">
+									<fileset dir="${project.basedir}/src/main/docs"
+										includes="*" />
 								</copy>
 							</tasks>
 						</configuration>
