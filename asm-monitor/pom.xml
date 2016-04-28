@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ca.apm.swat</groupId>
 	<artifactId>asm-monitor</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<name>ASMMonitor</name>
 	<description>Fieldpack to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
 	<properties>
@@ -40,37 +40,34 @@
 			<version>1.10</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<finalName>ca.apm.swat.asm-monitor</finalName>
+		<defaultGoal>clean package</defaultGoal>
+
+		<extensions>
+			<extension>
+				<groupId>ca.apm.fieldpacks</groupId>
+				<artifactId>introscope-agent-resources</artifactId>
+				<version>1.0.0</version>
+			</extension>
+		</extensions>
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
+					<version>3.5.1</version>
 					<configuration>
-						<compilerVersion>1.6</compilerVersion>
-						<fork>true</fork>
+						<source>1.6</source>
+						<target>1.6</target>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
+
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.0</version>
-			</plugin>
-			<plugin>
-				<groupId>ca.apm.fieldpacks</groupId>
-				<artifactId>wikipublish-maven-plugin</artifactId>
-				<configuration>
-					<wikiPageId>${wiki.page.id}</wikiPageId>
-					<pmfKey>${ca.pmfkey}</pmfKey>
-					<pmfPassword>${ca.password}</pmfPassword>
-					<maximumAttachmentsPerPage>15</maximumAttachmentsPerPage>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -80,7 +77,7 @@
 						<id>validate</id>
 						<phase>validate</phase>
 						<configuration>
-							<configLocation>/Users/grogu01/work/workspace-agent/tools/eclipse/apm-9-8-checkstyle6.0-java-style.xml</configLocation>
+							<configLocation>agent-resources/apm-9-8-checkstyle6.0-java-style.xml</configLocation>
 							<encoding>UTF-8</encoding>
 							<consoleOutput>true</consoleOutput>
 							<failsOnError>true</failsOnError>
@@ -92,18 +89,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
-					<finalName>${project.artifactId}.${env.USER}.${build.timestamp}</finalName>
-					<descriptors>
-						<descriptor>src/assembly/distribution.xml</descriptor>
-					</descriptors>
-				</configuration>
-			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -114,6 +100,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -135,6 +122,28 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+					<finalName>${project.artifactId}-${version}-${build.timestamp}</finalName>
+					<descriptors>
+						<descriptor>src/assembly/distribution.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -192,8 +201,19 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>ca.apm.fieldpacks</groupId>
+				<artifactId>wikipublish-maven-plugin</artifactId>
+				<configuration>
+					<wikiPageId>${wiki.page.id}</wikiPageId>
+					<pmfKey>${ca.pmfkey}</pmfKey>
+					<pmfPassword>${ca.password}</pmfPassword>
+					<maximumAttachmentsPerPage>15</maximumAttachmentsPerPage>
+				</configuration>
+			</plugin>
 		</plugins>
-		<defaultGoal>clean package assembly:single</defaultGoal>
+
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

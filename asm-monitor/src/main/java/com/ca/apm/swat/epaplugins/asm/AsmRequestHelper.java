@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
@@ -36,7 +37,7 @@ public class AsmRequestHelper implements AsmProperties {
     private static HashMap<String, HashMap<String, Long>> objectApiCallMap = null;
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
-    
+
     /**
      * Create new CloudMonitorRequestHelper.
      * @param accessor accessor
@@ -105,7 +106,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
         }
     }
-    
+
     /**
      * Write the API call statistics to the log.
      * Statistics are reset to 0 each day.
@@ -116,7 +117,7 @@ public class AsmRequestHelper implements AsmProperties {
             long count = 0;
             boolean resetValues = false;
             final Date now = new Date();
-            
+
             // determine if a new day and we have to reset stats to 0
             Calendar today = GregorianCalendar.getInstance();
             today.setTime(now);
@@ -127,12 +128,12 @@ public class AsmRequestHelper implements AsmProperties {
             if (today.get(Calendar.DAY_OF_MONTH) != before.get(Calendar.DAY_OF_MONTH)) {
                 resetValues = true;
             }
-            
+
             long timeElapsed = now.getTime() - lastPrintApiTimestamp;
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
                 Module module = new Module(Thread.currentThread().getName());
-            
+
                 EpaUtils.getFeedback().info(module,
                     AsmMessages.getMessage(AsmMessages.API_CALL_STATS_502));
 
@@ -164,12 +165,12 @@ public class AsmRequestHelper implements AsmProperties {
                     EpaUtils.getFeedback().info(module,"  " + name + " = " + count
                         + " (" + buf + ")");
                 }
-                
+
                 EpaUtils.getFeedback().info(module,"  sum = " + sum);
             }
         }
     }
-    
+
     /**
      * Get the folders to monitor.
      * Properties like asm.includeFolders and asm.excludeFolders are taken
@@ -201,34 +202,42 @@ public class AsmRequestHelper implements AsmProperties {
      */
     private String[] getFolders(String folderList, String excludeList) throws Exception {
         List<String> folderQueryOutput = new ArrayList<String>();
-        String folderRequest = accessor.executeApi(FOLDER_CMD, getCommandString());
-        countApiCall(FOLDER_CMD);
-        
-        JSONArray folderJsonArray = extractJsonArray(folderRequest, FOLDERS_TAG);
-        Module module = new Module(Thread.currentThread().getName());
 
-        folderQueryOutput.add(ROOT_FOLDER);
-        for (int i = 0; i < folderJsonArray.length(); i++) {
-            JSONObject folderJsonObject = folderJsonArray.getJSONObject(i);
+        try {
 
-            if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_FOLDERS, false))
-                    && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
-                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-                    EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
-                        AsmMessages.SKIP_FOLDER_305,
-                        folderJsonObject.getString(NAME_TAG)));
+            String folderRequest = accessor.executeApi(FOLDER_CMD, getCommandString());
+            countApiCall(FOLDER_CMD);
+
+            JSONArray folderJsonArray = extractJsonArray(folderRequest, FOLDERS_TAG);
+            Module module = new Module(Thread.currentThread().getName());
+
+            folderQueryOutput.add(ROOT_FOLDER);
+            for (int i = 0; i < folderJsonArray.length(); i++) {
+                JSONObject folderJsonObject = folderJsonArray.getJSONObject(i);
+
+                if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_FOLDERS, false))
+                        && (!YES.equals(folderJsonObject.optString(ACTIVE_TAG, NO)))) {
+                    if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                        EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
+                            AsmMessages.SKIP_FOLDER_305,
+                            folderJsonObject.getString(NAME_TAG)));
+                    }
+                    continue;
                 }
-                continue;
+                folderQueryOutput.add(folderJsonObject.get(NAME_TAG).toString());
             }
-            folderQueryOutput.add(folderJsonObject.get(NAME_TAG).toString());
-        }
 
-        if (!folderList.equals(ALL_FOLDERS)) {
-            folderQueryOutput = matchList(folderQueryOutput, folderList);
-        }
+            if (!folderList.equals(ALL_FOLDERS)) {
+                folderQueryOutput = matchList(folderQueryOutput, folderList);
+            }
 
-        if (!excludeList.equals(EMPTY_STRING)) {
-            folderQueryOutput = removeList(folderQueryOutput, excludeList);
+            if (!excludeList.equals(EMPTY_STRING)) {
+                folderQueryOutput = removeList(folderQueryOutput, excludeList);
+            }
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getFolders", e.getMessage()));
         }
 
         return (String[]) folderQueryOutput.toArray(EMPTY_STRING_ARRAY);
@@ -249,15 +258,23 @@ public class AsmRequestHelper implements AsmProperties {
      * @throws Exception errors
      */
     private JSONArray extractJsonArray(String metricInput, String arrayName) throws Exception {
-        JSONObject entireJsonObject = new JSONObject(metricInput);
         JSONArray thisJsonArray = new JSONArray();
 
-        if (entireJsonObject.optJSONObject(RESULT_TAG) != null) {
-            JSONObject resultJsonObject = entireJsonObject.getJSONObject(RESULT_TAG);
+        try {
+            JSONObject entireJsonObject = new JSONObject(metricInput);
 
-            if (resultJsonObject.optJSONArray(arrayName) != null) {
-                thisJsonArray = resultJsonObject.optJSONArray(arrayName);
+            if (entireJsonObject.optJSONObject(RESULT_TAG) != null) {
+                JSONObject resultJsonObject = entireJsonObject.getJSONObject(RESULT_TAG);
+
+                if (resultJsonObject.optJSONArray(arrayName) != null) {
+                    thisJsonArray = resultJsonObject.optJSONArray(arrayName);
+                }
             }
+
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "extractJsonArray", e.getMessage()));
         }
 
         return thisJsonArray;
@@ -298,24 +315,31 @@ public class AsmRequestHelper implements AsmProperties {
      */
     public HashMap<String, String> getCredits() throws Exception {
         MetricMap metricMap = new MetricMap();
-        String creditsRequest = EMPTY_STRING;
-        creditsRequest = accessor.executeApi(CREDITS_CMD, getCommandString());
-        countApiCall(CREDITS_CMD);
-        
-        JSONArray creditJsonArray = extractJsonArray(creditsRequest, CREDITS_TAG);
 
-        for (int i = 0; i < creditJsonArray.length(); i++) {
-            JSONObject creditJsonObject = creditJsonArray.getJSONObject(i);
+        try {
+            String creditsRequest = EMPTY_STRING;
+            creditsRequest = accessor.executeApi(CREDITS_CMD, getCommandString());
+            countApiCall(CREDITS_CMD);
 
-            String key = creditJsonObject.optString(TYPE_TAG, NO_TYPE);
-            String value = creditJsonObject.optString(AVAILABLE_TAG, ZERO);
+            JSONArray creditJsonArray = extractJsonArray(creditsRequest, CREDITS_TAG);
 
-            if (AsmPropertiesImpl.ASM_METRICS.containsKey(key)) {
-                key = ((String) AsmPropertiesImpl.ASM_METRICS.get(key)).toString();
+            for (int i = 0; i < creditJsonArray.length(); i++) {
+                JSONObject creditJsonObject = creditJsonArray.getJSONObject(i);
+
+                String key = creditJsonObject.optString(TYPE_TAG, NO_TYPE);
+                String value = creditJsonObject.optString(AVAILABLE_TAG, ZERO);
+
+                if (AsmPropertiesImpl.ASM_METRICS.containsKey(key)) {
+                    key = ((String) AsmPropertiesImpl.ASM_METRICS.get(key)).toString();
+                }
+
+                String rawMetric = CREDITS_CATEGORY + METRIC_NAME_SEPARATOR + key;
+                metricMap.put(rawMetric, value);
             }
-
-            String rawMetric = CREDITS_CATEGORY + METRIC_NAME_SEPARATOR + key;
-            metricMap.put(rawMetric, value);
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getCredits", e.getMessage()));
         }
 
         return metricMap;
@@ -329,28 +353,34 @@ public class AsmRequestHelper implements AsmProperties {
     public HashMap<String, String> getMonitoringStations() throws Exception {
         HashMap<String, String> stationMap = new HashMap<String, String>();
 
-        String cpRequest = accessor.executeApi(STATIONS_GET_CMD, getCommandString());
-        countApiCall(STATIONS_GET_CMD);
+        try {
+            String cpRequest = accessor.executeApi(STATIONS_GET_CMD, getCommandString());
+            countApiCall(STATIONS_GET_CMD);
 
-        JSONArray cpJsonArray = extractJsonArray(cpRequest, CHECKPOINTS_TAG);
+            JSONArray cpJsonArray = extractJsonArray(cpRequest, CHECKPOINTS_TAG);
 
-        for (int i = 0; i < cpJsonArray.length(); i++) {
-            JSONObject cpJsonObject = cpJsonArray.getJSONObject(i);
-            if (cpJsonObject.get(AREA_TAG).toString().contains(DEFAULT_DELIMITER)) {
-                stationMap.put(
-                    cpJsonObject.get(LOCATION_TAG).toString(),
-                    cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1] 
-                            + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
-                            + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
-            } else {
-                stationMap.put(
-                    cpJsonObject.get(LOCATION_TAG).toString(),
-                    cpJsonObject.get(AREA_TAG)
-                    + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
-                    + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
+            for (int i = 0; i < cpJsonArray.length(); i++) {
+                JSONObject cpJsonObject = cpJsonArray.getJSONObject(i);
+                if (cpJsonObject.get(AREA_TAG).toString().contains(DEFAULT_DELIMITER)) {
+                    stationMap.put(
+                        cpJsonObject.get(LOCATION_TAG).toString(),
+                        cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1] 
+                                + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
+                                + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
+                } else {
+                    stationMap.put(
+                        cpJsonObject.get(LOCATION_TAG).toString(),
+                        cpJsonObject.get(AREA_TAG)
+                        + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
+                        + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
+                }
             }
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getMonitoringStations", e.getMessage()));
         }
-        
+
         AsmRequestHelper.stationMap = stationMap;
         return stationMap;
     }
@@ -365,59 +395,78 @@ public class AsmRequestHelper implements AsmProperties {
      */
     private List<Monitor> getMonitors(String folder, String monitorsList) throws Exception {
         List<Monitor> monitors = new ArrayList<Monitor>();
-        String folderStr = EMPTY_STRING;
-        if (folder.equals(ROOT_FOLDER)) {
-            folder = EMPTY_STRING; // for later comparison
-        } else {
-            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-        }
 
-        String monitorRequest = accessor.executeApi(MONITOR_GET_CMD,
-            getCommandString() + folderStr);
-        countApiCall(MONITOR_GET_CMD, folder);
-
-        JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
-        Module module = new Module(Thread.currentThread().getName());
-
-        for (int i = 0; i < monitorJsonArray.length(); i++) {
-            JSONObject monitorJsonObject = monitorJsonArray.getJSONObject(i);
-            if (!monitorJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
-                continue;
+        try {
+            String folderStr = EMPTY_STRING;
+            if (folder.equals(ROOT_FOLDER)) {
+                folder = EMPTY_STRING; // for later comparison
+            } else {
+                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
             }
 
-            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-                EpaUtils.getFeedback().verbose(module,
-                    AsmMessages.getMessage(AsmMessages.READ_MONITOR_307, 
-                    monitorJsonObject.getString(NAME_TAG),
-                    monitorJsonObject.getString(TYPE_TAG),
-                    (monitorJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
-                        monitorJsonObject.getString(FOLDER_TAG))));
-            }
+            String monitorRequest = accessor.executeApi(MONITOR_GET_CMD,
+                getCommandString() + folderStr);
+            countApiCall(MONITOR_GET_CMD, folder);
 
-            if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))
-                    && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
-                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-                    EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
-                        AsmMessages.SKIP_MONITOR_308,
+            JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
+            Module module = new Module(Thread.currentThread().getName());
+
+            for (int i = 0; i < monitorJsonArray.length(); i++) {
+                try {
+                    JSONObject monitorJsonObject = monitorJsonArray.getJSONObject(i);
+                    if (!monitorJsonObject.optString(FOLDER_TAG, EMPTY_STRING).equals(folder)) {
+                        continue;
+                    }
+
+                    if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                        EpaUtils.getFeedback().verbose(module,
+                            AsmMessages.getMessage(AsmMessages.READ_MONITOR_307, 
+                                monitorJsonObject.getString(NAME_TAG),
+                                monitorJsonObject.getString(TYPE_TAG),
+                                (monitorJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
+                                    monitorJsonObject.getString(FOLDER_TAG))));
+                    }
+
+                    if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))
+                            && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
+                        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                            EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
+                                AsmMessages.SKIP_MONITOR_308,
+                                monitorJsonObject.getString(NAME_TAG),
+                                folder.length() > 0 ? folder : ROOT_FOLDER));
+                        }
+                        // do not skip the inactive monitors, we need that information later!
+                        // continue;
+                    }
+
+                    String url = "";
+                    if (monitorJsonObject.get(HOST_TAG) instanceof String) {
+                        url = MonitorFactory.createMonitorUrl(
+                            monitorJsonObject.getString(TYPE_TAG),
+                            monitorJsonObject.getString(HOST_TAG),
+                            monitorJsonObject.getString(PORT_TAG),
+                            monitorJsonObject.optString(PATH_TAG, EMPTY_STRING));
+                    }
+
+                    monitors.add(MonitorFactory.createMonitor(
                         monitorJsonObject.getString(NAME_TAG),
-                        folder.length() > 0 ? folder : ROOT_FOLDER));
+                        monitorJsonObject.getString(TYPE_TAG),
+                        monitorJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
+                            monitorJsonObject.getString(FOLDER_TAG),
+                            monitorJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
+                                monitorJsonObject.getString(TAGS_TAG).split(","),
+                                url,
+                                YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO))));
+                } catch (JSONException e) {
+                    EpaUtils.getFeedback().warn(module,
+                        AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                            "getMonitors", e.getMessage()));
                 }
-                // do not skip the inactive monitors, we need that information later!
-                // continue;
             }
-            monitors.add(MonitorFactory.createMonitor(
-                monitorJsonObject.getString(NAME_TAG),
-                monitorJsonObject.getString(TYPE_TAG),
-                monitorJsonObject.isNull(FOLDER_TAG) ? EMPTY_STRING :
-                    monitorJsonObject.getString(FOLDER_TAG),
-                monitorJsonObject.isNull(TAGS_TAG) ? EMPTY_STRING_ARRAY :
-                    monitorJsonObject.getString(TAGS_TAG).split(","),
-                MonitorFactory.createMonitorUrl(
-                    monitorJsonObject.getString(TYPE_TAG),
-                    monitorJsonObject.getString(HOST_TAG),
-                    monitorJsonObject.getString(PORT_TAG),
-                    monitorJsonObject.optString(PATH_TAG, EMPTY_STRING)),
-                YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO))));
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getMonitors", e.getMessage()));
         }
 
         if (!monitorsList.equals(ALL_MONITORS)) {
@@ -437,24 +486,30 @@ public class AsmRequestHelper implements AsmProperties {
     public HashMap<String, List<Monitor>> getMonitors(String[] folders) throws Exception {
         HashMap<String, List<Monitor>> foldersAndMonitors = new HashMap<String, List<Monitor>>();
 
-
-        for (int i = 0; i < folders.length; i++) {
-            String folderProp = EpaUtils.getProperty(FOLDER_PREFIX + folders[i], ALL_MONITORS);
-            List<Monitor> monitors;
-            if (((folderProp.length() == 0) || (folderProp.equals(ALL_MONITORS)))
-                    // if we skip inactive monitors we can't use ALL_MONITORS
-                    && (!EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))) {
-                monitors = getMonitors(folders[i], ALL_MONITORS);
-                monitors.add(0, MonitorFactory.getAllMonitorsMonitor());
-            } else {
-                monitors = getMonitors(folders[i], folderProp);
+        try {
+            for (int i = 0; i < folders.length; i++) {
+                String folderProp = EpaUtils.getProperty(FOLDER_PREFIX + folders[i], ALL_MONITORS);
+                List<Monitor> monitors;
+                if (((folderProp.length() == 0) || (folderProp.equals(ALL_MONITORS)))
+                        // if we skip inactive monitors we can't use ALL_MONITORS
+                        && (!EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))) {
+                    monitors = getMonitors(folders[i], ALL_MONITORS);
+                    monitors.add(0, MonitorFactory.getAllMonitorsMonitor());
+                } else {
+                    monitors = getMonitors(folders[i], folderProp);
+                }
+                // must be at least one monitor != ALL_MONITORS
+                if (((monitors.size() > 0) && (!monitors.get(0).equals(ALL_MONITORS)))
+                        || (monitors.size() > 1))  {
+                    foldersAndMonitors.put(folders[i], monitors);
+                }
             }
-            // must be at least one monitor != ALL_MONITORS
-            if (((monitors.size() > 0) && (!monitors.get(0).equals(ALL_MONITORS)))
-                    || (monitors.size() > 1))  {
-                foldersAndMonitors.put(folders[i], monitors);
-            }
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getMonitors", e.getMessage()));
         }
+
         return foldersAndMonitors;
     }
 
@@ -468,34 +523,45 @@ public class AsmRequestHelper implements AsmProperties {
      */
     public HashMap<String, String> getStats(String folder, String metricPrefix, boolean aggregate)
             throws Exception {
-        String aggregateStr = NOT_AGGREGATE_PARAM;
-        String folderStr = EMPTY_STRING;
 
-        if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-        } else {
-            folder = ROOT_FOLDER;
+        try {
+            String aggregateStr = NOT_AGGREGATE_PARAM;
+            String folderStr = EMPTY_STRING;
+
+            if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
+                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
+            } else {
+                folder = ROOT_FOLDER;
+            }
+
+            Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
+            countApiCall(STATS_CMD, folder);
+
+            if (aggregate) {
+                aggregateStr = AGGREGATE_PARAM;
+            }
+
+            String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
+                    + folderStr + aggregateStr + START_DATE_PARAM
+                    + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
+            String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
+
+            Module module = new Module(Thread.currentThread().getName());
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
+                    AsmMessages.METHOD_FOR_FOLDER_MONITOR_309,
+                    "getStats", folder, monitor.getName(), monitor.getType()));
+            }
+
+            return monitor.generateMetrics(statsRequest, metricPrefix);
+
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getStats", e.getMessage()));
         }
 
-        Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
-        countApiCall(STATS_CMD, folder);
-
-        if (aggregate) {
-            aggregateStr = AGGREGATE_PARAM;
-        }
-        
-        String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
-                + folderStr + aggregateStr + START_DATE_PARAM
-                + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
-        String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
-
-        Module module = new Module(Thread.currentThread().getName());
-        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
-                AsmMessages.METHOD_FOR_FOLDER_MONITOR_309,
-                "getStats", folder, monitor.getName(), monitor.getType()));
-        }
-        return monitor.generateMetrics(statsRequest, metricPrefix);
+        return new HashMap<String, String>();
     }
 
     /**
@@ -506,29 +572,39 @@ public class AsmRequestHelper implements AsmProperties {
      */
     public HashMap<String, String> getPsp(String folder, String metricPrefix)
             throws Exception {
-        String pspRequest = EMPTY_STRING;
-        String folderStr = EMPTY_STRING;
-        String monitorStr = EMPTY_STRING;
 
-        if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-        } else {
-            folder = ROOT_FOLDER;
+        try {
+            String pspRequest = EMPTY_STRING;
+            String folderStr = EMPTY_STRING;
+            String monitorStr = EMPTY_STRING;
+
+            if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
+                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
+            } else {
+                folder = ROOT_FOLDER;
+            }
+
+            countApiCall(PSP_CMD, folder);
+            pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
+                + folderStr + monitorStr);
+
+            Module module = new Module(Thread.currentThread().getName());
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module,
+                    AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
+                        "getPsp", folder));
+            }
+
+            Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
+            return monitor.generateMetrics(pspRequest, metricPrefix);
+
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getPsp", e.getMessage()));
         }
 
-        countApiCall(PSP_CMD, folder);
-        pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
-            + folderStr + monitorStr);
-
-        Module module = new Module(Thread.currentThread().getName());
-        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            EpaUtils.getFeedback().verbose(module,
-                AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
-                    "getPsp", folder));
-        }
-        
-        Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
-        return monitor.generateMetrics(pspRequest, metricPrefix);
+        return new HashMap<String, String>();
     }
 
     /**
@@ -542,51 +618,61 @@ public class AsmRequestHelper implements AsmProperties {
         int numMonitors,
         String metricPrefix) throws Exception {
 
-        String folderStr = EMPTY_STRING;
-        int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
-        if (numMonitors > 0) {
-            numLogs =  numLogs * numMonitors;
-        }
-        
-        if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-            folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-        } else {
-            folder = ROOT_FOLDER;
-            //TODO: check this again
-            //monitor = MonitorFactory.getAllMonitorsMonitor();
+        try {
+            String folderStr = EMPTY_STRING;
+
+            int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
+            if (numMonitors > 0) {
+                numLogs =  numLogs * numMonitors;
+            }
+
+            if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
+                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
+            } else {
+                folder = ROOT_FOLDER;
+                //TODO: check this again
+                //monitor = MonitorFactory.getAllMonitorsMonitor();
+            }
+
+            countApiCall(LOGS_CMD, folder);           
+
+            String logStr = NKEY_PARAM + this.nkey + folderStr
+                    + NUM_PARAM + numLogs + REVERSE_PARAM
+                    + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
+            //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
+            //        + "&num=" + numLogs + "&reverse=y&full=y";
+
+            String logResponse = accessor.executeApi(LOGS_CMD, logStr);
+
+            Module module = new Module(Thread.currentThread().getName());
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module,
+                    AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
+                        "getLogs", folder));
+            }
+
+            // report JMeter steps?
+            String monitorType = SCRIPT_MONITOR;
+            if (!EpaUtils.getBooleanProperty(REPORT_JMETER_STEPS, true)) {
+                monitorType = HTTP_MONITOR;
+            }
+
+            Monitor monitor =
+                    MonitorFactory.createMonitor("dummy",
+                        monitorType,
+                        folderStr,
+                        null,
+                        EMPTY_STRING,
+                        false);
+            return monitor.generateMetrics(logResponse, metricPrefix);
+
+        } catch (JSONException e) {
+            EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
+                AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
+                    "getLogs", e.getMessage()));
         }
 
-        countApiCall(LOGS_CMD, folder);           
-
-        String logStr = NKEY_PARAM + this.nkey + folderStr
-                + NUM_PARAM + numLogs + REVERSE_PARAM
-                + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
-        //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
-        //        + "&num=" + numLogs + "&reverse=y&full=y";
-
-        String logResponse = accessor.executeApi(LOGS_CMD, logStr);
-
-        Module module = new Module(Thread.currentThread().getName());
-        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            EpaUtils.getFeedback().verbose(module,
-                AsmMessages.getMessage(AsmMessages.METHOD_FOR_FOLDER_306,
-                    "getLogs", folder));
-        }
-        
-        // report JMeter steps?
-        String monitorType = SCRIPT_MONITOR;
-        if (!EpaUtils.getBooleanProperty(REPORT_JMETER_STEPS, true)) {
-            monitorType = HTTP_MONITOR;
-        }
-        
-        Monitor monitor =
-                MonitorFactory.createMonitor("dummy",
-                    monitorType,
-                    folderStr,
-                    null,
-                    EMPTY_STRING,
-                    false);
-        return monitor.generateMetrics(logResponse, metricPrefix);
+        return new HashMap<String, String>();
     }
 
     /**
