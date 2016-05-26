@@ -270,7 +270,8 @@ public interface AsmProperties {
     public static final String ASSERTION_FAILURES       = "Assertion Failures";
     public static final String ASSERTION_ERRORS         = "Assertion Errors";
     public static final String TEST_URL                 = "URL";
-   
+    public static final String TEST_LABEL               = "Label";
+    
     //  status indicator colors, see AsmPropertiesImpl.APM_CM_COLORS
     public static final String GREEN                    = "green";
     public static final String YELLOW                   = "yellow";
