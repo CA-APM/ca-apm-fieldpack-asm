@@ -330,13 +330,13 @@ public class BaseMonitor implements Monitor, AsmProperties {
             String resultString = metricMap.get(metricTree
                 + METRIC_NAME_SEPARATOR + RESULT_CODE);
             try {
-                Integer.parseInt(resultString);
+                resultCode = Integer.parseInt(resultString);
             } catch (NumberFormatException ex) {
                 resultCode = 99999; // assume error
             }
 
             // check result code 
-            if (400 > resultCode) {
+            if (400 <= resultCode) {
                 // we already have a http error => only log if verbose
                 if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                     EpaUtils.getFeedback().verbose(module,
@@ -344,14 +344,15 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             AsmMessages.GENERATE_METRICS_ERROR_710,
                             exception.getMessage(),
                             resultString));
-                } else {
-                    // no http error, log as warning
-                    EpaUtils.getFeedback().warn(module,
-                        AsmMessages.getMessage(
-                            AsmMessages.GENERATE_METRICS_ERROR_710,
-                            exception.getMessage(),
-                            resultString));
                 }
+            } else {
+                // no http error, log as warning
+                EpaUtils.getFeedback()
+                    .warn(module,
+                          AsmMessages.getMessage(
+                                                 AsmMessages.GENERATE_METRICS_ERROR_710,
+                                                 exception.getMessage(),
+                                                 resultString));
             }
         } else {
             // this is an error so log it
