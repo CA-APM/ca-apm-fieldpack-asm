@@ -445,7 +445,7 @@ public class AsmReader implements AsmProperties {
     }
 
     /**
-     * Shut off all metrics.
+     * Shut off only monitor metrics.
      */
     private void shutoffMetrics() {
         try {
@@ -458,7 +458,13 @@ public class AsmReader implements AsmProperties {
             Enumeration accs = snapshot.getAccumulators();
             while (accs.hasMoreElements()) {
                 IDataAccumulator acc = (IDataAccumulator) accs.nextElement();
-                if (null != acc) {
+                if ((null != acc)
+                        && acc.IDataAccumulator_getMetric().getAgentMetricPrefix()
+                        .toString().contains(AsmProperties.MONITOR_METRIC_PREFIX)) {
+
+                    log(SeverityLevel.DEBUG, "shutting off metric " 
+                            + acc.IDataAccumulator_getMetric().getAgentMetricPrefix());
+
                     admin.shutMetricOff(acc.IDataAccumulator_getMetric());
                 }
             }
