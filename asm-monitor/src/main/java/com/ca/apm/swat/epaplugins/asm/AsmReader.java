@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
@@ -67,6 +68,9 @@ public class AsmReader implements AsmProperties {
 
     private static String propertyFileName = PROPERTY_FILE_NAME;
     private static AsmReader instance;
+
+    private boolean stopped = true;
+    private Map<ScheduledFuture<?>, String> futureMap = null;
 
     /**
      * Called by EPAgent.
@@ -243,6 +247,12 @@ public class AsmReader implements AsmProperties {
 
         // connect and read folders, monitors and monitoring stations.
         folderMap = initialize(requestHelper);
+
+        // start folder thread pool
+        folderService = Executors
+                .newScheduledThreadPool(Integer
+                                        .parseInt(EpaUtils.getProperty(FOLDER_THREADS, "10")));
+
         startThreads(folderMap);
 
         // watch configuration file
@@ -264,17 +274,23 @@ public class AsmReader implements AsmProperties {
                 // check if we need to reread the configuration
                 now = new Date();
                 long timeElapsed = now.getTime() - lastConfigUpdateTimestamp;
-                if ((configUpdateInterval > 0) && (configUpdateInterval < timeElapsed)) {
+                if (stopped
+                        || ((configUpdateInterval > 0) && (configUpdateInterval < timeElapsed))) {
                     lastConfigUpdateTimestamp = now.getTime();
 
                     stopThreads();
+                    // print our threads
+                    printThreads();
                     folderMap = readConfiguration();
                     startThreads(folderMap);
                 }
 
                 // print our threads
-                printThreads();
-                Thread.sleep(epaWaitTime);
+                //printThreads();
+                
+                if (!stopped) {
+                    Thread.sleep(epaWaitTime);
+                }
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                         && (numRetriesLeft > 0)) {
@@ -333,8 +349,15 @@ public class AsmReader implements AsmProperties {
                     StackTraceElement[] ste = map.get(th);
 
                     if (null != ste) {
-                        for (int i = 0; i < ste.length; ++i) {
-                            EpaUtils.getFeedback().verbose(module, "    " + ste[i]);
+                        if (stopped
+                                && th.getName().contains("Asm.Folder")
+                                && !ste[0].toString().contains("park")) {
+                            log(SeverityLevel.WARN, th.getName()
+                                + " should not be running!");
+
+                            for (int i = 0; i < ste.length; ++i) {
+                                log(SeverityLevel.VERBOSE, "    " + ste[i]);
+                            }
                         }
                     }
                 }
@@ -348,21 +371,26 @@ public class AsmReader implements AsmProperties {
      */
     private void startThreads(HashMap<String, List<Monitor>> folderMap) {
 
-        folderService = Executors.newScheduledThreadPool(Integer.parseInt(
-            EpaUtils.getProperty(FOLDER_THREADS, "10")));
-
         int epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
+
+        futureMap = new HashMap<ScheduledFuture<?>, String>();
 
         for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
             String folder = it.next();
             AsmReaderThread rt = new AsmReaderThread(
-                folder,
-                requestHelper,
-                folderMap,
-                metricWriter,
-                reporterService);
-            folderService.scheduleAtFixedRate(rt, 0, epaWaitTime, TimeUnit.MILLISECONDS);
+                                                     folder,
+                                                     requestHelper,
+                                                     folderMap,
+                                                     metricWriter,
+                                                     reporterService);
+            ScheduledFuture<?> future = folderService.scheduleAtFixedRate(rt,
+                                                                          0,
+                                                                          epaWaitTime,
+                                                                          TimeUnit.MILLISECONDS);
+            futureMap.put(future, folder);
         }
+
+        stopped = false;
     }
 
     /**
@@ -430,22 +458,53 @@ public class AsmReader implements AsmProperties {
     private void stopThreads() {
 
         // tell threads to stop
-        EpaUtils.getFeedback().verbose(module, "stopping folder threads");
-        folderService.shutdown();
+        log(SeverityLevel.VERBOSE, "stopping folder threads");
+        Date now = new Date();
+        long startTime = now.getTime();
+
+//        folderService.shutdown();
 
         // wait for threads to stop
-        try {
-            if (!folderService.awaitTermination(5, TimeUnit.SECONDS)) {
-                EpaUtils.getFeedback().warn(module, "not all folder threads have stopped");
+//        try {
+//            if (!folderService.awaitTermination(5, TimeUnit.SECONDS)) {
+//                log(SeverityLevel.WARN, "not all folder threads have stopped");
+//
+//                folderService.shutdownNow();
+//
+//                if (!folderService.awaitTermination(5, TimeUnit.SECONDS)) {
+//                    log(SeverityLevel.WARN, "not all folder threads have stopped");
+
+        // cancel all tasks, leave service running
+        Iterator<ScheduledFuture<?>> it = futureMap.keySet().iterator();
+        while (it.hasNext()) {
+            ScheduledFuture<?> future = it.next();
+
+            if (!future.isCancelled()) {
+                log(SeverityLevel.VERBOSE,
+                    "cancelling task for folder " + futureMap.get(future));
+
+                if (future.cancel(true)) {
+                    log(SeverityLevel.VERBOSE,
+                        "folder " + futureMap.get(future) + " could not be cancelled");
+                }
             }
-        } catch (InterruptedException e) {
-            EpaUtils.getFeedback().warn(module, "interrupted while stopping folder threads");
         }
-        EpaUtils.getFeedback().verbose(module, "exiting stopThread()");
+
+//                }
+//            }
+//        } catch (InterruptedException e) {
+//            log(SeverityLevel.WARN, "interrupted while stopping folder threads");
+//        }
+
+        now = new Date();
+        long timeElapsed = now.getTime() - startTime;
+
+        log(SeverityLevel.VERBOSE, "exiting stopThreads(), took " + timeElapsed + " ms");
 
         // shut off all metrics. They will be turned on on the first run after reading the config.
         // So monitors that have moved between folders will remain shut off.
         shutoffMetrics();
+        stopped = true;
     }
 
     /**
