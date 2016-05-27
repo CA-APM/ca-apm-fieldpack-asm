@@ -49,6 +49,7 @@ public class AsmMessages {
     public static final String NON_INT_PROPERTY_WARN_701    = "701_nonIntegerWarningIgnore";
     public static final String OUTPUT_HANDLE_WARN_702       = "702_outputHandleWarning";
     public static final String METRIC_NULL_WARN_703         = "703_metricNullWarning";
+    public static final String METRIC_READ_WARN_704         = "704_metricReadWarning";
     public static final String GENERATE_METRICS_ERROR_710   = "710_generateMetricsError";
     public static final String DECOMPRESS_ERROR_711         = "711_decompressError";
     public static final String DECODE_ERROR_712             = "712_decodeError";

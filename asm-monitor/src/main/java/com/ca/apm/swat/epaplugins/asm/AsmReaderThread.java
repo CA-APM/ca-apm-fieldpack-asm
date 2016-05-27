@@ -26,7 +26,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     private ExecutorService reporterService;
     private Module module;
     private boolean firstRun;
-    
+
 
     /**
      * Worker thread for App Synthetic Monitor EPA plugin.
@@ -58,8 +58,11 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     public void run() {
         Thread.currentThread().setName(module.getName());
 
-        EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
-            AsmMessages.THREAD_STARTED_312, this.folder));
+        EpaUtils.getFeedback()
+            .verbose(module,
+                     AsmMessages.getMessage(AsmMessages.THREAD_STARTED_312,
+                                            Thread.currentThread().getId(),
+                                            this.folder));
 
         try {
             // get the metrics for this folder and all its monitors
@@ -73,10 +76,13 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             // We've been interrupted: exit
             return;
         } catch (Exception e) {
-            EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-                AsmMessages.FOLDER_THREAD_ERROR_906,
-                ASM_PRODUCT_NAME, this.folder,
-                e.getMessage() == null ? e.toString() : e.getMessage()));
+            EpaUtils.getFeedback()
+                .error(module, AsmMessages.getMessage(
+                                                      AsmMessages.FOLDER_THREAD_ERROR_906,
+                                                      ASM_PRODUCT_NAME, this.folder,
+                                                      e.getMessage() == null
+                                                      ? e.toString()
+                                                      : e.getMessage()));
             EpaUtils.getFeedback().error(module, this.folder + ": " + ErrorUtils.getStackTrace(e));
         }
     }
@@ -97,8 +103,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
 
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             EpaUtils.getFeedback().verbose(module, 
-                AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA_301,
-                    folderMonitors.size(), folder));
+                                           AsmMessages.getMessage(AsmMessages.GET_FOLDER_DATA_301,
+                                                                  folderMonitors.size(), folder));
         }
 
         // prefix for metric name
@@ -114,19 +120,32 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         try {
             if (EpaUtils.getBooleanProperty(METRICS_STATS_FOLDER, false)) {
                 if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-                    EpaUtils.getFeedback().verbose(module, 
-                        AsmMessages.getMessage(AsmMessages.GET_STATS_DATA_302,
-                            folderMonitors.size(), folder));
+                    EpaUtils.getFeedback()
+                        .verbose(module, 
+                                 AsmMessages.getMessage(AsmMessages.GET_STATS_DATA_302,
+                                                        folderMonitors.size(), folder));
                 }
 
                 // get aggregated folder stats
                 resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, true));
             } else {
-                EpaUtils.getFeedback().verbose(module, 
-                    AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA_303, folder));
+                EpaUtils.getFeedback()
+                    .verbose(module, 
+                             AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA_303, folder));
             }
         } catch (Exception e) {
-            EpaUtils.getFeedback().warn(module, e.getMessage());
+            EpaUtils.getFeedback().warn(module, AsmMessages
+                                        .getMessage(AsmMessages.METRIC_READ_WARN_704,
+                                                    e.getMessage()));
+        }
+
+        if (Thread.currentThread().isInterrupted()) {
+            EpaUtils.getFeedback()
+                .verbose(module, 
+                         "thread interrupted - "
+                                 + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                                                          folder, resultMetricMap.size()));
+            return resultMetricMap;
         }
 
         // don't get aggregate metrics for root folder
@@ -137,17 +156,41 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                     resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, false));
                 }
             } catch (Exception e) {
-                EpaUtils.getFeedback().warn(module, e.getMessage());
+                EpaUtils.getFeedback().warn(module, AsmMessages
+                                            .getMessage(AsmMessages.METRIC_READ_WARN_704,
+                                                        e.getMessage()));
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+                EpaUtils.getFeedback()
+                .verbose(module, 
+                         "thread interrupted - "
+                                 + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                                                          folder, resultMetricMap.size()));
+                return resultMetricMap;
             }
 
             // get logs for all monitors of this folder
             try {
                 if (EpaUtils.getBooleanProperty(METRICS_LOGS, false)) {
                     resultMetricMap.putAll(
-                        requestHelper.getLogs(folder, folderMonitors.size(), folderPrefix));
+                                           requestHelper.getLogs(folder,
+                                                                 folderMonitors.size(),
+                                                                 folderPrefix));
                 }
             } catch (Exception e) {
-                EpaUtils.getFeedback().warn(module, e.getMessage());
+                EpaUtils.getFeedback().warn(module, AsmMessages
+                                            .getMessage(AsmMessages.METRIC_READ_WARN_704,
+                                                        e.getMessage()));
+            }
+
+            if (Thread.currentThread().isInterrupted()) {
+                EpaUtils.getFeedback()
+                .verbose(module, 
+                         "thread interrupted - "
+                                 + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                                                          folder, resultMetricMap.size()));
+                return resultMetricMap;
             }
 
             // get public metrics for all monitors of this folder
@@ -156,14 +199,16 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                     resultMetricMap.putAll(requestHelper.getPsp(folder, folderPrefix));
                 }
             } catch (Exception e) {
-                EpaUtils.getFeedback().warn(module, e.getMessage());
+                EpaUtils.getFeedback().warn(module, AsmMessages
+                                            .getMessage(AsmMessages.METRIC_READ_WARN_704,
+                                                        e.getMessage()));
             }
         }
 
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             EpaUtils.getFeedback().verbose(module, 
-                AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
-                    folder, resultMetricMap.size()));
+                                           AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                                                                  folder, resultMetricMap.size()));
         }
         return resultMetricMap;
     }
