@@ -53,6 +53,7 @@ public interface AsmProperties {
     public static final String PROXY_USER               = "asm.proxyUser";
     public static final String PROXY_PASSWORD_ENCRYPTED = "asm.proxyPasswordEncrypted";
     public static final String PROXY_PASSWORD           = "asm.proxyPassword";
+    public static final String HTTP_READ_TIMEOUT        = "asm.httpReadTimeout";
 
     public static final String LOCAL_TEST               = "asm.localtest";
     public static final String LOCAL_TEST_PATH          = "asm.localtestpath";

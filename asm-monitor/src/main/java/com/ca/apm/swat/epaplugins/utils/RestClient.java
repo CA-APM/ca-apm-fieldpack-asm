@@ -27,6 +27,8 @@ public class RestClient {
     public static final String HTTP_PROXY_PORT = "http.proxyPort";
     public static final String HTTPS_PROXY_PORT = "https.proxyPort";
 
+    public static final int HTTP_READ_TIMEOUT = 10000; // 10 seconds
+
     private static final int BUFFER_LENGTH = 8192;
 
     /**
@@ -85,7 +87,7 @@ public class RestClient {
             }
 
             EpaUtils.getFeedback().verbose(module,
-                AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url2, params));
+                                           AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url2, params));
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -114,6 +116,11 @@ public class RestClient {
 //
 //        }
 
+        int readTimeout =
+                Integer.parseInt(EpaUtils.getProperty(AsmProperties.HTTP_READ_TIMEOUT,
+                                                      Integer.toString(HTTP_READ_TIMEOUT)));
+        connection.setReadTimeout(readTimeout);
+
         final long startTime = System.currentTimeMillis();
         connection.connect();
 
@@ -131,8 +138,8 @@ public class RestClient {
 
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             EpaUtils.getFeedback().verbose(module,
-                AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE_311,
-                    response.length(), time));
+                                           AsmMessages.getMessage(AsmMessages.HTTP_RESPONSE_311,
+                                                                  response.length(), time));
         }
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
