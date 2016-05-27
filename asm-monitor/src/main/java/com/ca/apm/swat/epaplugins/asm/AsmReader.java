@@ -242,9 +242,6 @@ public class AsmReader implements AsmProperties {
         this.keepRunning = true;
         this.numRetriesLeft = 10;
 
-        Date now = new Date();
-        lastConfigUpdateTimestamp = now.getTime();
-
         // connect and read folders, monitors and monitoring stations.
         folderMap = initialize(requestHelper);
 
@@ -272,11 +269,9 @@ public class AsmReader implements AsmProperties {
                 requestHelper.printApiCallStatistics();
 
                 // check if we need to reread the configuration
-                now = new Date();
-                long timeElapsed = now.getTime() - lastConfigUpdateTimestamp;
+                long timeElapsed = new Date().getTime() - lastConfigUpdateTimestamp;
                 if (stopped
                         || ((configUpdateInterval > 0) && (configUpdateInterval < timeElapsed))) {
-                    lastConfigUpdateTimestamp = now.getTime();
 
                     stopThreads();
                     // print our threads
@@ -406,16 +401,15 @@ public class AsmReader implements AsmProperties {
                     file.getPath());
 
                 try {
+                    stopThreads();
+
                     // print our threads
                     printThreads();
 
-                    stopThreads();
                     AsmReader.setProperties(readPropertiesFromFile(file.getPath()));
                     AsmReader.getInstance().folderMap = readConfiguration();
+                    
                     startThreads(AsmReader.getInstance().folderMap);
-
-                    // print our threads
-                    printThreads();
                 } catch (Exception e) {
                     if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                             && (numRetriesLeft > 0)) {
@@ -578,6 +572,8 @@ public class AsmReader implements AsmProperties {
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             log(SeverityLevel.VERBOSE, "read monitoring stations");
         }
+
+        lastConfigUpdateTimestamp = new Date().getTime();
 
         log(SeverityLevel.INFO, AsmMessages.READ_CONFIGURATION_505, EpaUtils.getProperty(URL));
 
