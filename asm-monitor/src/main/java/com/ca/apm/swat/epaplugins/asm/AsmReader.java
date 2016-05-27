@@ -278,8 +278,10 @@ public class AsmReader implements AsmProperties {
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                         && (numRetriesLeft > 0)) {
-                    numRetriesLeft = retryConnection(numRetriesLeft,
-                        AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
+                    numRetriesLeft =
+                            retryConnection(numRetriesLeft,
+                                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD),
+                                            e.getMessage());
                 } else if (e instanceof InterruptedException) {
                     // ignore, the config file has changed
                     log(SeverityLevel.VERBOSE,
@@ -389,8 +391,10 @@ public class AsmReader implements AsmProperties {
                 } catch (Exception e) {
                     if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                             && (numRetriesLeft > 0)) {
-                        numRetriesLeft = retryConnection(numRetriesLeft,
-                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD));
+                        numRetriesLeft =
+                                retryConnection(numRetriesLeft,
+                                                AsmMessages.getMessage(AsmMessages.PARENT_THREAD),
+                                                e.getMessage());
                     } else {
                         log(SeverityLevel.ERROR,
                             AsmMessages.RUN_ERROR_904,
@@ -525,12 +529,16 @@ public class AsmReader implements AsmProperties {
      * Retry to connect.
      * @param numRetriesLeft retries left
      * @param apmcmInfo message to log
+     * @param errorMessage error message of exception that was thrown
      * @return number of retries left
      */
-    public int retryConnection(int numRetriesLeft, String apmcmInfo) {
-        EpaUtils.getFeedback().error(module,
-            AsmMessages.getMessage(AsmMessages.CONNECTION_ERROR_902,
-                ASM_PRODUCT_NAME, apmcmInfo));
+    public int retryConnection(int numRetriesLeft, String apmcmInfo, String errorMessage) {
+        log(SeverityLevel.ERROR,
+            AsmMessages.CONNECTION_ERROR_902,
+            ASM_PRODUCT_NAME,
+            apmcmInfo,
+            errorMessage);
+        
         if (numRetriesLeft > 0) {
             log(SeverityLevel.INFO,
                 AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_501,
@@ -573,8 +581,11 @@ public class AsmReader implements AsmProperties {
             } catch (Exception e) {
                 if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
                         && (initNumRetriesLeft > 0)) {
-                    initNumRetriesLeft = retryConnection(initNumRetriesLeft,
-                        AsmMessages.getMessage(AsmMessages.AGENT_INITIALIZATION));
+                    initNumRetriesLeft =
+                            retryConnection(initNumRetriesLeft,
+                                            AsmMessages
+                                            .getMessage(AsmMessages.AGENT_INITIALIZATION),
+                                            e.getMessage());
                 } else {
                     log(SeverityLevel.ERROR,
                         AsmMessages.INITIALIZATION_ERROR_900,
