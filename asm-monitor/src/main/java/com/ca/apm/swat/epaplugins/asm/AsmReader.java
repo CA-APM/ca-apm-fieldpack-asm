@@ -278,6 +278,9 @@ public class AsmReader implements AsmProperties {
                     printThreads();
                     folderMap = readConfiguration();
                     startThreads(folderMap);
+                    
+                    // reset retries
+                    this.numRetriesLeft = 10;
                 }
 
                 // print our threads
