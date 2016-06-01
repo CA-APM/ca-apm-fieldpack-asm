@@ -87,7 +87,8 @@ public class RestClient {
             }
 
             EpaUtils.getFeedback().verbose(module,
-                                           AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310, method, url2, params));
+                                           AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310,
+                                                                  method, url2, params));
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
