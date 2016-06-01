@@ -204,8 +204,13 @@ public class BaseMonitor implements Monitor, AsmProperties {
                         try {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
-                            if (null != thisValue) {
+                            if ((null != thisValue) && (0 < thisValue.length())) {
                                 outputMap = successor.generateMetrics(thisValue, metricTree);
+                            } else {
+                                EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
+                                    AsmMessages.OUTPUT_EMPTY_WARN_705,
+                                    getName(),
+                                    metricTree));
                             }
                         } catch (AsmException e) {
                             handleException(e, metricTree, metricMap, module);

@@ -37,13 +37,13 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put(COLORS_TAG, "Performance Status");
         ASM_METRICS.put("consecutive_errors", "Consecutive Errors");
         ASM_METRICS.put("ctime", "Connect Time (ms)");
-        ASM_METRICS.put("descr", "Error Description");
+        ASM_METRICS.put(DESCR_TAG, "Error Description");
         ASM_METRICS.put("dsize", "Download Size (kB)");
         ASM_METRICS.put("dspeed", "Download Speed (kB/s)");
         ASM_METRICS.put("dtime", "Download Time (ms)");
         ASM_METRICS.put("elapsed", "API Call Time (ms)");
         ASM_METRICS.put("end", "Check End Time");
-        ASM_METRICS.put("errors", "Errors Per Interval");
+        ASM_METRICS.put(ERRORS_TAG, "Errors Per Interval");
         ASM_METRICS.put("errorsince", "Error Since");
         ASM_METRICS.put(GMT_OFFSET_TAG, "Agent GMT Offset");
         ASM_METRICS.put("info", "Info");
