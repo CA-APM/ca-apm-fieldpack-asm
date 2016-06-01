@@ -314,7 +314,7 @@ public class AsmReader implements AsmProperties {
                                                ASM_PRODUCT_NAME,
                                                AsmMessages.PARENT_THREAD,
                                                e.getMessage()));
-                    log(SeverityLevel.ERROR,"FATAL ERROR IN work(): ", e);
+                    log(SeverityLevel.ERROR, "FATAL ERROR IN work(): " + e.getMessage());
                     e.printStackTrace();
                     keepRunning = Boolean.valueOf(false);
                     System.exit(2);
