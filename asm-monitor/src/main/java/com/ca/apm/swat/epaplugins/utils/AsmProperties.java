@@ -26,7 +26,7 @@ public interface AsmProperties {
 
     public static final String PROPERTY_FILE_NAME       = "AppSyntheticMonitor.properties";
     public static final String PROPERTY_FILE_DIR        = "config";
-    
+
     public static final String PASSWORD_URL             =
             "https://asm.ca.com/en/change_passwd.php";
 
@@ -39,7 +39,7 @@ public interface AsmProperties {
     public static final String CONFIG_UPDATE_INTERVAL   = "asm.configUpdateInterval";
     public static final String DISPLAY_STATIONS         = "asm.displayMonitoringStations";
     public static final String PRINT_API_STATISTICS     = "asm.printApiStatistics";
-    
+
     // which metrics to get and display
     public static final String METRICS_STATS_FOLDER     = "asm.metrics.stats.folder";
     public static final String METRICS_STATS_MONITOR    = "asm.metrics.stats.monitor";
@@ -83,7 +83,7 @@ public interface AsmProperties {
     public static final String STEP_FORMAT_PREFIX       = "asm.stepFormatPrefix";
     public static final String STEP_FORMAT_ALWAYS       = "asm.stepFormatAlways";
     public static final String TIMEOUT_REPORT_ALWAYS    = "asm.alwaysReportTimeout";
-    
+
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";
     public static final String ALL_FOLDERS              = "all_folders";
@@ -142,12 +142,13 @@ public interface AsmProperties {
     public static final int    BUFFER_WAIT_TIME         = 60000;
 
     public static final String JAVA_NET_EXCEPTION_REGEX =
-            ".*(BindException|ConnectException|HttpRetryException|NoRouteToHostException|"
-            + "ProtocolException|SocketException|SocketTimeoutException|UnknownHostException).*";
+            ".*(BindException|ConnectException|HttpRetryException|NoRouteToHostException"
+                    + "|ProtocolException|SocketException|SocketTimeoutException"
+                    + "|UnknownHostException|IOException).*";
 
     // JSON constants
     public static final String JSON_PATTERN             = "\\p{InCombiningDiacriticalMarks}+";
-    
+
     // Crypto constants
     public static final String kAlgorithm               = "PBEWithMD5AndDES";
     public static final String MESSAGE_DIGEST           = "1D0NTF33LT4RDY";
@@ -240,7 +241,7 @@ public interface AsmProperties {
     public static final String SCRIPT_MONITOR           = "script";
     public static final String FULL_PAGE_MONITOR        = "browser";
     public static final String REAL_BROWSER_MONITOR     = "script_firefox";
-    
+
     // JMeter log result tags
     public static final String TEST_RESULTS             = "testResults";
     public static final String RESPONSE_CODE_TAG        = "rc";
@@ -271,7 +272,7 @@ public interface AsmProperties {
     public static final String ASSERTION_FAILURES       = "Assertion Failures";
     public static final String ASSERTION_ERRORS         = "Assertion Errors";
     public static final String TEST_URL                 = "URL";
-   
+
     //  status indicator colors, see AsmPropertiesImpl.APM_CM_COLORS
     public static final String GREEN                    = "green";
     public static final String YELLOW                   = "yellow";

@@ -591,7 +591,7 @@ public class AsmReader implements AsmProperties {
      * @return number of retries left
      */
     public int retryConnection(int numRetriesLeft, String apmcmInfo, String errorMessage) {
-        log(SeverityLevel.ERROR,
+        log(SeverityLevel.WARN,
             AsmMessages.CONNECTION_ERROR_902,
             ASM_PRODUCT_NAME,
             apmcmInfo,
