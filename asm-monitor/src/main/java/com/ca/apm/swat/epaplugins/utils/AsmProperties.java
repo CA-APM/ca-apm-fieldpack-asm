@@ -46,7 +46,8 @@ public interface AsmProperties {
     public static final String METRICS_CREDITS          = "asm.metrics.credits";
     public static final String METRICS_PUBLIC           = "asm.metrics.public";
     public static final String METRICS_LOGS             = "asm.metrics.logs";
-
+    public static final String REPORT_LABELS_IN_PATH    = "asm.metrics.labelInPath";
+    
     public static final String USE_PROXY                = "asm.useProxy";
     public static final String PROXY_HOST               = "asm.proxyHost";
     public static final String PROXY_PORT               = "asm.proxyPort";

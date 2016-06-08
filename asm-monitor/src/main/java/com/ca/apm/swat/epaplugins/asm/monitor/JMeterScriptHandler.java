@@ -150,6 +150,10 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         boolean assertionAvailable = false;
         boolean assertionFailure = false;
         boolean assertionError = false;
+        String label = null;
+        if (EpaUtils.getBooleanProperty(REPORT_LABELS_IN_PATH, false)) {
+        	label = url;
+        }
         String failureMessage = UNDEFINED_ASSERTION;
 
         NodeList stepChildren = stepNode.getChildNodes();
@@ -227,8 +231,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
         // report metrics
         String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
-            + format.formatStep(step, url) + METRIC_NAME_SEPARATOR);
-
+                + format.formatStep(step, (label == null ? url : label)) + METRIC_NAME_SEPARATOR);
+        
         metricMap.put(metric + STATUS_MESSAGE_VALUE,    Integer.toString(statusCode));
         metricMap.put(metric + RESPONSE_CODE,           Integer.toString(responseCode));
         metricMap.put(metric + ERROR_COUNT,             Integer.toString(errorCount));
