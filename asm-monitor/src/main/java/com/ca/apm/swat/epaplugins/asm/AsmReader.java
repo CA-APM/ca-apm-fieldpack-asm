@@ -57,6 +57,7 @@ public class AsmReader implements AsmProperties {
 
     private boolean keepRunning;
     private int numRetriesLeft;
+    private long retryInterval;
     private long configUpdateInterval = DEFAULT_UPDATE_INTERVAL * 60000;
     private long lastConfigUpdateTimestamp = 0;
     private AsmRequestHelper requestHelper = null;
@@ -66,6 +67,8 @@ public class AsmReader implements AsmProperties {
     private HashMap<String, List<Monitor>> folderMap = null;
     private static Module module = new Module("Asm.MainThread");
 
+    private static String connectionRetries = "10";
+    private static String connectionRetryInterval = "60";
     private static String propertyFileName = PROPERTY_FILE_NAME;
     private static AsmReader instance;
 
@@ -240,7 +243,11 @@ public class AsmReader implements AsmProperties {
         reporterService = Executors.newSingleThreadExecutor();
 
         this.keepRunning = true;
-        this.numRetriesLeft = 10;
+        this.numRetriesLeft =
+                Integer.parseInt(EpaUtils.getProperty(CONNECTION_RETRIES, connectionRetries));
+        this.retryInterval =
+                Integer.parseInt(EpaUtils.getProperty(CONNECTION_RETRY_INTERVAL,
+                                                      connectionRetryInterval)) * 1000L;
 
         // connect and read folders, monitors and monitoring stations.
         folderMap = initialize(requestHelper);
@@ -278,25 +285,19 @@ public class AsmReader implements AsmProperties {
                     printThreads();
                     folderMap = readConfiguration();
                     startThreads(folderMap);
-                    
+
                     // reset retries
                     this.numRetriesLeft = 10;
                 }
 
                 // print our threads
                 //printThreads();
-                
+
                 if (!stopped) {
                     Thread.sleep(epaWaitTime);
                 }
             } catch (Exception e) {
-                if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
-                        && (numRetriesLeft > 0)) {
-                    numRetriesLeft =
-                            retryConnection(numRetriesLeft,
-                                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD),
-                                            e.getMessage());
-                } else if (e instanceof InterruptedException) {
+                if (e instanceof InterruptedException) {
                     // ignore, the config file has changed
                     log(SeverityLevel.VERBOSE,
                         e.getMessage() == null ? e.toString() : e.getMessage());
@@ -306,6 +307,13 @@ public class AsmReader implements AsmProperties {
                             log(SeverityLevel.VERBOSE, "  " + ste[i]);
                         }
                     }
+                } else if ((UNLIMITED_RETRIES == numRetriesLeft)
+                        || (numRetriesLeft > 0)) {
+//                        ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))  &&
+                    numRetriesLeft =
+                            retryConnection(numRetriesLeft,
+                                            AsmMessages.getMessage(AsmMessages.PARENT_THREAD),
+                                            e.getMessage());
                 } else if (e instanceof AsmException) {
                     log(SeverityLevel.WARN, e.getMessage());
                 } else {
@@ -411,11 +419,12 @@ public class AsmReader implements AsmProperties {
 
                     AsmReader.setProperties(readPropertiesFromFile(file.getPath()));
                     AsmReader.getInstance().folderMap = readConfiguration();
-                    
+
                     startThreads(AsmReader.getInstance().folderMap);
                 } catch (Exception e) {
-                    if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
-                            && (numRetriesLeft > 0)) {
+//                    if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX)) &&
+                    if ((UNLIMITED_RETRIES == numRetriesLeft)
+                            || (numRetriesLeft > 0)) {
                         numRetriesLeft =
                                 retryConnection(numRetriesLeft,
                                                 AsmMessages.getMessage(AsmMessages.PARENT_THREAD),
@@ -585,6 +594,7 @@ public class AsmReader implements AsmProperties {
 
     /**
      * Retry to connect.
+     * Actually doesn't connect but sleeps 60s and then the outer loop retries to connect.
      * @param numRetriesLeft retries left
      * @param apmcmInfo message to log
      * @param errorMessage error message of exception that was thrown
@@ -596,14 +606,15 @@ public class AsmReader implements AsmProperties {
             ASM_PRODUCT_NAME,
             apmcmInfo,
             errorMessage);
-        
-        if (numRetriesLeft > 0) {
+
+        if ((UNLIMITED_RETRIES == numRetriesLeft)
+                || (numRetriesLeft > 0)) {
             log(SeverityLevel.INFO,
                 AsmMessages.getMessage(AsmMessages.CONNECTION_RETRY_501,
                                        numRetriesLeft));
             numRetriesLeft--;
             try {
-                Thread.sleep(60000L);
+                Thread.sleep(retryInterval);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -622,7 +633,8 @@ public class AsmReader implements AsmProperties {
     public HashMap<String, List<Monitor>> initialize(AsmRequestHelper requestHelper) {
         HashMap<String, List<Monitor>> folderMap = null;
         boolean keepTrying = true;
-        int initNumRetriesLeft = 10;
+        int initNumRetriesLeft =
+                Integer.parseInt(EpaUtils.getProperty(CONNECTION_RETRIES, connectionRetries));
 
         while (keepTrying) {
             try {
@@ -637,8 +649,9 @@ public class AsmReader implements AsmProperties {
                 keepTrying = false;
 
             } catch (Exception e) {
-                if ((e.toString().matches(JAVA_NET_EXCEPTION_REGEX))
-                        && (initNumRetriesLeft > 0)) {
+//                if (e.toString().matches(JAVA_NET_EXCEPTION_REGEX)) &&
+                if ((UNLIMITED_RETRIES == numRetriesLeft)
+                        || (numRetriesLeft > 0)) {
                     initNumRetriesLeft =
                             retryConnection(initNumRetriesLeft,
                                             AsmMessages

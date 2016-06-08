@@ -20,6 +20,7 @@ public interface AsmProperties {
     public static final String BLANK                    = " ";
     public static final String TRUE                     = "true";
     public static final String FALSE                    = "false";
+    public static final int    UNLIMITED_RETRIES        = -1;
 
     public static final String ASM_PRODUCT_NAME         = "App Synthetic Monitor";
     public static final String ASM_PRODUCT_NAME_SHORT   = "ASM";
@@ -39,6 +40,8 @@ public interface AsmProperties {
     public static final String CONFIG_UPDATE_INTERVAL   = "asm.configUpdateInterval";
     public static final String DISPLAY_STATIONS         = "asm.displayMonitoringStations";
     public static final String PRINT_API_STATISTICS     = "asm.printApiStatistics";
+    public static final String CONNECTION_RETRIES       = "asm.connectionRetries";
+    public static final String CONNECTION_RETRY_INTERVAL= "asm.connectionRetryInterval";
 
     // which metrics to get and display
     public static final String METRICS_STATS_FOLDER     = "asm.metrics.stats.folder";
