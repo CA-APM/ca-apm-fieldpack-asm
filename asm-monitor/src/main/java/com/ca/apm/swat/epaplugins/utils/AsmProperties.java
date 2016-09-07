@@ -49,7 +49,8 @@ public interface AsmProperties {
     public static final String METRICS_CREDITS          = "asm.metrics.credits";
     public static final String METRICS_PUBLIC           = "asm.metrics.public";
     public static final String METRICS_LOGS             = "asm.metrics.logs";
-
+    public static final String REPORT_LABELS_IN_PATH    = "asm.metrics.labelInPath";
+    
     public static final String USE_PROXY                = "asm.useProxy";
     public static final String PROXY_HOST               = "asm.proxyHost";
     public static final String PROXY_PORT               = "asm.proxyPort";
@@ -275,7 +276,8 @@ public interface AsmProperties {
     public static final String ASSERTION_FAILURES       = "Assertion Failures";
     public static final String ASSERTION_ERRORS         = "Assertion Errors";
     public static final String TEST_URL                 = "URL";
-
+    public static final String TEST_LABEL               = "Label";
+    
     //  status indicator colors, see AsmPropertiesImpl.APM_CM_COLORS
     public static final String GREEN                    = "green";
     public static final String YELLOW                   = "yellow";
