@@ -30,13 +30,15 @@ public class ScriptMonitor extends BaseMonitor {
         // build chain of responsibility
         Handler jmeterHandler = new JMeterScriptHandler();
         Handler decoder = new InflatingBase64Decoder();
+        Handler downloader = new AssetDownloader();
+        decoder.setSuccessor(downloader);
         
         if (EpaUtils.getBooleanProperty(AsmProperties.FIX_AMPERSAND, true)) {
             Handler fixer = new XmlFixer();
-            decoder.setSuccessor(fixer);
+            downloader.setSuccessor(fixer);
             fixer.setSuccessor(jmeterHandler);
         } else {
-            decoder.setSuccessor(jmeterHandler);
+            downloader.setSuccessor(jmeterHandler);
         }
         
         setSuccessor(decoder);

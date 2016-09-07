@@ -55,6 +55,7 @@ public class AsmMessages {
     public static final String DECOMPRESS_ERROR_711         = "711_decompressError";
     public static final String DECODE_ERROR_712             = "712_decodeError";
     public static final String JSON_PARSING_ERROR_713       = "713_jsonParsingError";
+    public static final String ASSET_DOWNLOAD_ERROR_714     = "714_assetDownloadError";
 
     //error messages
     public static final String INITIALIZATION_ERROR_900     = "900_initializationError";
