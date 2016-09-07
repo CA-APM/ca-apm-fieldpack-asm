@@ -642,6 +642,13 @@ public class AsmRequestHelper implements AsmProperties {
             //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
             //        + "&num=" + numLogs + "&reverse=y&full=y";
 
+            // only download full data if configured
+            if (!EpaUtils.getBooleanProperty(METRICS_DOWNLOAD_FULL, false)) {
+                logStr += 'y';
+            } else {
+                logStr += 'n';
+            }
+            
             String logResponse = accessor.executeApi(LOGS_CMD, logStr);
 
             Module module = new Module(Thread.currentThread().getName());

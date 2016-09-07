@@ -50,6 +50,8 @@ public interface AsmProperties {
     public static final String METRICS_PUBLIC           = "asm.metrics.public";
     public static final String METRICS_LOGS             = "asm.metrics.logs";
     public static final String REPORT_LABELS_IN_PATH    = "asm.metrics.labelInPath";
+    public static final String METRICS_DOWNLOAD_FULL    = "asm.metrics.download.full";
+
     
     public static final String USE_PROXY                = "asm.useProxy";
     public static final String PROXY_HOST               = "asm.proxyHost";
@@ -193,7 +195,7 @@ public interface AsmProperties {
     public static final String NUM_PARAM                = "&num=";
     public static final String START_DATE_PARAM         = "&start_date=";
     public static final String ACCOUNT_PARAM            = "&acct=";
-    public static final String FULL_PARAM               = "&full=y";
+    public static final String FULL_PARAM               = "&full=";
 
     // response tags
     public static final String XML_PREFIX               = "<?xml";
