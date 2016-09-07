@@ -59,10 +59,10 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         Thread.currentThread().setName(module.getName());
 
         EpaUtils.getFeedback()
-        .verbose(module,
-                 AsmMessages.getMessage(AsmMessages.THREAD_STARTED_312,
-                                        Thread.currentThread().getId(),
-                                        this.folder));
+            .verbose(module,
+                     AsmMessages.getMessage(AsmMessages.THREAD_STARTED_312,
+                                            Thread.currentThread().getId(),
+                                            this.folder));
 
         try {
             // get the metrics for this folder and all its monitors
@@ -77,12 +77,12 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             return;
         } catch (Exception e) {
             EpaUtils.getFeedback()
-            .error(module, AsmMessages.getMessage(
-                                                  AsmMessages.FOLDER_THREAD_ERROR_906,
-                                                  ASM_PRODUCT_NAME, this.folder,
-                                                  e.getMessage() == null
-                                                  ? e.toString()
-                                                  : e.getMessage()));
+                .error(module, AsmMessages.getMessage(
+                                                      AsmMessages.FOLDER_THREAD_ERROR_906,
+                                                      ASM_PRODUCT_NAME, this.folder,
+                                                      e.getMessage() == null
+                                                      ? e.toString()
+                                                      : e.getMessage()));
             EpaUtils.getFeedback().error(module, this.folder + ": " + ErrorUtils.getStackTrace(e));
         }
     }
@@ -121,17 +121,17 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             if (EpaUtils.getBooleanProperty(METRICS_STATS_FOLDER, false)) {
                 if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                     EpaUtils.getFeedback()
-                    .verbose(module, 
-                             AsmMessages.getMessage(AsmMessages.GET_STATS_DATA_302,
-                                                    folderMonitors.size(), folder));
+                        .verbose(module, 
+                                 AsmMessages.getMessage(AsmMessages.GET_STATS_DATA_302,
+                                                        folderMonitors.size(), folder));
                 }
 
                 // get aggregated folder stats
                 resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, true));
             } else {
                 EpaUtils.getFeedback()
-                .verbose(module, 
-                         AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA_303, folder));
+                    .verbose(module, 
+                             AsmMessages.getMessage(AsmMessages.GET_NO_STATS_DATA_303, folder));
             }
         } catch (Exception e) {
             EpaUtils.getFeedback().warn(module, AsmMessages
@@ -141,8 +141,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
 
         if (Thread.currentThread().isInterrupted()) {
             EpaUtils.getFeedback()
-            .verbose(module, 
-                     "thread interrupted - "
+                .verbose(module, 
+                         "thread interrupted - "
                              + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
                                                       folder, resultMetricMap.size()));
             return resultMetricMap;
@@ -165,8 +165,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                 EpaUtils.getFeedback()
                     .verbose(module, 
                              "thread interrupted - "
-                                     + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
-                                                              folder, resultMetricMap.size()));
+                                 + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                                                          folder, resultMetricMap.size()));
                 return resultMetricMap;
             }
 
@@ -188,8 +188,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                 EpaUtils.getFeedback()
                     .verbose(module, 
                              "thread interrupted - "
-                                     + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
-                                                              folder, resultMetricMap.size()));
+                                 + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
+                                                          folder, resultMetricMap.size()));
                 return resultMetricMap;
             }
 

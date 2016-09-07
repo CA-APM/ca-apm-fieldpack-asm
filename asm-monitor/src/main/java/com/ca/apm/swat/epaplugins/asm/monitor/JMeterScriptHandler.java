@@ -25,9 +25,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
     protected Handler successor = null;  
 
     public JMeterScriptHandler() {
-        
+
     }
-    
+
     public void setSuccessor(Handler successor) {
         this.successor = successor;
     }
@@ -153,6 +153,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         String failureMessage = UNDEFINED_ASSERTION;
 
         NodeList stepChildren = stepNode.getChildNodes();
+//        int subStep = 0;
 
         //Walk through the elements of one step
         for (int j = 0; j < stepChildren.getLength(); j++) {
@@ -187,6 +188,12 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 if ((null != text) && (0 < text.length())) {
                     url = text;
                 }
+//            } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
+//                    .equals(HTTP_SAMPLE)) {
+//                String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
+//                    + format.formatStep(step, url) + METRIC_NAME_SEPARATOR);
+//                metricMap.putAll(reportJMeterStep(metric, subStep, stepChild));
+//                ++subStep;
             }
         }
 
