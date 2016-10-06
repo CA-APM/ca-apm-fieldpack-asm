@@ -152,7 +152,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         boolean assertionError = false;
         String label = null;
         if (EpaUtils.getBooleanProperty(REPORT_LABELS_IN_PATH, false)) {
-        	label = "|" + url;
+            label = "|" + url;
         }
         String failureMessage = UNDEFINED_ASSERTION;
 

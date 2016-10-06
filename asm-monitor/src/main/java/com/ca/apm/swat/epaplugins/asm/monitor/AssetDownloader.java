@@ -42,9 +42,9 @@ public class AssetDownloader implements Handler {
                         new JSONObject(string).getJSONObject("jtl").getString("url")
                     ).openStream()));
                 StringBuilder sb = new StringBuilder();
-                String s;
-                while ((s = in.readLine()) != null) {
-                    sb.append(s);
+                String str;
+                while ((str = in.readLine()) != null) {
+                    sb.append(str);
                 }
                 string = sb.toString();
 
@@ -60,7 +60,9 @@ public class AssetDownloader implements Handler {
                 if (in != null) {
                     try {
                         in.close();
-                    } catch (Exception ignored) { }
+                    } catch (Exception ignored) {
+                        // ignore
+                    }
                 }
             }
 

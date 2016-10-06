@@ -41,7 +41,7 @@ public interface AsmProperties {
     public static final String DISPLAY_STATIONS         = "asm.displayMonitoringStations";
     public static final String PRINT_API_STATISTICS     = "asm.printApiStatistics";
     public static final String CONNECTION_RETRIES       = "asm.connectionRetries";
-    public static final String CONNECTION_RETRY_INTERVAL= "asm.connectionRetryInterval";
+    public static final String CONNECTION_RETRY_INTERVAL = "asm.connectionRetryInterval";
 
     // which metrics to get and display
     public static final String METRICS_STATS_FOLDER     = "asm.metrics.stats.folder";
