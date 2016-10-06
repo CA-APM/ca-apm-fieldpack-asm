@@ -36,7 +36,7 @@ public class AsmLoginTest extends FileTest {
         try {
             this.properties = AsmReader.readPropertiesFromFile(propertyFileName);
             this.properties.setProperty(USER, "bryan.jasper@ca.com");
-            this.properties.setProperty(URL, "https://api.cloudmonitor.ca.com/1.6");
+            this.properties.setProperty(URL, "https://api.asm.ca.com/1.6/");
             this.properties.setProperty(NUM_LOGS, "5");
             this.properties.setProperty(WAIT_TIME, "5000");
             this.properties.setProperty(LOCAL_TEST, FALSE);
