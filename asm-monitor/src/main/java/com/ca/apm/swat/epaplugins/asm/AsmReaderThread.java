@@ -136,7 +136,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         } catch (Exception e) {
             EpaUtils.getFeedback().warn(module, AsmMessages
                                         .getMessage(AsmMessages.METRIC_READ_WARN_704,
-                                                    e.getMessage()));
+                                                    folder, STATS_CMD, e.getMessage()));
         }
 
         if (Thread.currentThread().isInterrupted()) {
@@ -158,7 +158,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             } catch (Exception e) {
                 EpaUtils.getFeedback().warn(module, AsmMessages
                                             .getMessage(AsmMessages.METRIC_READ_WARN_704,
-                                                        e.getMessage()));
+                                                        folder, STATS_CMD, e.getMessage()));
             }
 
             if (Thread.currentThread().isInterrupted()) {
@@ -181,7 +181,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             } catch (Exception e) {
                 EpaUtils.getFeedback().warn(module, AsmMessages
                                             .getMessage(AsmMessages.METRIC_READ_WARN_704,
-                                                        e.getMessage()));
+                                                        folder, LOGS_CMD, e.getMessage()));
             }
 
             if (Thread.currentThread().isInterrupted()) {
@@ -201,7 +201,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             } catch (Exception e) {
                 EpaUtils.getFeedback().warn(module, AsmMessages
                                             .getMessage(AsmMessages.METRIC_READ_WARN_704,
-                                                        e.getMessage()));
+                                                        folder, PSP_CMD, e.getMessage()));
             }
         }
 
