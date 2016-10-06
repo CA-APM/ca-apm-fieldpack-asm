@@ -1,4 +1,4 @@
-# CA APM App Synthetic Monitor Fieldpack (Version 1.1)
+# CA APM App Synthetic Monitor Integration
 
 ## Description
 This field pack integrates metrics from CA App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM. It provides a lot more configuration flexibility and more information than the out-of-the-box extension that is provided in the CA APM product.
@@ -9,7 +9,7 @@ Provide a short description of the field pack here. See [Mastering Markdown](htt
 This field pack has been tested with CA APM 9.7 and 10.0.
 
 ## Supported third party versions
-This field pack has been tested with CA App Synthetic Monitor 8.3.
+This field pack has been tested with CA App Synthetic Monitor 8.5.
 
 ## License
 This field pack is provided under the [Eclipse Public License - v 1.0](https://github.com/CA-APM/ca-apm-fieldpack-asm/blob/master/LICENSE) license.
@@ -33,3 +33,4 @@ Version | Author | Comment
 --------|--------|--------
 1.0 | Seth Schwartzman | First version of the field pack.
 1.1 | Guenter Grossberger | Overhaul of the whole field pack adding more configuration points and information about individual script step results.
+1.2 | Alex Bradley, Martin Macura, Guenter Grossberger | Download new HAR file format, add JMeter label to metric path (optional), by default don't download 'full' logs, avoid high cpu in unzip
