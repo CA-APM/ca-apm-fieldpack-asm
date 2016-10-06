@@ -103,28 +103,6 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<artifactSet>
-						<includes>
-							<include>org.json:json</include>
-							<include>commons-codec:commons-codec</include>
-						</includes>
-					</artifactSet>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.3</version>
 				<executions>
@@ -142,64 +120,6 @@
 						<descriptor>src/assembly/distribution.xml</descriptor>
 					</descriptors>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<configuration>
-							<tasks>
-								<mkdir dir="${project.build.directory}/bin" />
-								<copy todir="${project.build.directory}/bin" flatten="true"
-									overwrite="true" verbose="true" failonerror="true">
-									<fileset dir="${project.basedir}/src/main/bin"
-										includes="*.sh" />
-								</copy>
-								<mkdir dir="${project.build.directory}/docs" />
-								<copy todir="${project.build.directory}/docs" flatten="true"
-									overwrite="true" verbose="true" failonerror="true">
-									<fileset dir="${project.basedir}/src/main/docs"
-										includes="*" />
-								</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>copy-jars</id>
-						<phase>pre-integration-test</phase>
-						<configuration>
-							<target>
-								<ant antfile="${basedir}/build.xml">
-									<target name="copy" />
-								</ant>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>clean</id>
-						<phase>clean</phase>
-						<configuration>
-							<target>
-								<ant antfile="${basedir}/build.xml">
-									<target name="clean" />
-								</ant>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 			<plugin>
@@ -224,14 +144,8 @@
 					<include>AppSyntheticMonitor.typeviewers.xml</include>
 				</includes>
 			</resource>
-			<resource>
-				<directory>src/main/bin</directory>
-				<filtering>false</filtering>
-				<includes>
-					<include>**/*.sh</include>
-				</includes>
-			</resource>
 		</resources>
+
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>

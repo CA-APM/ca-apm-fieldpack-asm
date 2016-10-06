@@ -107,9 +107,9 @@ if [ ${MIN_HEAP_VAL_IN_MB} -gt ${MAX_HEAP_VAL_IN_MB} ]
 fi
 
 # the command to start the EPAgent
-#EpaCmd="java -Xms${MIN_HEAP_VAL_IN_MB}m -Xmx${MAX_HEAP_VAL_IN_MB}m -cp lib/EPAgent.jar:lib/IntroscopeServices.jar:lib/Agent.jar:epaplugins/epaMQMonitor/epaMQMonitor.jar:epaplugins/epaMQMonitor:epaplugins/epaMQMonitor/lib/com.ibm.mq.pcf.jar:epaplugins/epaMQMonitor/lib/com.ibm.mq.jar:epaplugins/epaMQMonitor/lib/connector.jar:epaplugins/epaMQMonitor/lib/com.ibm.mqjms.jar com.wily.introscope.api.IntroscopeEPAgent"
-EpaCmd="java -Xdebug -Xms${MIN_HEAP_VAL_IN_MB}m -Xmx${MAX_HEAP_VAL_IN_MB}m -Dcom.wily.introscope.epagent.properties=./config/AppSyntheticMonitor.properties -cp lib/EPAgent.jar:lib/ca.apm.swat.asm-monitor.jar com.wily.introscope.api.IntroscopeEPAgent"
-#echo $EpaCmd
+#-Xdebug
+EpaCmd="java -Xms${MIN_HEAP_VAL_IN_MB}m -Xmx${MAX_HEAP_VAL_IN_MB}m -Dcom.wily.introscope.epagent.properties=./config/AppSyntheticMonitor.properties -cp lib/EPAgent.jar:lib/ca.apm.swat.asm-monitor.jar:lib/commons-codec-1.10.jar:lib/json-20131018.jar com.wily.introscope.api.IntroscopeEPAgent"
+echo $EpaCmd
 # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
 
 cd "${WILYHOME}"

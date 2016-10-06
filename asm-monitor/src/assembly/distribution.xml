@@ -20,12 +20,12 @@
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.build.directory}</directory>
-			<outputDirectory></outputDirectory>
+			<directory>${project.build.directory}/../..</directory>
+			<outputDirectory>docs</outputDirectory>
 			<includes>
 				<include>README*</include>
 				<include>LICENSE*</include>
-				<include>NOTICE.txt</include>
+				<include>NOTICE*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -46,14 +46,14 @@
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.build.directory}/bin</directory>
+			<directory>${project.build.directory}/../src/main/bin</directory>
 			<outputDirectory>bin</outputDirectory>
 			<includes>
 				<include>*.sh</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>${project.build.directory}/docs</directory>
+			<directory>${project.build.directory}/../src/main/docs</directory>
 			<outputDirectory>docs</outputDirectory>
 			<includes>
 				<include>*</include>
@@ -63,4 +63,16 @@
 			</excludes>
 		</fileSet>
 	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib</outputDirectory>
+			<useProjectArtifact>true</useProjectArtifact>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<include>org.json:json</include>
+				<include>commons-codec:commons-codec</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
 </assembly>
