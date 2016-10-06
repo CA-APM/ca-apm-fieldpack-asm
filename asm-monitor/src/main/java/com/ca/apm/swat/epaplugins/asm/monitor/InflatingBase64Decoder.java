@@ -90,8 +90,10 @@ public class InflatingBase64Decoder implements Handler {
      * @param data compressed data
      * @return uncompressed data
      */
-    public byte[] decompress(byte[] data) {
+    protected byte[] decompress(byte[] data) {
         try {
+            Module module = new Module(Thread.currentThread().getName());
+
             Inflater inflater = new Inflater();
             inflater.setInput(data);
 
@@ -99,13 +101,22 @@ public class InflatingBase64Decoder implements Handler {
             byte[] buffer = new byte[1024];
             while (!inflater.finished()) {
                 int count = inflater.inflate(buffer);
+
+                if (count == 0) {
+                    if (EpaUtils.getFeedback().isWarningEnabled(module)) {
+                        EpaUtils.getFeedback().warn(module,
+                            this.getClass().getSimpleName()
+                            + ": Inflater readBytes=0, breaking loop");
+                    }
+                    break; // exit loop
+                }
+
                 outputStream.write(buffer, 0, count);
             }
             outputStream.close();
-            byte[] output = outputStream.toByteArray();
-
             inflater.end();
-            return output;
+
+            return outputStream.toByteArray();
         } catch (Exception ex) {
             return null;
         }
