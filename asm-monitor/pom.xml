@@ -1,22 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ca.apm.swat</groupId>
+	<groupId>com.ca.apm.extensions</groupId>
 	<artifactId>asm-monitor</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.1</version>
 	<name>ASMMonitor</name>
 	<description>Fieldpack to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
+
 	<properties>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
 		<!-- default is: yyyyMMdd-HHmm -->
 		<wiki.page.id>732790862</wiki.page.id>
 	</properties>
+
 	<scm>
-		<connection>scm:git:git@github-isl-01.ca.com/grogu01/fieldpack.asmmonitor.git</connection>
-		<url>scm:git:git@github-isl-01.ca.com/grogu01/fieldpack.asmmonitor.git</url>
-		<developerConnection>scm:git:git@github-isl-01.ca.com/grogu01/fieldpack.asmmonitor.git</developerConnection>
+		<connection>scm:git:git@github.com/CA-APM/ca-apm-fieldpack-asm.git</connection>
+		<url>scm:git:git@github.com/CA-APM/ca-apm-fieldpack-asm.git</url>
+		<developerConnection>scm:git:git@github.com/CA-APM/ca-apm-fieldpack-asm.git</developerConnection>
 	</scm>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -42,7 +45,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>ca.apm.swat.asm-monitor</finalName>
+		<finalName>com.ca.apm.extensions.epagent.${project.artifactId}-${project.version}</finalName>
 		<defaultGoal>clean package</defaultGoal>
 
 		<extensions>

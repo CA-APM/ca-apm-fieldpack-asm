@@ -34,3 +34,4 @@ Version | Author | Comment
 1.0 | Seth Schwartzman | First version of the field pack.
 1.1 | Guenter Grossberger | Overhaul of the whole field pack adding more configuration points and information about individual script step results.
 1.2 | Alex Bradley, Martin Macura, Guenter Grossberger | Download new HAR file format, add JMeter label to metric path (optional), by default don't download 'full' logs, avoid high cpu in unzip
+1.2.1 | Guenter Grossberger | added asm.skipNoCheckpointAvailable property and changed artifact and file names
