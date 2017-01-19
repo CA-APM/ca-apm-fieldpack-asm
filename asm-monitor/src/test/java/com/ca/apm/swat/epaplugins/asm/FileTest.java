@@ -97,7 +97,7 @@ public abstract class FileTest implements AsmProperties {
                              String[] expectedMetricValues,
                              HashMap<String, String> metricMap) {
         for (int i = 0; i < expectedMetricNames.length; ++i) {
-            Assert.assertEquals(expectedMetricNames + " missing",
+            Assert.assertEquals(expectedMetricNames[i],
                 expectedMetricValues[i],
                 metricMap.get(expectedMetricNames[i]));
         }

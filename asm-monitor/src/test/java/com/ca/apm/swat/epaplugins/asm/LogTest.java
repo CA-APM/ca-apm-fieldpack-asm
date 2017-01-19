@@ -458,4 +458,147 @@ public class LogTest extends FileTest {
             Assert.fail(e.getMessage());
         }
     }
+    
+    /**
+     * Test that previous error is printed for "no checkpoint available".
+     */
+    @Test
+    public void skipNoCheckpointAvailable() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            EpaUtils.getProperties().setProperty(SKIP_NO_CHECKPOINT_AVAILABLE, TRUE);
+
+            String folder = "Tests";
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+            
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_error.json");
+
+            // call API
+            HashMap<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+
+          
+            String[] expectedMetrics = {
+                "Monitors|Tests|Map Service_Restricted_Area:Alerts Per Interval",
+                "Monitors|Tests|Map Service_Restricted_Area:Check Start Time",
+                "Monitors|Tests|Map Service_Restricted_Area:Error Description",
+                "Monitors|Tests|Map Service_Restricted_Area:Errors Per Interval",
+                "Monitors|Tests|Map Service_Restricted_Area:Location Code",
+                "Monitors|Tests|Map Service_Restricted_Area:Monitor ID",
+                "Monitors|Tests|Map Service_Restricted_Area:Monitor Name",
+                "Monitors|Tests|Map Service_Restricted_Area:Repeat",
+                "Monitors|Tests|Map Service_Restricted_Area:Result Code",
+                "Monitors|Tests|Map Service_Restricted_Area:Status Message Value",
+                "Monitors|Tests|Map Service_Restricted_Area:Repeat",                
+                "Monitors|Tests|Map Service_Restricted_Area:Type",
+            };
+
+            String[] expectedValues = {
+                "0",
+                "2016-11-02 00:02:28",
+                "Timeout of monitor sequence",
+                "1",
+                "ad",
+                "402423",
+                "Map Service_Restricted_Area",
+                "1",
+                "1042",
+                "600",
+                "1",
+                "0"
+            };
+            
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+            
+            // check
+            checkMetrics(expectedMetrics, expectedValues, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test that "no checkpoint available" is returned if property is not set.
+     */
+    @Test
+    public void skipNoCheckpointAvailableDefault() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+
+            String folder = "Tests";
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+            
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_error.json");
+
+            // call API
+            HashMap<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+
+            String[] expectedMetrics = {
+                "Monitors|Tests|Map Service_Restricted_Area:Alerts Per Interval",
+                "Monitors|Tests|Map Service_Restricted_Area:Check Start Time",
+                "Monitors|Tests|Map Service_Restricted_Area:Error Description",
+                "Monitors|Tests|Map Service_Restricted_Area:Errors Per Interval",
+                "Monitors|Tests|Map Service_Restricted_Area:Location Code",
+                "Monitors|Tests|Map Service_Restricted_Area:Monitor ID",
+                "Monitors|Tests|Map Service_Restricted_Area:Monitor Name",
+                "Monitors|Tests|Map Service_Restricted_Area:Repeat",
+                "Monitors|Tests|Map Service_Restricted_Area:Result Code",
+                "Monitors|Tests|Map Service_Restricted_Area:Status Message Value",
+                "Monitors|Tests|Map Service_Restricted_Area:Type",
+            };
+
+            String[] expectedValues = {
+                "0",
+                "2016-11-02 00:03:10",
+                "No checkpoint available for check type script/IPvANY in namespace #195 and pool &apos;ad&apos;, excluding &apos;ad&apos;",
+                "1",
+                "--",
+                "402423",
+                "Map Service_Restricted_Area",
+                "1",
+                "-93",
+                "-93",
+                "5"
+                                   };
+            
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+            
+            // check
+            checkMetrics(expectedMetrics, expectedValues, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
 }

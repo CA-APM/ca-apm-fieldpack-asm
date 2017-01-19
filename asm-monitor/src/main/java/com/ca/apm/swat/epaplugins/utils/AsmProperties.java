@@ -89,6 +89,7 @@ public interface AsmProperties {
     public static final String STEP_FORMAT_PREFIX       = "asm.stepFormatPrefix";
     public static final String STEP_FORMAT_ALWAYS       = "asm.stepFormatAlways";
     public static final String TIMEOUT_REPORT_ALWAYS    = "asm.alwaysReportTimeout";
+    public static final String SKIP_NO_CHECKPOINT_AVAILABLE = "asm.skipNoCheckpointAvailable";
 
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";
@@ -135,7 +136,7 @@ public interface AsmProperties {
     public static final int    RESULT_RESPONSE_ASSERTION    = 7001;
     public static final int    RESULT_OPERATION_TIMEOUT     = 7011;
     public static final int    RESULT_ASSERTION_NOT_MATCHED = 9501;
-
+    public static final int    RESULT_NO_CHECKPOINT_AVAILABLE = -93;
     // status codes
     public static final int    STATUS_CODE_OK               = 1;
     public static final int    STATUS_CODE_ASSERTION_ERROR  = 3;

@@ -168,6 +168,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
         
         // iterate over JSON object
         Iterator jsonObjectKeys = jsonObject.keys();
+        boolean skipNoCheckpointAvailable =
+                EpaUtils.getBooleanProperty(SKIP_NO_CHECKPOINT_AVAILABLE, false);
+
         while (jsonObjectKeys.hasNext()) {
             String thisKey = jsonObjectKeys.next().toString();
 
@@ -179,10 +182,31 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 // iterate over array
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
                 for (int i = 0; i < innerJsonArray.length(); i++) {
+
                     // recursively generate metrics for these tags
-                    if ((thisKey.equals(RESULT_TAG))
-                            || (thisKey.equals(MONITORS_TAG))
-                            || (thisKey.equals(STATS_TAG))) {
+                    if (thisKey.equals(RESULT_TAG)) {
+                        
+                        // if result of first object was "No checkpoint available"
+                        // and there is a next element skip it
+                        JSONObject arrayElement = innerJsonArray.getJSONObject(i);
+                        if (skipNoCheckpointAvailable
+                                && arrayElement.has(RESULT_TAG) 
+                                && (RESULT_NO_CHECKPOINT_AVAILABLE
+                                    == arrayElement.optInt(RESULT_TAG))
+                                && ((i + 1) < innerJsonArray.length())) {
+
+                            EpaUtils.getFeedback().debug(module,
+                                                         "skipping node '" + thisKey
+                                                         + "' with result value "
+                                                         + arrayElement.optInt(RESULT_TAG));
+                        } else {
+                            // recursively generate metrics for these tags
+                            metricMap.putAll(generateMetrics(
+                                innerJsonArray.getJSONObject(i).toString(), metricTree));
+                        }
+                    } else if (thisKey.equals(MONITORS_TAG)
+                            || thisKey.equals(STATS_TAG)) {
+                        // recursively generate metrics for these tags
                         metricMap.putAll(generateMetrics(
                             innerJsonArray.getJSONObject(i).toString(), metricTree));
                     } else {
