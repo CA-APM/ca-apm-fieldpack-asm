@@ -56,7 +56,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("ptime", "Processing Time (ms)");
         ASM_METRICS.put("repeat", "Repeat");
         ASM_METRICS.put(RESULT_TAG, RESULT_CODE);
-        ASM_METRICS.put("id", "Monitor ID");
+        ASM_METRICS.put("id", "ID");
         ASM_METRICS.put("rid", "Monitor ID");
         ASM_METRICS.put("rtime", "Resolve Time (ms)");
         ASM_METRICS.put("secscan", "Vulnerability Scan Credits Available");
