@@ -1,18 +1,19 @@
 # CA APM App Synthetic Monitor Integration
 
 ## Description
-This field pack integrates metrics from CA App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM. It provides a lot more configuration flexibility and more information than the out-of-the-box extension that is provided in the CA APM product.
+This extension integrates metrics from CA App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM. It provides a lot more configuration flexibility and more information than the out-of-the-box extension that is provided in the CA APM product.
 
-Provide a short description of the field pack here. See [Mastering Markdown](https://guides.github.com/features/mastering-markdown/) for markdown syntax.
+### Short Description
+This extension integrates metrics from CA App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.
 
 ## APM version
-This field pack has been tested with CA APM 9.7 and 10.0.
+This extension has been tested with CA APM 9.7 and 10.0.
 
 ## Supported third party versions
-This field pack has been tested with CA App Synthetic Monitor 8.5.
+This extension has been tested with CA App Synthetic Monitor 8.5.
 
 ## License
-This field pack is provided under the [Eclipse Public License - v 1.0](https://github.com/CA-APM/ca-apm-fieldpack-asm/blob/master/LICENSE) license.
+This extension is provided under the [Eclipse Public License - v 1.0](https://github.com/CA-APM/ca-apm-fieldpack-asm/blob/master/LICENSE) license.
 
 
 # Installation and Usage Instructions
@@ -23,15 +24,20 @@ This document and associated tools are made available from CA Technologies as ex
 
 Although these utilities are unsupported, please let us know if you have any problems or questions by adding a comment to the CA APM Community Site area where the resource is located, so that the Author(s) may attempt to address the issue or question.
 
-Unless explicitly stated otherwise this field pack is only supported on the same platforms as the APM core agent. See [APM Compatibility Guide](http://www.ca.com/us/support/ca-support-online/product-content/status/compatibility-matrix/application-performance-management-compatibility-guide.aspx).
+Unless explicitly stated otherwise this extension is only supported on the same platforms as the APM core agent. See [APM Compatibility Guide](http://www.ca.com/us/support/ca-support-online/product-content/status/compatibility-matrix/application-performance-management-compatibility-guide.aspx).
 
+### Support URL
+https://github.com/CA-APM/ca-apm-fieldpack-asm/issues
+
+## Categories
+Integration
 
 # Change log
-Changes for each version of the field pack.
+Changes for each version of the extension.
 
 Version | Author | Comment
 --------|--------|--------
-1.0 | Seth Schwartzman | First version of the field pack.
-1.1 | Guenter Grossberger | Overhaul of the whole field pack adding more configuration points and information about individual script step results.
+1.0 | Seth Schwartzman | First version of the extension.
+1.1 | Guenter Grossberger | Overhaul of the whole extension adding more configuration points and information about individual script step results.
 1.2 | Alex Bradley, Martin Macura, Guenter Grossberger | Download new HAR file format, add JMeter label to metric path (optional), by default don't download 'full' logs, avoid high cpu in unzip
 1.2.1 | Guenter Grossberger | added asm.skipNoCheckpointAvailable property and changed artifact and file names
