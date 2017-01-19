@@ -51,6 +51,8 @@
 			<includes>
 				<include>*.sh</include>
 			</includes>
+			<filtered>true</filtered>
+			<fileMode>775</fileMode>
 		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/../src/main/docs</directory>

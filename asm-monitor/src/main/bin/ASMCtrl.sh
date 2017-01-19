@@ -108,7 +108,7 @@ fi
 
 # the command to start the EPAgent
 #-Xdebug
-EpaCmd="java -Xms${MIN_HEAP_VAL_IN_MB}m -Xmx${MAX_HEAP_VAL_IN_MB}m -Dcom.wily.introscope.epagent.properties=./config/AppSyntheticMonitor.properties -cp lib/EPAgent.jar:lib/ca.apm.swat.asm-monitor.jar:lib/commons-codec-1.10.jar:lib/json-20131018.jar com.wily.introscope.api.IntroscopeEPAgent"
+EpaCmd="java -Xms${MIN_HEAP_VAL_IN_MB}m -Xmx${MAX_HEAP_VAL_IN_MB}m -Dcom.wily.introscope.epagent.properties=./config/AppSyntheticMonitor.properties -cp lib/EPAgent.jar:lib/com.ca.apm.extensions.epagent.asm-monitor-${project.version}.jar:lib/commons-codec-1.10.jar:lib/json-20131018.jar com.wily.introscope.api.IntroscopeEPAgent"
 echo $EpaCmd
 # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
 
