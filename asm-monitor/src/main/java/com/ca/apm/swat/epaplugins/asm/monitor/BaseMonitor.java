@@ -252,7 +252,14 @@ public class BaseMonitor implements Monitor, AsmProperties {
                     continue;
                 }
 
-                String thisValue = jsonObject.getString(thisKey);
+                // automatically converts to string if an integer
+                String thisValue = jsonObject.optString(thisKey);
+
+                // only continue if not empty
+                if ((null == thisValue)
+                        || thisValue.length() == 0) {
+                    return metricMap;
+                }
 
                 // store description as error
                 if (thisKey.equals(DESCR_TAG)) {
