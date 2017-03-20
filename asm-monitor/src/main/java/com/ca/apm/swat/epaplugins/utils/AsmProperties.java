@@ -286,4 +286,15 @@ public interface AsmProperties {
     public static final String YELLOW                   = "yellow";
     public static final String ORANGE                   = "orange";
     public static final String RED                      = "red";
+    
+    // target metric names for mapping
+    public static final String METRIC_NAME_PROBE_ERRORS = "Probe Errors";
+    public static final String METRIC_NAME_PROBES       = "Probes";
+    public static final String METRIC_NAME_CHECK_ERRORS = "Check Errors";
+    public static final String METRIC_NAME_CHECKS       = "Checks";
+    public static final String METRIC_NAME_REPEAT       = "Repeat";
+    public static final String METRIC_NAME_CONSECUTIVE_ERRORS  = "Consecutive Errors";
+    public static final String METRIC_NAME_ERRORS_PER_INTERVAL = "Errors Per Interval";
+    public static final String METRIC_NAME_ALERTS_PER_INTERVAL = "Alerts Per Interval";
+
 }

@@ -22,7 +22,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
 
     static {
         ASM_METRICS.put(ACTIVE_TAG, "Active");
-        ASM_METRICS.put("alerts", "Alerts Per Interval");
+        ASM_METRICS.put("alerts", METRIC_NAME_ALERTS_PER_INTERVAL);
         ASM_METRICS.put("apdex", "Apdex Score");
         ASM_METRICS.put("api", "API Credits Available");
         ASM_METRICS.put("avg_perf_cur", "Performance Current Average (ms)");
@@ -30,12 +30,12 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("avg_uptime_cur", "Uptime Current Average (%)");
         ASM_METRICS.put("avg_uptime_day", "Uptime Daily Average (%)");
         ASM_METRICS.put("check", "Check Credits Available");
-        ASM_METRICS.put("check_errors", "Check Errors");
-        ASM_METRICS.put("checks", "Checks");
+        ASM_METRICS.put("check_errors", METRIC_NAME_CHECK_ERRORS);
+        ASM_METRICS.put("checks", METRIC_NAME_CHECKS);
         ASM_METRICS.put(CODE_TAG, "Error Code");
         ASM_METRICS.put(COLOR_TAG, "Color");
         ASM_METRICS.put(COLORS_TAG, "Performance Status");
-        ASM_METRICS.put("consecutive_errors", "Consecutive Errors");
+        ASM_METRICS.put("consecutive_errors", METRIC_NAME_CONSECUTIVE_ERRORS);
         ASM_METRICS.put("ctime", "Connect Time (ms)");
         ASM_METRICS.put(DESCR_TAG, "Error Description");
         ASM_METRICS.put("dsize", "Download Size (kB)");
@@ -43,7 +43,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("dtime", "Download Time (ms)");
         ASM_METRICS.put("elapsed", "API Call Time (ms)");
         ASM_METRICS.put("end", "Check End Time");
-        ASM_METRICS.put(ERRORS_TAG, "Errors Per Interval");
+        ASM_METRICS.put(ERRORS_TAG, METRIC_NAME_ERRORS_PER_INTERVAL);
         ASM_METRICS.put("errorsince", "Error Since");
         ASM_METRICS.put(GMT_OFFSET_TAG, "Agent GMT Offset");
         ASM_METRICS.put("info", "Info");
@@ -51,10 +51,10 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("lastcheck", "Last Check");
         ASM_METRICS.put("loc", "Location Code");
         ASM_METRICS.put("name", "Monitor Name");
-        ASM_METRICS.put("probe_errors", "Probe Errors");
-        ASM_METRICS.put("probes", "Probes");
+        ASM_METRICS.put("probe_errors", METRIC_NAME_PROBE_ERRORS);
+        ASM_METRICS.put("probes", METRIC_NAME_PROBES);
         ASM_METRICS.put("ptime", "Processing Time (ms)");
-        ASM_METRICS.put("repeat", "Repeat");
+        ASM_METRICS.put("repeat", METRIC_NAME_REPEAT);
         ASM_METRICS.put(RESULT_TAG, RESULT_CODE);
         ASM_METRICS.put("id", "ID");
         ASM_METRICS.put("rid", "Monitor ID");

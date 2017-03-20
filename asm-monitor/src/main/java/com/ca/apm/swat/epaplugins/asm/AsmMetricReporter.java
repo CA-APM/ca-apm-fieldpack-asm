@@ -52,21 +52,21 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
     public void run() {
         Iterator<Map.Entry<String, String>> metricIt = metricMap.entrySet().iterator();
         while (metricIt.hasNext()) {
-            Map.Entry<String, String> metricPair = (Map.Entry<String, String>) metricIt.next();
+            Map.Entry<String, String> metricPair = metricIt.next();
 
             if (((String) metricPair.getValue()).length() == 0) {
                 continue;
             }
 
-            String thisMetricType = returnMetricType((String) metricPair.getValue());
-
-            if (thisMetricType.equals(MetricWriter.kFloat)) {
-                metricPair.setValue(((String) metricPair.getValue()).split(SEPARATOR)[0]);
-                thisMetricType = MetricWriter.kIntCounter;
-            }
+            String thisMetricType = returnMetricType(metricPair.getKey(), metricPair.getValue());
 
             String metricPath = metricPair.getKey();
             String metricValue = metricPair.getValue();
+
+            if (MetricWriter.kFloat.equals(thisMetricType)) {
+                 metricPair.setValue(((String) metricPair.getValue()).split(SEPARATOR)[0]);
+                 thisMetricType = MetricWriter.kIntAverage;
+            }
             
             if (EpaUtils.getBooleanProperty(PRINT_ASM_NODE, true)) {
                 metricPath = METRIC_TREE + METRIC_PATH_SEPARATOR + metricPair.getKey();
@@ -75,14 +75,14 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
             metricPath = EpaUtils.fixMetricName(metricPath);
             if (MetricWriter.kStringEvent.equals(thisMetricType)) {
                 metricValue = EpaUtils.fixMetricValue(metricValue);
-            
+
 //                Module module = new Module(Thread.currentThread().getName());
 //                if (EpaUtils.getFeedback().isDebugEnabled(module)) {
 //                    EpaUtils.getFeedback().debug(module, "writing metric of type "
 //                            + thisMetricType + " '" + metricPath + "' = " + metricValue);
 //                }
             }
-            
+
             if (turnOn) {
                 try {
                     MetricRecordingAdministrator admin =
@@ -92,58 +92,65 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
                     admin.turnMetricOn(agentMetric);
                 } catch (AgentNotAvailableException e) {
                     EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-                        AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
+                         AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
                 } catch (BadlyFormedNameException e) {
                     EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
                         AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
                 }
 
             }
-            
+
             metricWriter.writeMetric(thisMetricType, metricPath, metricValue);
         }
     }
 
     /**
      * Get metric data type. 
-     * @param thisMetric input metric data
+     * @param metricName input metric name
+     * @param metricValue input metric value
      * @return metric type, one of {@link MetricWriter.kStringEvent},
      * {@link MetricWriter.kIntCounter}, {@link MetricWriter.kLongCounter} or
      * {@link MetricWriter.kFloat}
      */
-    private String returnMetricType(String thisMetric) {
+    public static String returnMetricType(String metricName, String metricValue) {
         String metricType = MetricWriter.kStringEvent;
 
-        if (thisMetric.matches("^[+-]?[0-9]+$")) {
-            try {
-                new Integer(thisMetric);
-                metricType = MetricWriter.kIntCounter;
-            } catch (NumberFormatException e) {
-                metricType = MetricWriter.kLongCounter;
-            }
-        } else if (thisMetric.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
-            metricType = MetricWriter.kFloat;
+        // determine type from metric name
+        if (metricName.endsWith(METRIC_NAME_PROBE_ERRORS)
+                || metricName.endsWith(METRIC_NAME_PROBES)
+                || metricName.endsWith(METRIC_NAME_CHECK_ERRORS)
+                || metricName.endsWith(METRIC_NAME_CHECKS)
+                || metricName.endsWith(METRIC_NAME_REPEAT)
+                || metricName.endsWith(METRIC_NAME_CONSECUTIVE_ERRORS)
+                || metricName.endsWith(METRIC_NAME_ALERTS_PER_INTERVAL)
+                || metricName.endsWith(METRIC_NAME_ERRORS_PER_INTERVAL)) {
+
+            metricType = MetricWriter.kPerIntervalCounter;
+
+        } else if (metricName.endsWith("Time (ms)")
+                || metricName.endsWith("Speed (kB/s)")
+                || metricName.endsWith("Size (kB)")) {
+        
+            metricType = MetricWriter.kIntAverage;
+
         } else {
-            metricType = MetricWriter.kStringEvent;
-        }
-        /*
-        try {
-            new Integer(thisMetric);
-            metricType = MetricWriter.kIntCounter;
-        } catch (NumberFormatException e) {
-            try {
-                new Long(thisMetric);
-                metricType = MetricWriter.kLongCounter;
-            } catch (NumberFormatException ee) {
+            // determine type from metric value
+
+            if (metricValue.matches("^[+-]?[0-9]+$")) {
                 try {
-                    new Float(thisMetric);
-                    metricType = MetricWriter.kFloat;
-                } catch (NumberFormatException eee) {
-                    metricType = MetricWriter.kStringEvent;
+                    new Integer(metricValue);
+                    metricType = MetricWriter.kIntCounter;
+                } catch (NumberFormatException e) {
+                    metricType = MetricWriter.kLongCounter;
                 }
+            } else if (metricValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
+                // float, cannot convert
+                metricType = MetricWriter.kFloat;
+            } else {
+                metricType = MetricWriter.kStringEvent;
             }
         }
-         */
+
         return metricType;
     }
 
@@ -176,13 +183,13 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
         if (metricMap.size() != 0) {
             Iterator<Map.Entry<String, String>> metricIt = metricMap.entrySet().iterator();
             while (metricIt.hasNext()) {
-                Map.Entry<String, String> metricPairs = (Map.Entry<String, String>) metricIt.next();
+                Map.Entry<String, String> metricPair = (Map.Entry<String, String>) metricIt.next();
 
-                if (!returnMetricType((String) metricPairs.getValue()).equals(
-                    MetricWriter.kStringEvent)) {
-                    metricMap.put((String) metricPairs.getKey(), ZERO);
+                if (!returnMetricType(metricPair.getKey(), metricPair.getValue())
+                        .equals(MetricWriter.kStringEvent)) {
+                    metricMap.put((String) metricPair.getKey(), ZERO);
                 } else {
-                    metricMap.put((String) metricPairs.getKey(), EMPTY_STRING);
+                    metricMap.put((String) metricPair.getKey(), EMPTY_STRING);
                 }
             }
         }

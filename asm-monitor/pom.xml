@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ca.apm.extensions</groupId>
 	<artifactId>asm-monitor</artifactId>
-	<version>1.2.2</version>
+	<version>1.3.0</version>
 	<name>ASMMonitor</name>
-	<description>Fieldpack to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
+	<description>Extension to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
 
 	<properties>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
