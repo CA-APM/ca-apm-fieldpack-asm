@@ -131,44 +131,43 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
      */
     public static String returnMetricType(String metricName, String metricValue) {
         String metricType = MetricWriter.kStringEvent;
-
-//      does not make sense as we are sending metrics only every 5 minutes
+        boolean metricTypeSet = false;
 
         // determine type from metric name
-//        if (metricName.endsWith(METRIC_NAME_PROBE_ERRORS)
-//                || metricName.endsWith(METRIC_NAME_PROBES)
-//                || metricName.endsWith(METRIC_NAME_CHECK_ERRORS)
-//                || metricName.endsWith(METRIC_NAME_CHECKS)
-//                || metricName.endsWith(METRIC_NAME_REPEAT)
-//                || metricName.endsWith(METRIC_NAME_CONSECUTIVE_ERRORS)
-//                || metricName.endsWith(METRIC_NAME_ALERTS_PER_INTERVAL)
-//                || metricName.endsWith(METRIC_NAME_ERRORS_PER_INTERVAL)) {
-//
-//            metricType = MetricWriter.kPerIntervalCounter;
-//
-//        } else if (metricName.endsWith("Time (ms)")
-//                || metricName.endsWith("Speed (kB/s)")
-//                || metricName.endsWith("Size (kB)")) {
-//
-//            metricType = MetricWriter.kIntAverage;
-//        } else {
+        // does mostly not make sense as we are sending metrics only every 5 minutes
+        if (EpaUtils.getBooleanProperty(REPORT_PER_INTERVAL_COUNTER, false)
+                && (metricName.endsWith(METRIC_NAME_PROBE_ERRORS)
+                        || metricName.endsWith(METRIC_NAME_PROBES)
+                        || metricName.endsWith(METRIC_NAME_CHECK_ERRORS)
+                        || metricName.endsWith(METRIC_NAME_CHECKS)
+                        || metricName.endsWith(METRIC_NAME_REPEAT)
+                        || metricName.endsWith(METRIC_NAME_CONSECUTIVE_ERRORS)
+                        || metricName.endsWith(METRIC_NAME_ALERTS_PER_INTERVAL)
+                        || metricName.endsWith(METRIC_NAME_ERRORS_PER_INTERVAL))) {
 
-        // determine type from metric value
-        if (metricValue.matches("^[+-]?[0-9]+$")) {
-            try {
-                new Integer(metricValue);
-                metricType = MetricWriter.kIntCounter;
-            } catch (NumberFormatException e) {
-                metricType = MetricWriter.kLongCounter;
-            }
-        } else if (metricValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
-            // float, cannot convert
-            metricType = MetricWriter.kFloat;
-        } else {
-            metricType = MetricWriter.kStringEvent;
+            metricType = MetricWriter.kPerIntervalCounter;
+            metricTypeSet = true;
+
+        } else if (EpaUtils.getBooleanProperty(REPORT_LONG_AVERAGE, false)
+            && (metricName.endsWith("Time (ms)")
+                    || metricName.endsWith("Speed (kB/s)")
+                    || metricName.endsWith("Size (kB)"))) {
+
+            metricType = MetricWriter.kLongAverage;
+            metricTypeSet = true;
         }
 
-//        }
+        if (!metricTypeSet) {
+        // determine type from metric value
+            if (metricValue.matches("^[+-]?[0-9]+$")) {
+                metricType = MetricWriter.kLongCounter;
+            } else if (metricValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
+                // float, cannot convert here
+                metricType = MetricWriter.kFloat;
+            } else {
+                metricType = MetricWriter.kStringEvent;
+            }
+        }
 
         return metricType;
     }

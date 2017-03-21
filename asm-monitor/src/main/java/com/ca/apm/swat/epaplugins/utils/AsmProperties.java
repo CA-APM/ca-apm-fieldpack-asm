@@ -90,6 +90,8 @@ public interface AsmProperties {
     public static final String STEP_FORMAT_ALWAYS       = "asm.stepFormatAlways";
     public static final String TIMEOUT_REPORT_ALWAYS    = "asm.alwaysReportTimeout";
     public static final String SKIP_NO_CHECKPOINT_AVAILABLE = "asm.skipNoCheckpointAvailable";
+    public static final String REPORT_PER_INTERVAL_COUNTER  = "asm.report.perIntervalCounter";
+    public static final String REPORT_LONG_AVERAGE      = "asm.report.longAverage";
 
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";
