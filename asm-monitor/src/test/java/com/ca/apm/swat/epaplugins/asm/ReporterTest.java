@@ -33,13 +33,18 @@ public class ReporterTest implements AsmProperties {
 
         try {
 
+            // kPerIntervalCounter and kIntAverage do not make sense
+            // as we are sending metrics only every 5 minutes, they are 0 in between
+
+            // metric, value, expected type
             String[] testData = {
                                  "Monitors|Tests:Agent Time Zone",
                                  "PT",
                                  MetricWriter.kStringEvent,
                                  "Monitors|Tests|Simple HTTP validation test:Alerts Per Interval",
                                  "17",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Check End Time",
                                  "2015-04-08 23:56:09",
                                  MetricWriter.kStringEvent,
@@ -48,16 +53,19 @@ public class ReporterTest implements AsmProperties {
                                  MetricWriter.kStringEvent,
                                  "Monitors|Tests|Simple HTTP validation test:Connect Time (ms)",
                                  "13",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Download Size (kB)",
                                  "96496828134",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kLongCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Pi",
                                  "3.141592",
                                  MetricWriter.kFloat,
                                  "Monitors|Tests|Simple HTTP validation test:Download Time (ms)",
                                  "63469847",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:IP Address",
                                  "10.12.12.13",
                                  MetricWriter.kStringEvent,
@@ -66,13 +74,16 @@ public class ReporterTest implements AsmProperties {
                                  MetricWriter.kStringEvent,
                                  "Monitors|Tests|Simple HTTP validation test:Processing Time (ms)",
                                  "135",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Repeat",
                                  "1",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Resolve Time (ms)",
                                  "123",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Result Code",
                                  "-17",
                                  MetricWriter.kIntCounter,
@@ -84,10 +95,12 @@ public class ReporterTest implements AsmProperties {
                                  MetricWriter.kStringEvent,
                                  "Monitors|Tests|Simple HTTP validation test:Total Time (ms)",
                                  "987",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Download Speed (kB/s)",
                                  "987",
-                                 MetricWriter.kIntAverage,
+                                 //MetricWriter.kIntAverage,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|Simple HTTP validation test:Type",
                                  "42",
                                  MetricWriter.kIntCounter,
@@ -96,28 +109,36 @@ public class ReporterTest implements AsmProperties {
                                  MetricWriter.kStringEvent,
                                  "Monitors|Tests|DNS test:Alerts Per Interval",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|DNS test:Errors Per Interval",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|DNS test:Probe Errors",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|DNS test:Probes",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|FTP test:Check Errors",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|FTP test:Checks",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|FTP test:Repeat",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter,
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
                                  "Monitors|Tests|FTP test:Consecutive Errors",
                                  "4",
-                                 MetricWriter.kPerIntervalCounter
+                                 //MetricWriter.kPerIntervalCounter,
+                                 MetricWriter.kIntCounter,
             };
 
 
@@ -138,7 +159,7 @@ public class ReporterTest implements AsmProperties {
                     System.out.println(key + ", " + metricMap.get(key) + " -> " + metricType);
                 //}
                 
-                Assert.assertEquals(testData[index+2], metricType);
+                Assert.assertEquals(testData[index], testData[index+2], metricType);
 
                 // remove test value from map
                 metricMap.remove(key);
