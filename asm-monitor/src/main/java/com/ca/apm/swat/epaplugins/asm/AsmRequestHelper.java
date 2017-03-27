@@ -38,6 +38,8 @@ public class AsmRequestHelper implements AsmProperties {
     private static HashMap<String, HashMap<String, Long>> objectApiCallMap = null;
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
+    private static final long DEFAULT_REQUEST_RETRY_DELAY = 30000; // 30s
+    private static final long DEFAULT_MAX_LOG_LIMIT = 2000; // 2s
 
     /**
      * Create new CloudMonitorRequestHelper.
@@ -612,21 +614,22 @@ public class AsmRequestHelper implements AsmProperties {
      * Get logs for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param numMonitors number of monitors in folder
-     * @param metricPrefix
+     * @param metricPrefix metric prefix
      * @return metric map
      * @throws Exception errors
      */
     public HashMap<String,String> getLogs(String folder,
         int numMonitors,
         String metricPrefix) throws Exception {
-        return new HashMap<String,String>(getLogs(folder, numMonitors, metricPrefix, null).getMap());
+        return new HashMap<String,String>(getLogs(folder, numMonitors, metricPrefix, null)
+                .getMap());
     }
 
     /**
      * Get logs for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param numMonitors number of monitors in folder
-     * @param metricPrefix
+     * @param metricPrefix metric prefix
      * @param lastId UUID of last event returned in previous call or null
      * @return metric map
      * @throws Exception errors
@@ -656,12 +659,15 @@ public class AsmRequestHelper implements AsmProperties {
                 logStr += 'y';
                 if (!EpaUtils.getBooleanProperty(LEGACY_OUTPUT_FORMAT, true)) {
                     // Use the new output format. 
-                    // Output contains URL of the resource, agent downloads it directly from the checkpoint.
+                    // Output contains URL of the resource,
+                    // agent downloads it directly from the checkpoint.
                     logStr += NEW_OUTPUT_PARAM;
                 }
+            } else {
+                logStr += 'n';
             }
             
-            if(lastId == null) {
+            if (lastId == null) {
                 // get n latest records on the first run
                 int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
                 if (numMonitors > 0) {
@@ -670,26 +676,31 @@ public class AsmRequestHelper implements AsmProperties {
                 logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
             } else {
                 // get all records newer than last uuid
-                logStr += UUID_PARAM + lastId + NUM_PARAM + Integer.parseInt(EpaUtils.getProperty(MAX_LOG_LIMIT));
+                logStr += UUID_PARAM + lastId + NUM_PARAM
+                        + Long.parseLong(EpaUtils.getProperty(MAX_LOG_LIMIT,
+                                             Long.toString(DEFAULT_MAX_LOG_LIMIT)));
             }
 
-            long maxRuntime = Long.parseLong(EpaUtils.getProperty(WAIT_TIME)) * 2/3;
+            long maxRuntime = Long.parseLong(EpaUtils.getProperty(WAIT_TIME)) * 2 / 3;
             long start = new Date().getTime();
-            double d = Double.parseDouble(EpaUtils.getProperty(REQUEST_RETRY_DELAY));
-            long delay = Math.round(d + d*(Math.random()-0.5));
+            double rrDelay = Double.parseDouble(EpaUtils.getProperty(REQUEST_RETRY_DELAY,
+                                                    Long.toString(DEFAULT_REQUEST_RETRY_DELAY)));
+            long delay = Math.round(rrDelay + rrDelay * (Math.random() - 0.5));
             String logResponse;
 
-            while(true) {
+            while (true) {
                 try {
                     logResponse = accessor.executeApi(LOGS_CMD, logStr);
                     break;
                 } catch (Exception ex) {
-                    if(new Date().getTime() - start > maxRuntime) {
+                    if (new Date().getTime() - start > maxRuntime) {
                         throw ex;
                     }
                     // retry API call on failure, after a delay
                     EpaUtils.getFeedback().info(new Module(Thread.currentThread().getName()),
-                            AsmMessages.getMessage(AsmMessages.API_RETRY_508, ex.getMessage(), delay));
+                            AsmMessages.getMessage(AsmMessages.API_RETRY_508,
+                                                   ex.getMessage(),
+                                                   delay));
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException ignore) {
@@ -720,7 +731,8 @@ public class AsmRequestHelper implements AsmProperties {
                         EMPTY_STRING,
                         false);
             // TODO handle duplicate metrics.
-            // Since the check run time is variable, we can end up with two records in one polling cycle and none in subsequent one.
+            // Since the check run time is variable, we can end up with two
+            // records in one polling cycle and none in subsequent one.
             Map<String, String> metrics = monitor.generateMetrics(logResponse, metricPrefix);
             return new LogResult(metrics, metrics.remove(UUID_TAG));
 

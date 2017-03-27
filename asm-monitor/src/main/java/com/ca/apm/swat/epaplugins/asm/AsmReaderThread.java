@@ -179,7 +179,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                                                                  folderMonitors.size(),
                                                                  folderPrefix,
                                                                  lastId);
-                    if(result.getLastId() != null) {
+                    if (result.getLastId() != null) {
                         lastId = result.getLastId();
                     }
                     resultMetricMap.putAll(result.getMap());
