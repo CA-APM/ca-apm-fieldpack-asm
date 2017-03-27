@@ -38,7 +38,6 @@ public class AsmRequestHelper implements AsmProperties {
     private static HashMap<String, HashMap<String, Long>> objectApiCallMap = null;
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
-    private static final long DEFAULT_REQUEST_RETRY_DELAY = 30000; // 30s
     private static final long DEFAULT_MAX_LOG_LIMIT = 2000; // 2s
 
     /**
@@ -681,35 +680,8 @@ public class AsmRequestHelper implements AsmProperties {
                                              Long.toString(DEFAULT_MAX_LOG_LIMIT)));
             }
 
-            long maxRuntime = Long.parseLong(EpaUtils.getProperty(WAIT_TIME)) * 2 / 3;
-            long start = new Date().getTime();
-            double rrDelay = Double.parseDouble(EpaUtils.getProperty(REQUEST_RETRY_DELAY,
-                                                    Long.toString(DEFAULT_REQUEST_RETRY_DELAY)));
-            long delay = Math.round(rrDelay + rrDelay * (Math.random() - 0.5));
-            String logResponse;
-
-            while (true) {
-                try {
-                    logResponse = accessor.executeApi(LOGS_CMD, logStr);
-                    break;
-                } catch (Exception ex) {
-                    if (new Date().getTime() - start > maxRuntime) {
-                        throw ex;
-                    }
-                    // retry API call on failure, after a delay
-                    EpaUtils.getFeedback().info(new Module(Thread.currentThread().getName()),
-                            AsmMessages.getMessage(AsmMessages.API_RETRY_508,
-                                                   ex.getMessage(),
-                                                   delay));
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException ignore) {
-                        throw ex;
-                    }
-                    delay *= 2;
-                }
-            }
-
+            String logResponse = accessor.executeApi(LOGS_CMD, logStr);
+            
             Module module = new Module(Thread.currentThread().getName());
             if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                 EpaUtils.getFeedback().verbose(module,
