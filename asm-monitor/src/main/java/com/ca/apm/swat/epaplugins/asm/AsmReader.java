@@ -254,8 +254,7 @@ public class AsmReader implements AsmProperties {
 
         // start folder thread pool
         folderService = Executors
-                .newScheduledThreadPool(Integer
-                                        .parseInt(EpaUtils.getProperty(FOLDER_THREADS, "10")));
+                .newScheduledThreadPool(folderMap.size());
 
         startThreads(folderMap);
 
@@ -378,6 +377,11 @@ public class AsmReader implements AsmProperties {
     private void startThreads(HashMap<String, List<Monitor>> folderMap) {
 
         int epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
+        int stagger = 0;
+        if(folderMap.size() > 0){
+            stagger = epaWaitTime / folderMap.size();
+        }
+        int delay = 0;
 
         futureMap = new HashMap<ScheduledFuture<?>, String>();
 
@@ -390,10 +394,11 @@ public class AsmReader implements AsmProperties {
                                                      metricWriter,
                                                      reporterService);
             ScheduledFuture<?> future = folderService.scheduleAtFixedRate(rt,
-                                                                          0,
+                                                                          delay,
                                                                           epaWaitTime,
                                                                           TimeUnit.MILLISECONDS);
             futureMap.put(future, folder);
+            delay += stagger;
         }
 
         stopped = false;

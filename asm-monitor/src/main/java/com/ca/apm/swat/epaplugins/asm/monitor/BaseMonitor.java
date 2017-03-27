@@ -15,6 +15,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.UUID;
 
 /**
  * Base class for implementations of the {@link Monitor} interface.
@@ -349,6 +350,13 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 + " metrics for monitor " + getName() + " in metric tree " + metricTree);
         }
 
+        // save the most recent UUID
+        String lastUUID = metricMap.get(UUID_TAG);
+        String currentUUID = jsonObject.optString(UUID_TAG, null);
+        if(currentUUID != null && 
+                (lastUUID == null || UUID.fromString(currentUUID).compareTo(UUID.fromString(lastUUID)) > 0)) {
+            metricMap.put(UUID_TAG, currentUUID);            
+        }
         return metricMap;
     }
 
