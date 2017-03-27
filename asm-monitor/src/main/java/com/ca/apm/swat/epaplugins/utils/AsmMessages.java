@@ -42,7 +42,8 @@ public class AsmMessages {
     public static final String PUT_PW_IN_PROPERTIES_504     = "504_putInProperties";
     public static final String READ_CONFIGURATION_505       = "505_readConfiguration";
     public static final String PROPERTY_FILE_CHANGED_506    = "506_propertyFileChanged";
-    public static final String CONFIG_POLLING_STARTED_507   = "507_configPollingStarted";   
+    public static final String CONFIG_POLLING_STARTED_507   = "507_configPollingStarted";
+    public static final String API_RETRY_508                = "508_apiRetry";
 
     // warning messages
     public static final String NON_INT_PROPERTY_WARN_700    = "700_nonIntegerWarningDefault";

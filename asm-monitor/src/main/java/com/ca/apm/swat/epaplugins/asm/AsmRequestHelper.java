@@ -23,6 +23,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.Map;
 
 /**
  * Interface to App Synthetic Monitor API.
@@ -611,20 +612,31 @@ public class AsmRequestHelper implements AsmProperties {
      * Get logs for folder and monitor.
      * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
      * @param numMonitors number of monitors in folder
+     * @param metricPrefix
      * @return metric map
      * @throws Exception errors
      */
-    public HashMap<String, String> getLogs(String folder,
+    public HashMap<String,String> getLogs(String folder,
         int numMonitors,
         String metricPrefix) throws Exception {
+        return new HashMap<String,String>(getLogs(folder, numMonitors, metricPrefix, null).getMap());
+    }
+
+    /**
+     * Get logs for folder and monitor.
+     * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
+     * @param numMonitors number of monitors in folder
+     * @param metricPrefix
+     * @param lastId UUID of last event returned in previous call or null
+     * @return metric map
+     * @throws Exception errors
+     */
+    public LogResult getLogs(String folder,
+        int numMonitors,
+        String metricPrefix, String lastId) throws Exception {
 
         try {
             String folderStr = EMPTY_STRING;
-
-            int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
-            if (numMonitors > 0) {
-                numLogs =  numLogs * numMonitors;
-            }
 
             if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
                 folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
@@ -636,20 +648,56 @@ public class AsmRequestHelper implements AsmProperties {
 
             countApiCall(LOGS_CMD, folder);           
 
-            String logStr = NKEY_PARAM + this.nkey + folderStr
-                    + NUM_PARAM + numLogs + REVERSE_PARAM
+            String logStr = NKEY_PARAM + this.nkey + folderStr                    
                     + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
-            //    String logStr = "nkey=" + this.nkey + folderStr + monitorStr
-            //        + "&num=" + numLogs + "&reverse=y&full=y";
 
             // only download full data if configured
-            if (!EpaUtils.getBooleanProperty(METRICS_DOWNLOAD_FULL, false)) {
+            if (EpaUtils.getBooleanProperty(METRICS_DOWNLOAD_FULL, false)) {
                 logStr += 'y';
-            } else {
-                logStr += 'n';
+                if (!EpaUtils.getBooleanProperty(LEGACY_OUTPUT_FORMAT, true)) {
+                    // Use the new output format. 
+                    // Output contains URL of the resource, agent downloads it directly from the checkpoint.
+                    logStr += NEW_OUTPUT_PARAM;
+                }
             }
             
-            String logResponse = accessor.executeApi(LOGS_CMD, logStr);
+            if(lastId == null) {
+                // get n latest records on the first run
+                int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
+                if (numMonitors > 0) {
+                    numLogs =  numLogs * numMonitors;
+                }
+                logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
+            } else {
+                // get all records newer than last uuid
+                logStr += UUID_PARAM + lastId + NUM_PARAM + Integer.parseInt(EpaUtils.getProperty(MAX_LOG_LIMIT));
+            }
+
+            long maxRuntime = Long.parseLong(EpaUtils.getProperty(WAIT_TIME)) * 2/3;
+            long start = new Date().getTime();
+            double d = Double.parseDouble(EpaUtils.getProperty(REQUEST_RETRY_DELAY));
+            long delay = Math.round(d + d*(Math.random()-0.5));
+            String logResponse;
+
+            while(true) {
+                try {
+                    logResponse = accessor.executeApi(LOGS_CMD, logStr);
+                    break;
+                } catch (Exception ex) {
+                    if(new Date().getTime() - start > maxRuntime) {
+                        throw ex;
+                    }
+                    // retry API call on failure, after a delay
+                    EpaUtils.getFeedback().info(new Module(Thread.currentThread().getName()),
+                            AsmMessages.getMessage(AsmMessages.API_RETRY_508, ex.getMessage(), delay));
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException ignore) {
+                        throw ex;
+                    }
+                    delay *= 2;
+                }
+            }
 
             Module module = new Module(Thread.currentThread().getName());
             if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
@@ -671,7 +719,10 @@ public class AsmRequestHelper implements AsmProperties {
                         null,
                         EMPTY_STRING,
                         false);
-            return monitor.generateMetrics(logResponse, metricPrefix);
+            // TODO handle duplicate metrics.
+            // Since the check run time is variable, we can end up with two records in one polling cycle and none in subsequent one.
+            Map<String, String> metrics = monitor.generateMetrics(logResponse, metricPrefix);
+            return new LogResult(metrics, metrics.remove(UUID_TAG));
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -679,7 +730,7 @@ public class AsmRequestHelper implements AsmProperties {
                     "getLogs", e.getMessage()));
         }
 
-        return new HashMap<String, String>();
+        return new LogResult(new HashMap<String, String>(), null);
     }
 
     /**

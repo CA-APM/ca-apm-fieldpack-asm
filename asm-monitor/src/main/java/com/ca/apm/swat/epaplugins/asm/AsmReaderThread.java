@@ -26,6 +26,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     private ExecutorService reporterService;
     private Module module;
     private boolean firstRun;
+    private String lastId;
 
 
     /**
@@ -49,6 +50,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         this.reporterService = reporterService;
         this.module = new Module("Asm.Folder." + folderName);
         this.firstRun = true;
+        this.lastId = null;
     }
 
 
@@ -56,15 +58,15 @@ public class AsmReaderThread implements AsmProperties, Runnable {
      * Run the main loop.
      */
     public void run() {
-        Thread.currentThread().setName(module.getName());
-
-        EpaUtils.getFeedback()
-            .verbose(module,
-                     AsmMessages.getMessage(AsmMessages.THREAD_STARTED_312,
-                                            Thread.currentThread().getId(),
-                                            this.folder));
-
         try {
+            Thread.currentThread().setName(module.getName());
+
+            EpaUtils.getFeedback()
+                .verbose(module,
+                         AsmMessages.getMessage(AsmMessages.THREAD_STARTED_312,
+                                                Thread.currentThread().getId(),
+                                                this.folder));
+
             // get the metrics for this folder and all its monitors
             HashMap<String, String> metricMap = getFolderMetrics();
 
@@ -173,10 +175,14 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             // get logs for all monitors of this folder
             try {
                 if (EpaUtils.getBooleanProperty(METRICS_LOGS, false)) {
-                    resultMetricMap.putAll(
-                                           requestHelper.getLogs(folder,
+                    LogResult result = requestHelper.getLogs(folder,
                                                                  folderMonitors.size(),
-                                                                 folderPrefix));
+                                                                 folderPrefix,
+                                                                 lastId);
+                    if(result.getLastId() != null) {
+                        lastId = result.getLastId();
+                    }
+                    resultMetricMap.putAll(result.getMap());
                 }
             } catch (Exception e) {
                 EpaUtils.getFeedback().warn(module, AsmMessages

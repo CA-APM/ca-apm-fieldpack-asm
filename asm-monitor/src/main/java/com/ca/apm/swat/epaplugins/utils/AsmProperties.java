@@ -60,6 +60,7 @@ public interface AsmProperties {
     public static final String PROXY_PASSWORD_ENCRYPTED = "asm.proxyPasswordEncrypted";
     public static final String PROXY_PASSWORD           = "asm.proxyPassword";
     public static final String HTTP_READ_TIMEOUT        = "asm.httpReadTimeout";
+    public static final String REQUEST_RETRY_DELAY      = "asm.requestRetryDelay";
 
     public static final String LOCAL_TEST               = "asm.localtest";
     public static final String LOCAL_TEST_PATH          = "asm.localtestpath";
@@ -77,6 +78,8 @@ public interface AsmProperties {
     public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String FOLDER_PREFIX            = "asm.folder.";
     public static final String NUM_LOGS                 = "asm.numlogs";
+    public static final String MAX_LOG_LIMIT            = "asm.maxLogLimit";
+    public static final String LEGACY_OUTPUT_FORMAT     = "asm.legacyOutputFormat";
     public static final String IGNORE_TAGS              = "asm.ignoreTags";
     public static final String IGNORE_METRICS           = "asm.ignoreMetrics";
     public static final String SUPPRESS_STEP_WITH_CODES = "asm.suppressStepsWithCodes";
@@ -196,12 +199,15 @@ public interface AsmProperties {
     public static final String NOT_AGGREGATE_PARAM      = "&aggregate=n";
     public static final String AGGREGATE_PARAM          = "&aggregate=y";
     public static final String NUM_PARAM                = "&num=";
+    public static final String UUID_PARAM                = "&uuid=";
     public static final String START_DATE_PARAM         = "&start_date=";
     public static final String ACCOUNT_PARAM            = "&acct=";
     public static final String FULL_PARAM               = "&full=";
+    public static final String NEW_OUTPUT_PARAM         = "&legacy_output=n";
 
     // response tags
     public static final String XML_PREFIX               = "<?xml";
+    public static final String UUID_TAG                 = "uuid";
     public static final String ACTIVE_TAG               = "active";
     public static final String AVAILABLE_TAG            = "available";
     public static final String AREA_TAG                 = "areas";
