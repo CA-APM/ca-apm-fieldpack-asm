@@ -254,7 +254,8 @@ public class AsmReader implements AsmProperties {
 
         // start folder thread pool
         folderService = Executors
-                .newScheduledThreadPool(folderMap.size());
+                .newScheduledThreadPool(Integer
+                                        .parseInt(EpaUtils.getProperty(FOLDER_THREADS, "10")));
 
         startThreads(folderMap);
 
@@ -378,7 +379,7 @@ public class AsmReader implements AsmProperties {
 
         int epaWaitTime = Integer.parseInt(EpaUtils.getProperty(WAIT_TIME));
         int stagger = 0;
-        if(folderMap.size() > 0){
+        if (folderMap.size() > 0) {
             stagger = epaWaitTime / folderMap.size();
         }
         int delay = 0;

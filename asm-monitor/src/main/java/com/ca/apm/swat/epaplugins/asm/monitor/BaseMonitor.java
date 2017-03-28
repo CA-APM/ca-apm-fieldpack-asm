@@ -351,11 +351,12 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         // save the most recent UUID
-        String lastUUID = metricMap.get(UUID_TAG);
-        String currentUUID = jsonObject.optString(UUID_TAG, null);
-        if(currentUUID != null && 
-                (lastUUID == null || UUID.fromString(currentUUID).compareTo(UUID.fromString(lastUUID)) > 0)) {
-            metricMap.put(UUID_TAG, currentUUID);            
+        String lastUuid = metricMap.get(UUID_TAG);
+        String currentUuid = jsonObject.optString(UUID_TAG, null);
+        if (currentUuid != null
+                && (lastUuid == null 
+                || UUID.fromString(currentUuid).compareTo(UUID.fromString(lastUuid)) > 0)) {
+            metricMap.put(UUID_TAG, currentUuid);            
         }
         return metricMap;
     }

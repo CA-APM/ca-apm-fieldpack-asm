@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.Properties;
 
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
 
     public static final String FAILED = "Failed";
     public static final String LOGGED_OUT = "Logged Out.";
+    private static final long DEFAULT_REQUEST_RETRY_DELAY = 30000; // 30s
 
     /**
      * Access the App Synthetic Monitor API.
@@ -86,9 +88,42 @@ public class AsmAccessor extends Accessor implements AsmProperties {
 
         String apiResponse = "";
         if (!localTest) {
-            URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType
-                + "?" + callParams);
-            apiResponse = this.restClient.request(HTTP_POST, apiUrl, EMPTY_STRING);
+            long maxRuntime = Long.parseLong(EpaUtils.getProperty(WAIT_TIME)) * 2 / 3;
+            long start = new Date().getTime();
+            double rrDelay = Double.parseDouble(EpaUtils.getProperty(REQUEST_RETRY_DELAY,
+                                                    Long.toString(DEFAULT_REQUEST_RETRY_DELAY)));
+            long delay = Math.round(rrDelay + rrDelay * (Math.random() - 0.5));
+            boolean retry = false;
+            
+            while (true) {
+                try {
+                    URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType
+                                         + "?" + callParams);
+                    apiResponse = this.restClient.request(HTTP_POST, apiUrl, EMPTY_STRING);
+
+                    if (retry) {
+                        EpaUtils.getFeedback().info(new Module(Thread.currentThread().getName()),
+                                                    AsmMessages.getMessage(AsmMessages.API_RETRY_SUCCEEDED_509));
+                    }
+                    break;
+                } catch (Exception ex) {
+                    retry = true;
+                    if (new Date().getTime() - start > maxRuntime) {
+                        throw ex;
+                    }
+                    // retry API call on failure, after a delay
+                    EpaUtils.getFeedback().info(new Module(Thread.currentThread().getName()),
+                            AsmMessages.getMessage(AsmMessages.API_RETRY_508,
+                                                   ex.getMessage(),
+                                                   delay));
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException ignore) {
+                        throw ex;
+                    }
+                    delay *= 2;
+                }
+            }
         } else if (!callType.equals(LOGOUT_CMD)) {
             String inputLine = null;
             String inputFileName = this.localTestPath + "\\" + callType + ".txt";
