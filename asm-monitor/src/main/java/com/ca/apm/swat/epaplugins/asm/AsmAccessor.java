@@ -97,9 +97,8 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             
             while (true) {
                 try {
-                    URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType
-                                         + "?" + callParams);
-                    apiResponse = this.restClient.request(HTTP_POST, apiUrl, EMPTY_STRING);
+                    URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType);
+                    apiResponse = this.restClient.request(HTTP_POST, apiUrl, callParams);
 
                     if (retry) {
                         EpaUtils.getFeedback().info(new Module(Thread.currentThread().getName()),
