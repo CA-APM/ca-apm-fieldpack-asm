@@ -17,6 +17,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.Map;
 
 public class JMeterScriptHandler implements Handler, AsmProperties {
 
@@ -38,9 +39,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * @param metricTree metric tree prefix
      * @return map containing the metrics
      */
-    public MetricMap generateMetrics(String xmlString, String metricTree) {
-
-        MetricMap metricMap = new MetricMap();
+    public Map<String, String> generateMetrics(Map<String, String> metricMap, String xmlString, String metricTree) {
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module,

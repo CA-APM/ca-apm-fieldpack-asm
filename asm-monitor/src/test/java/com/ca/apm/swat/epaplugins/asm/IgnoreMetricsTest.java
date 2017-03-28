@@ -2,7 +2,6 @@ package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,6 +13,7 @@ import org.junit.Test;
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * This test checks if asm.ignoreMetrics is handled correctly.
@@ -102,8 +102,8 @@ public class IgnoreMetricsTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_http.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // create a filtered MetricWriter
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();

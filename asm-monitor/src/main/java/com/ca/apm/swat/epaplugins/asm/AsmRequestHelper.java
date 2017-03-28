@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMapReplacing;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -522,7 +523,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @return metric map
      * @throws Exception if an error occurred
      */
-    public HashMap<String, String> getStats(String folder, String metricPrefix, boolean aggregate)
+    public Map<String, String> getStats(String folder, String metricPrefix, boolean aggregate)
             throws Exception {
 
         try {
@@ -554,7 +555,7 @@ public class AsmRequestHelper implements AsmProperties {
                     "getStats", folder, monitor.getName(), monitor.getType()));
             }
 
-            return monitor.generateMetrics(statsRequest, metricPrefix);
+            return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -571,7 +572,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @return metric map
      * @throws Exception errors
      */
-    public HashMap<String, String> getPsp(String folder, String metricPrefix)
+    public Map<String, String> getPsp(String folder, String metricPrefix)
             throws Exception {
 
         try {
@@ -597,7 +598,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
-            return monitor.generateMetrics(pspRequest, metricPrefix);
+            return monitor.generateMetrics(new MetricMap(), pspRequest, metricPrefix);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -606,20 +607,6 @@ public class AsmRequestHelper implements AsmProperties {
         }
 
         return new HashMap<String, String>();
-    }
-
-    /**
-     * Get logs for folder and monitor.
-     * @param folder defaults to {@link AsmProperties#ROOT_FOLDER}
-     * @param numMonitors number of monitors in folder
-     * @param metricPrefix
-     * @return metric map
-     * @throws Exception errors
-     */
-    public HashMap<String,String> getLogs(String folder,
-        int numMonitors,
-        String metricPrefix) throws Exception {
-        return new HashMap<String,String>(getLogs(folder, numMonitors, metricPrefix, null).getMap());
     }
 
     /**
@@ -660,6 +647,7 @@ public class AsmRequestHelper implements AsmProperties {
                     logStr += NEW_OUTPUT_PARAM;
                 }
             }
+            Map<String, String> metrics;
             
             if(lastId == null) {
                 // get n latest records on the first run
@@ -668,9 +656,11 @@ public class AsmRequestHelper implements AsmProperties {
                     numLogs =  numLogs * numMonitors;
                 }
                 logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
+                metrics = new MetricMap();
             } else {
                 // get all records newer than last uuid
                 logStr += UUID_PARAM + lastId + NUM_PARAM + Integer.parseInt(EpaUtils.getProperty(MAX_LOG_LIMIT));
+                metrics = new MetricMapReplacing();
             }
 
             long maxRuntime = Long.parseLong(EpaUtils.getProperty(WAIT_TIME)) * 2/3;
@@ -718,10 +708,8 @@ public class AsmRequestHelper implements AsmProperties {
                         folderStr,
                         null,
                         EMPTY_STRING,
-                        false);
-            // TODO handle duplicate metrics.
-            // Since the check run time is variable, we can end up with two records in one polling cycle and none in subsequent one.
-            Map<String, String> metrics = monitor.generateMetrics(logResponse, metricPrefix);
+                        false);            
+            monitor.generateMetrics(metrics, logResponse, metricPrefix);
             return new LogResult(metrics, metrics.remove(UUID_TAG));
 
         } catch (JSONException e) {

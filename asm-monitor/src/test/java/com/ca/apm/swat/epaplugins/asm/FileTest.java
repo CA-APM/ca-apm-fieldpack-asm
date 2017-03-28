@@ -1,11 +1,11 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Before;
 
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import java.util.Map;
 
 
 /**
@@ -54,7 +54,7 @@ public abstract class FileTest implements AsmProperties {
      * @param expectedMetricNames array of expected metric names
      * @param metricMap metric map to check against
      */
-    public void checkMetrics(String[] expectedMetricNames, HashMap<String, String> metricMap) {
+    public void checkMetrics(String[] expectedMetricNames, Map<String, String> metricMap) {
         for (int i = 0; i < expectedMetricNames.length; ++i) {
             Assert.assertTrue(expectedMetricNames[i] + " missing",
                 metricMap.containsKey(expectedMetricNames[i]));
@@ -67,7 +67,7 @@ public abstract class FileTest implements AsmProperties {
      * @param metricMap metric map to check against
      */
     public void checkNotExistMetrics(String[] notExpectedMetricNames,
-                                     HashMap<String, String> metricMap) {
+                                     Map<String, String> metricMap) {
         for (int i = 0; i < notExpectedMetricNames.length; ++i) {
             Assert.assertFalse(notExpectedMetricNames[i] + " found",
                 metricMap.containsKey(notExpectedMetricNames[i]));
@@ -95,7 +95,7 @@ public abstract class FileTest implements AsmProperties {
      */
     public void checkMetrics(String[] expectedMetricNames,
                              String[] expectedMetricValues,
-                             HashMap<String, String> metricMap) {
+                             Map<String, String> metricMap) {
         for (int i = 0; i < expectedMetricNames.length; ++i) {
             Assert.assertEquals(expectedMetricNames[i],
                 expectedMetricValues[i],

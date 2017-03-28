@@ -12,6 +12,7 @@ import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.JMeterScriptHandler;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * Test class for testing the fldr_get API.
@@ -84,7 +85,7 @@ public class JMeterDisplayTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            MetricMap metricMap = handler.generateMetrics(xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());

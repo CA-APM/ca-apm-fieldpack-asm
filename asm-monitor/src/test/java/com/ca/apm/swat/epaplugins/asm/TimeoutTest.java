@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -10,7 +9,9 @@ import org.junit.Test;
 import com.ca.apm.swat.epaplugins.asm.monitor.JMeterScriptHandler;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * Test class for testing the rule_log API and asm.alwaysReportTimeout property.
@@ -57,8 +58,8 @@ public class TimeoutTest extends FileTest {
             monitor.setSuccessor(new JMeterScriptHandler());
 
             // call API
-            HashMap<String, String> metricMap =
-                    monitor.generateMetrics(logRequest, metricPrefix);
+            Map<String, String> metricMap =
+                    monitor.generateMetrics(new MetricMap(), logRequest, metricPrefix);
 
             // print
             if (DEBUG) {
@@ -135,8 +136,8 @@ public class TimeoutTest extends FileTest {
             monitor.setSuccessor(new JMeterScriptHandler());
 
             // call API
-            HashMap<String, String> metricMap =
-                    monitor.generateMetrics(logRequest, metricPrefix);
+            Map<String, String> metricMap =
+                    monitor.generateMetrics(new MetricMap(), logRequest, metricPrefix);
 
             // print
             if (DEBUG) {

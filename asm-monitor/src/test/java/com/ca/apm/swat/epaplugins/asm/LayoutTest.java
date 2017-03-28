@@ -2,7 +2,6 @@ package com.ca.apm.swat.epaplugins.asm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -17,6 +16,7 @@ import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricWriter;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * Test class for testing the output formatting.
@@ -100,7 +100,7 @@ public class LayoutTest extends FileTest {
                                            METRIC_TREE + METRIC_PATH_SEPARATOR + "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
             };
 
-            HashMap<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
+            Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
             checkMetricWriter(metricMap, expectedMetrics, notExpectedMetrics);
 
             // now set to false and switch expected and not expected metrics
@@ -168,7 +168,7 @@ public class LayoutTest extends FileTest {
                                            "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
-            HashMap<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
+            Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -240,7 +240,7 @@ public class LayoutTest extends FileTest {
                                            "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
-            HashMap<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
+            Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -312,7 +312,7 @@ public class LayoutTest extends FileTest {
                                            "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
-            HashMap<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
+            Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -338,7 +338,7 @@ public class LayoutTest extends FileTest {
      * @param notExpectedMetrics metrics that must not be returned
      * @return the metric Map
      */
-    private HashMap<String, String> runTest(String file, Properties props) {
+    private Map<String, String> runTest(String file, Properties props) {
         try {
             Formatter.setProperties(props);
 
@@ -352,8 +352,8 @@ public class LayoutTest extends FileTest {
             accessor.loadFile(LOGS_CMD, file);
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             return metricMap;
         } catch (Exception e) {
@@ -369,7 +369,7 @@ public class LayoutTest extends FileTest {
      * @param expectedMetrics array of expected metric name
      * @param notExpectedMetrics array of not expected metric name
      */
-    private void checkMetricWriter(HashMap<String, String> metricMap,
+    private void checkMetricWriter(Map<String, String> metricMap,
                                    String[] expectedMetrics,
                                    String[] notExpectedMetrics) {
         try {
@@ -447,8 +447,8 @@ public class LayoutTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             final String CALGARY    = "|america-north|Canada|Calgary";
@@ -529,8 +529,8 @@ public class LayoutTest extends FileTest {
             MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, EMPTY_STRING, true);
             MonitorFactory.createMonitor("Bad request test http_//ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, EMPTY_STRING, true);
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -629,8 +629,8 @@ public class LayoutTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             final String CALGARY    = "|america-north|Canada|Calgary";
@@ -707,8 +707,8 @@ public class LayoutTest extends FileTest {
             MonitorFactory.createMonitor("Custom page ping", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, EMPTY_STRING, true);
             MonitorFactory.createMonitor("Bad request test http_//ca.com/foo", HTTP_MONITOR, folder, EMPTY_STRING_ARRAY, EMPTY_STRING, false);
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
