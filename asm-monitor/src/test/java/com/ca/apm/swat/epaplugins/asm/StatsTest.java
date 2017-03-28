@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -8,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * Test class for testing the acct_credits API.
@@ -51,7 +51,7 @@ public class StatsTest extends FileTest {
             accessor.loadFile(STATS_CMD, "target/test-classes/rule_stats_aggregate.json");
 
             // call API
-            HashMap<String, String> metricMap =
+            Map<String, String> metricMap =
                     requestHelper.getStats(folder, metricPrefix, true);
 
             // metricMap should contain those entries

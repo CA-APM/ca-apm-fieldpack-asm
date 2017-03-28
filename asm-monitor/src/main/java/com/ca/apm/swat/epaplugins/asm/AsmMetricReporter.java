@@ -25,7 +25,7 @@ import com.wily.util.feedback.Module;
 public class AsmMetricReporter implements AsmProperties, Runnable {
 
     private MetricWriter metricWriter;
-    private HashMap<String, String> metricMap = null;
+    private Map<String, String> metricMap = null;
     private boolean turnOn = false;
     private static Module module = null;
 
@@ -38,7 +38,7 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
      * @param turnOn turn metrics on
      */
     public AsmMetricReporter(MetricWriter metricWriter,
-                             HashMap<String, String> metricMap,
+                             Map<String, String> metricMap,
                              boolean turnOn) {
         this.metricWriter = metricWriter;
         this.metricMap = metricMap;

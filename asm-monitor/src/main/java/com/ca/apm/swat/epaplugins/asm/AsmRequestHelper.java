@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import com.ca.apm.swat.epaplugins.asm.monitor.Monitor;
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMapReplacing;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
@@ -366,7 +367,7 @@ public class AsmRequestHelper implements AsmProperties {
                 if (cpJsonObject.get(AREA_TAG).toString().contains(DEFAULT_DELIMITER)) {
                     stationMap.put(
                         cpJsonObject.get(LOCATION_TAG).toString(),
-                        cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1] 
+                        cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1]
                                 + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
                                 + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
                 } else {
@@ -422,7 +423,7 @@ public class AsmRequestHelper implements AsmProperties {
 
                     if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                         EpaUtils.getFeedback().verbose(module,
-                            AsmMessages.getMessage(AsmMessages.READ_MONITOR_307, 
+                            AsmMessages.getMessage(AsmMessages.READ_MONITOR_307,
                                 monitorJsonObject.getString(NAME_TAG),
                                 monitorJsonObject.getString(TYPE_TAG),
                                 (monitorJsonObject.isNull(FOLDER_TAG) ? ROOT_FOLDER :
@@ -523,7 +524,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @return metric map
      * @throws Exception if an error occurred
      */
-    public HashMap<String, String> getStats(String folder, String metricPrefix, boolean aggregate)
+    public Map<String, String> getStats(String folder, String metricPrefix, boolean aggregate)
             throws Exception {
 
         try {
@@ -555,7 +556,7 @@ public class AsmRequestHelper implements AsmProperties {
                     "getStats", folder, monitor.getName(), monitor.getType()));
             }
 
-            return monitor.generateMetrics(statsRequest, metricPrefix);
+            return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -572,7 +573,7 @@ public class AsmRequestHelper implements AsmProperties {
      * @return metric map
      * @throws Exception errors
      */
-    public HashMap<String, String> getPsp(String folder, String metricPrefix)
+    public Map<String, String> getPsp(String folder, String metricPrefix)
             throws Exception {
 
         try {
@@ -598,7 +599,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
-            return monitor.generateMetrics(pspRequest, metricPrefix);
+            return monitor.generateMetrics(new MetricMap(), pspRequest, metricPrefix);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -648,16 +649,16 @@ public class AsmRequestHelper implements AsmProperties {
                 //monitor = MonitorFactory.getAllMonitorsMonitor();
             }
 
-            countApiCall(LOGS_CMD, folder);           
+            countApiCall(LOGS_CMD, folder);
 
-            String logStr = NKEY_PARAM + this.nkey + folderStr                    
+            String logStr = NKEY_PARAM + this.nkey + folderStr
                     + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
 
             // only download full data if configured
             if (EpaUtils.getBooleanProperty(METRICS_DOWNLOAD_FULL, false)) {
                 logStr += 'y';
                 if (!EpaUtils.getBooleanProperty(LEGACY_OUTPUT_FORMAT, true)) {
-                    // Use the new output format. 
+                    // Use the new output format.
                     // Output contains URL of the resource,
                     // agent downloads it directly from the checkpoint.
                     logStr += NEW_OUTPUT_PARAM;
@@ -665,7 +666,8 @@ public class AsmRequestHelper implements AsmProperties {
             } else {
                 logStr += 'n';
             }
-            
+            Map<String, String> metrics;
+
             if (lastId == null) {
                 // get n latest records on the first run
                 int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
@@ -673,15 +675,17 @@ public class AsmRequestHelper implements AsmProperties {
                     numLogs =  numLogs * numMonitors;
                 }
                 logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
+                metrics = new MetricMap();
             } else {
                 // get all records newer than last uuid
                 logStr += UUID_PARAM + lastId + NUM_PARAM
                         + Long.parseLong(EpaUtils.getProperty(MAX_LOG_LIMIT,
                                              Long.toString(DEFAULT_MAX_LOG_LIMIT)));
+                metrics = new MetricMapReplacing();
             }
 
             String logResponse = accessor.executeApi(LOGS_CMD, logStr);
-            
+
             Module module = new Module(Thread.currentThread().getName());
             if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                 EpaUtils.getFeedback().verbose(module,
@@ -702,10 +706,7 @@ public class AsmRequestHelper implements AsmProperties {
                         null,
                         EMPTY_STRING,
                         false);
-            // TODO handle duplicate metrics.
-            // Since the check run time is variable, we can end up with two
-            // records in one polling cycle and none in subsequent one.
-            Map<String, String> metrics = monitor.generateMetrics(logResponse, metricPrefix);
+            monitor.generateMetrics(metrics, logResponse, metricPrefix);
             return new LogResult(metrics, metrics.remove(UUID_TAG));
 
         } catch (JSONException e) {

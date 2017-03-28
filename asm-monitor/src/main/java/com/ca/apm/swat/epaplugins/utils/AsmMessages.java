@@ -18,6 +18,7 @@ public class AsmMessages {
     
     //debug messages
     public static final String DUPLICATE_METRIC_200         = "200_duplicateMetric";
+    public static final String DUPLICATE_METRIC_REPLACED_201 = "201_duplicateMetricReplaced";
     
     // verbose messages
     public static final String READING_PROPERTIES_300       = "300_readingProperties";

@@ -15,6 +15,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -104,16 +105,16 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
     /**
      * Recursively generate metrics from API call result. 
+     * @param metricMap map to insert metrics into
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      */
     @SuppressWarnings("rawtypes")
-    public MetricMap generateMetrics(
+    public Map<String, String> generateMetrics(
+        Map<String, String> metricMap,
         String jsonString,
         String metricTree) {
-
-        MetricMap metricMap = new MetricMap();
 
         if (null == jsonString) {
             return metricMap;
@@ -130,7 +131,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         // return if this monitor is inactive
-        if (jsonObject.optString(ACTIVE_TAG, YES) == NO) {
+        if (NO.equals(jsonObject.optString(ACTIVE_TAG, YES))) {
             return metricMap;
         }
         
@@ -164,7 +165,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
             }
         }
 
-        MetricMap outputMap = null;
+        Map<String, String> outputMap = new MetricMap();
         int result = 0;
         
         // iterate over JSON object
@@ -178,7 +179,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
             // if this is another object do recursion
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
-                metricMap.putAll(generateMetrics(innerJsonObject.toString(), metricTree));
+                generateMetrics(metricMap, innerJsonObject.toString(), metricTree);
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 // iterate over array
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
@@ -202,18 +203,21 @@ public class BaseMonitor implements Monitor, AsmProperties {
                                                          + arrayElement.optInt(RESULT_TAG));
                         } else {
                             // recursively generate metrics for these tags
-                            metricMap.putAll(generateMetrics(
-                                innerJsonArray.getJSONObject(i).toString(), metricTree));
+                            generateMetrics(
+                                metricMap,
+                                innerJsonArray.getJSONObject(i).toString(), metricTree);
                         }
                     } else if (thisKey.equals(MONITORS_TAG)
                             || thisKey.equals(STATS_TAG)) {
                         // recursively generate metrics for these tags
-                        metricMap.putAll(generateMetrics(
-                            innerJsonArray.getJSONObject(i).toString(), metricTree));
+                        generateMetrics(
+                            metricMap,
+                            innerJsonArray.getJSONObject(i).toString(), metricTree);
                     } else {
-                        metricMap.putAll(generateMetrics(
+                        generateMetrics(
+                            metricMap,
                             innerJsonArray.getJSONObject(i).toString(),
-                            metricTree + METRIC_PATH_SEPARATOR + thisKey));
+                            metricTree + METRIC_PATH_SEPARATOR + thisKey);
                     }
                 }
             } else {
@@ -230,7 +234,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if ((null != thisValue) && (0 < thisValue.length())) {
-                                outputMap = successor.generateMetrics(thisValue, metricTree);
+                                successor.generateMetrics(outputMap, thisValue, metricTree);
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                     AsmMessages.OUTPUT_EMPTY_WARN_705,
@@ -322,20 +326,18 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         // if monitor result is timeout set step status message value to timeout, too
-        if (null != outputMap) {
-            if (EpaUtils.getBooleanProperty(TIMEOUT_REPORT_ALWAYS, true) && isTimeout(result)) {
-                for (Iterator<String> it = outputMap.keySet().iterator(); it.hasNext(); ) {
-                    String key = it.next();
-                    if (key.endsWith(STATUS_MESSAGE_VALUE)) {
-                        metricMap.put(key,
-                            format.mapResponseToStatusCode(Integer.toString(result)));
-                    } else {
-                        metricMap.put(key, outputMap.get(key));
-                    }
+        if (EpaUtils.getBooleanProperty(TIMEOUT_REPORT_ALWAYS, true) && isTimeout(result)) {
+            for (Iterator<String> it = outputMap.keySet().iterator(); it.hasNext(); ) {
+                String key = it.next();
+                if (key.endsWith(STATUS_MESSAGE_VALUE)) {
+                    metricMap.put(key,
+                        format.mapResponseToStatusCode(Integer.toString(result)));
+                } else {
+                    metricMap.put(key, outputMap.get(key));
                 }
-            } else {
-                metricMap.putAll(outputMap);
             }
+        } else {
+            metricMap.putAll(outputMap);
         }
         
         // add a step node if STEP_FORMAT_ALWAYS is true
@@ -371,7 +373,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
      */
     private void handleException(AsmException exception,
                                  String metricTree,
-                                 MetricMap metricMap,
+                                 Map<String, String> metricMap,
                                  Module module) {
  
         if (ERROR_900 > exception.getErrorCode()) {
@@ -418,7 +420,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @param metricTree the metric tree for the monitor
      * @return the metric map with the added step node
      */
-    protected MetricMap addStep(MetricMap metricMap, Monitor monitor, String metricTree) {
+    protected Map<String, String> addStep(Map<String, String> metricMap,
+                                          Monitor monitor,
+                                          String metricTree) {
         if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
             String stepMetricTree = metricTree + METRIC_PATH_SEPARATOR
                     + format.formatStep(1, EMPTY_STRING);

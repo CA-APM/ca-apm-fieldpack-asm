@@ -7,10 +7,10 @@ import java.util.zip.Inflater;
 import org.apache.commons.codec.binary.Base64;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
-import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 public class SimpleBase64Decoder implements Handler {
 
@@ -24,12 +24,15 @@ public class SimpleBase64Decoder implements Handler {
      * Generate metrics from API call result.
      * SimpleBase64Decoder decodes the Base64 encoded string and forwards to the next handler.
      * 
+     * @param map map to insert metrics into
      * @param encodedString Base64 encoded string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String encodedString, String metricTree)
+    public Map<String, String> generateMetrics(Map<String, String> map,
+                                               String encodedString,
+                                               String metricTree)
             throws AsmException {
 
         // doesn't make sense if nobody handles the result
@@ -58,7 +61,7 @@ public class SimpleBase64Decoder implements Handler {
                 }
 
                 // call next handler in chain
-                return successor.generateMetrics(decodedString, metricTree);
+                return successor.generateMetrics(map, decodedString, metricTree);
             } else {
                 EpaUtils.getFeedback().warn(AsmMessages.getMessage(
                     AsmMessages.BYTES_DECODED_NULL_909,
@@ -70,7 +73,7 @@ public class SimpleBase64Decoder implements Handler {
                 AsmMessages.INVALID_HANDLER_CHAIN_910,
                 this.getClass().getSimpleName()));
         }
-        return new MetricMap();
+        return map;
     }
 
     /**

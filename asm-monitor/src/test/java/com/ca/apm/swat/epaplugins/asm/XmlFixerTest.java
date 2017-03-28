@@ -8,6 +8,7 @@ import com.ca.apm.swat.epaplugins.asm.monitor.XmlFixer;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * Test class for testing the XmlFixer class.
@@ -49,7 +50,7 @@ public class XmlFixerTest implements AsmProperties {
             for (int i = 0; i < test.length; ++i) {
                 checker.setExpectedResult(expected[i]);
 
-                fixer.generateMetrics(test[i], null);
+                fixer.generateMetrics(new MetricMap(), test[i], null);
             }
             
         } catch (Exception e) {
@@ -67,12 +68,12 @@ public class XmlFixerTest implements AsmProperties {
             expected = expectedResult;
         }
     
-        public MetricMap generateMetrics(String xmlString, String metricTree) {
+        public Map<String, String> generateMetrics(Map<String, String> map, String xmlString, String metricTree) {
             if (DEBUG) {
                 System.out.println(xmlString);
             }
             Assert.assertEquals(xmlString, expected);
-            return null;
+            return map;
         }
     }
 

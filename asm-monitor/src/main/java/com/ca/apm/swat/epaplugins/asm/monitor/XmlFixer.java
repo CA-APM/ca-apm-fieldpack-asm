@@ -2,10 +2,10 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
-import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.Map;
 
 public class XmlFixer implements Handler {
 
@@ -19,12 +19,15 @@ public class XmlFixer implements Handler {
      * Generate metrics from API call result.
      * XmlFixer replaces all '&' characters in xml string with "&amp;"
      * 
+     * @param map map to insert metrics into
      * @param xmlString xml string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String xmlString, String metricTree) throws AsmException {
+    public Map<String, String> generateMetrics(Map<String, String> map,
+                                               String xmlString,
+                                               String metricTree) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
@@ -36,13 +39,13 @@ public class XmlFixer implements Handler {
                     metricTree));
             }
             // replace all occu
-            return successor.generateMetrics(xmlString.replaceAll("&", "&amp;"), metricTree);
+            return successor.generateMetrics(map, xmlString.replaceAll("&", "&amp;"), metricTree);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
                 AsmMessages.INVALID_HANDLER_CHAIN_910,
                 this.getClass().getSimpleName()));
         }
-        return new MetricMap();
+        return map;
     }
 }
