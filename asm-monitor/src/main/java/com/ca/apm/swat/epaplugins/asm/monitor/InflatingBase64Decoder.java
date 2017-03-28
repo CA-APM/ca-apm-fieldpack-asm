@@ -7,11 +7,11 @@ import java.util.zip.Inflater;
 import org.apache.commons.codec.binary.Base64;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
-import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.Map;
 
 public class InflatingBase64Decoder implements Handler {
 
@@ -31,7 +31,7 @@ public class InflatingBase64Decoder implements Handler {
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String encodedString, String metricTree)
+    public Map<String, String> generateMetrics(Map<String, String> map, String encodedString, String metricTree)
             throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
@@ -65,7 +65,7 @@ public class InflatingBase64Decoder implements Handler {
                     }
 
                     // call next handler in chain
-                    return successor.generateMetrics(decodedString, metricTree);
+                    return successor.generateMetrics(map, decodedString, metricTree);
                 } else {
                     throw new AsmException(AsmMessages.getMessage(
                         AsmMessages.DECOMPRESS_ERROR_711,

@@ -2,7 +2,6 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
-import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
@@ -11,6 +10,7 @@ import org.json.JSONException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Map;
 
 public class AssetDownloader implements Handler {
 
@@ -29,7 +29,7 @@ public class AssetDownloader implements Handler {
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String string, String metricTree) throws AsmException {
+    public Map<String, String> generateMetrics(Map<String, String> map, String string, String metricTree) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
@@ -66,7 +66,7 @@ public class AssetDownloader implements Handler {
                 }
             }
 
-            return successor.generateMetrics(string, metricTree);
+            return successor.generateMetrics(map, string, metricTree);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
@@ -74,6 +74,6 @@ public class AssetDownloader implements Handler {
                     this.getClass().getSimpleName()
                 ));
         }
-        return new MetricMap();
+        return map;
     }
 }

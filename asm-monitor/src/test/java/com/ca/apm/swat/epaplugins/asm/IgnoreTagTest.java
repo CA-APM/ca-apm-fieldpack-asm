@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -10,6 +9,7 @@ import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * This test checks if asm.ignoreTags is handled correctly.
@@ -98,8 +98,8 @@ public class IgnoreTagTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_http.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());

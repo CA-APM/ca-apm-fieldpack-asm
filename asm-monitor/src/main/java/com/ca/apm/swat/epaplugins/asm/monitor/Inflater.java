@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 import com.ca.apm.swat.epaplugins.asm.error.AsmException;
-import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 public class Inflater implements Handler {
 
@@ -26,7 +26,7 @@ public class Inflater implements Handler {
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public MetricMap generateMetrics(String compressedString, String metricTree)
+    public Map<String, String> generateMetrics(Map<String, String> map, String compressedString, String metricTree)
             throws AsmException {
 
         // doesn't make sense if nobody handles the result
@@ -38,7 +38,7 @@ public class Inflater implements Handler {
                     String decompressedString;
                     decompressedString = new String(bytesDecompressed, 0,
                         bytesDecompressed.length, EpaUtils.getEncoding());
-                    return successor.generateMetrics(decompressedString, metricTree);
+                    return successor.generateMetrics(map, decompressedString, metricTree);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                         AsmMessages.BYTES_DECODED_NULL_909,
@@ -59,7 +59,7 @@ public class Inflater implements Handler {
                 AsmMessages.INVALID_HANDLER_CHAIN_910,
                 this.getClass().getSimpleName()));
         }
-        return new MetricMap();
+        return map;
     }
 
     /**

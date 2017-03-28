@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -8,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.wily.introscope.epagent.EpaUtils;
+import java.util.Map;
 
 /**
  * Test class for testing the rule_log API.
@@ -53,8 +53,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             final String CALGARY    = "|america-north|Canada|Calgary";
@@ -119,8 +119,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             final String CALGARY    = "|america-north|Canada|Calgary";
@@ -184,8 +184,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_all.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             
@@ -264,8 +264,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_http.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -327,8 +327,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_browser.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -389,8 +389,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_firefox.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -434,8 +434,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_firefox2.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             // metricMap should contain those entries
             String[] expectedMetrics = {
@@ -481,8 +481,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_error.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
           
             String[] expectedMetrics = {
@@ -553,8 +553,8 @@ public class LogTest extends FileTest {
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_error.json");
 
             // call API
-            HashMap<String, String> metricMap =
-                    requestHelper.getLogs(folder, numMonitors, metricPrefix);
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
 
             String[] expectedMetrics = {
                 "Monitors|Tests|Map Service_Restricted_Area:Alerts Per Interval",

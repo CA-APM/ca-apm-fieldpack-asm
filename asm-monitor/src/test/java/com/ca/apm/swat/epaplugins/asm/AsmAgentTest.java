@@ -1,6 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.SortedSet;
@@ -10,6 +9,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ca.apm.swat.epaplugins.asm.monitor.MonitorFactory;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
+import java.util.Map;
 
 
 /**
@@ -46,8 +47,8 @@ public class AsmAgentTest extends FileTest {
             Properties properties = AsmReader.readPropertiesFromFile(propertyFileName);
             properties.setProperty(DISPLAY_STATIONS, FALSE);
 
-            HashMap<String, String> map = MonitorFactory.getAllMonitorsMonitor()
-                    .generateMetrics(json, "Monitors|CA");
+            Map<String, String> map = MonitorFactory.getAllMonitorsMonitor()
+                    .generateMetrics(new MetricMap(), json, "Monitors|CA");
 
             SortedSet<String> set = new TreeSet<String>();
             for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {
