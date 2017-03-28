@@ -105,7 +105,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
 
     /**
      * Recursively generate metrics from API call result. 
-     * @param metricMap
+     * @param metricMap map to insert metrics into
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
@@ -420,7 +420,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @param metricTree the metric tree for the monitor
      * @return the metric map with the added step node
      */
-    protected Map<String, String> addStep(Map<String, String> metricMap, Monitor monitor, String metricTree) {
+    protected Map<String, String> addStep(Map<String, String> metricMap,
+                                          Monitor monitor,
+                                          String metricTree) {
         if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
             String stepMetricTree = metricTree + METRIC_PATH_SEPARATOR
                     + format.formatStep(1, EMPTY_STRING);

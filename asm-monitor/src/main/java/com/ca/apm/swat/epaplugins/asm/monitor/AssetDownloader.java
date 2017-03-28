@@ -24,12 +24,15 @@ public class AssetDownloader implements Handler {
      * Generate metrics from API call result.
      * AssetDownloader replaces a reference to an asset with it's actual content
      * 
+     * @param map map to insert metrics into
      * @param string a string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public Map<String, String> generateMetrics(Map<String, String> map, String string, String metricTree) throws AsmException {
+    public Map<String, String> generateMetrics(Map<String, String> map,
+                                               String string,
+                                               String metricTree) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result

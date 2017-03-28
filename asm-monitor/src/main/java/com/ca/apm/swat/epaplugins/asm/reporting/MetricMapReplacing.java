@@ -9,7 +9,7 @@ import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
 
 /**
- * Overrides the HashMap implementation to add logging
+ * Overrides the HashMap implementation to add logging.
  * 
  *
  */

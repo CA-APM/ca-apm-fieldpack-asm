@@ -19,12 +19,15 @@ public class XmlFixer implements Handler {
      * Generate metrics from API call result.
      * XmlFixer replaces all '&' characters in xml string with "&amp;"
      * 
+     * @param map map to insert metrics into
      * @param xmlString xml string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public Map<String, String> generateMetrics(Map<String, String> map, String xmlString, String metricTree) throws AsmException {
+    public Map<String, String> generateMetrics(Map<String, String> map,
+                                               String xmlString,
+                                               String metricTree) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result

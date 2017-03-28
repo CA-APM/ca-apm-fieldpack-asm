@@ -26,12 +26,15 @@ public class InflatingBase64Decoder implements Handler {
      * InflatingBase64Decoder decodes the Base64 encoded string and unzips it
      *   before forwarding the string to the next handler.
      * 
+     * @param map map to insert metrics into
      * @param encodedString Base64 encoded string
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public Map<String, String> generateMetrics(Map<String, String> map, String encodedString, String metricTree)
+    public Map<String, String> generateMetrics(Map<String, String> map,
+                                               String encodedString,
+                                               String metricTree)
             throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 

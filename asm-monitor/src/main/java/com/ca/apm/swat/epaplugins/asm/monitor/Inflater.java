@@ -21,12 +21,15 @@ public class Inflater implements Handler {
      * Generate metrics from API call result.
      * Inflater unzips the compressed string and forwards to the next handler.
      * 
+     * @param map map to insert metrics into
      * @param compressedString compressedString
      * @param metricTree metric tree prefix
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public Map<String, String> generateMetrics(Map<String, String> map, String compressedString, String metricTree)
+    public Map<String, String> generateMetrics(Map<String, String> map,
+                                               String compressedString,
+                                               String metricTree)
             throws AsmException {
 
         // doesn't make sense if nobody handles the result

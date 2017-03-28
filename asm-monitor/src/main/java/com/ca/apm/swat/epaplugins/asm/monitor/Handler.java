@@ -26,5 +26,8 @@ public interface Handler {
      * @return map containing the metrics
      * @throws AsmException error during metrics generation
      */
-    public Map<String, String> generateMetrics(Map<String,String> map, String jsonString, String metricTree) throws AsmException;
+    public Map<String, String> generateMetrics(Map<String,String> map,
+                                               String jsonString,
+                                               String metricTree)
+                                                       throws AsmException;
 }

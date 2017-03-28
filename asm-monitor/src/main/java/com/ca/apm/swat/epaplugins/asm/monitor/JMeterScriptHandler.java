@@ -35,11 +35,14 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
     /**
      * Generate metrics from API call result. 
+     * @param metricMap map to insert metrics into
      * @param xmlString JMeter script data
      * @param metricTree metric tree prefix
      * @return map containing the metrics
      */
-    public Map<String, String> generateMetrics(Map<String, String> metricMap, String xmlString, String metricTree) {
+    public Map<String, String> generateMetrics(Map<String, String> metricMap,
+                                               String xmlString,
+                                               String metricTree) {
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module,
