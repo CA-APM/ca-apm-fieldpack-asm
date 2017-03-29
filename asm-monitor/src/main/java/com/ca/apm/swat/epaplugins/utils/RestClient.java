@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -102,21 +103,15 @@ public class RestClient {
             connection.setRequestProperty("Authorization", "Basic " + authStringEnc);
         }
 
-//        byte[] bytes = params.getBytes();
-//        InputStream body = new ByteArrayInputStream(bytes);
-//
-        byte[] buffer = new byte[BUFFER_LENGTH];
-        int read = 0;
-//        if (body != null) {
-//            connection.setDoOutput(true);
-//
-//            OutputStream output = connection.getOutputStream();
-//            while ((read = body.read(buffer)) != -1) {
-//                output.write(buffer, 0, read);
-//            }
-//
-//        }
-
+        byte[] postData       = params.getBytes(StandardCharsets.UTF_8);
+        int    postDataLength = postData.length;
+        
+        connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded"); 
+        connection.setRequestProperty( "charset", "utf-8");
+        connection.setRequestProperty( "Content-Length", Integer.toString( postDataLength ));
+        connection.setDoOutput(true);
+        connection.getOutputStream().write(postData);
+        
         int readTimeout =
                 Integer.parseInt(EpaUtils.getProperty(AsmProperties.HTTP_READ_TIMEOUT,
                                                       Integer.toString(HTTP_READ_TIMEOUT)));
@@ -129,7 +124,9 @@ public class RestClient {
         StringBuffer responseBody = new StringBuffer();
 
 
-
+        byte[] buffer = new byte[BUFFER_LENGTH];
+        int read = 0;
+        
         while ((read = responseBodyStream.read(buffer)) != -1) {
             responseBody.append(new String(buffer, 0, read));
         }
