@@ -131,9 +131,12 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
      */
     public static String returnMetricType(String metricName, String metricValue) {
         String metricType = MetricWriter.kStringEvent;
-        boolean metricTypeSet = false;
 
         // determine type from metric name
+        if (metricName.endsWith(METRIC_NAME_DATA_RECEIVED)) {
+            return MetricWriter.kPerIntervalCounter;
+        }
+
         // does mostly not make sense as we are sending metrics only every 5 minutes
         if (EpaUtils.getBooleanProperty(REPORT_PER_INTERVAL_COUNTER, false)
                 && (metricName.endsWith(METRIC_NAME_PROBE_ERRORS)
@@ -145,28 +148,24 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
                         || metricName.endsWith(METRIC_NAME_ALERTS_PER_INTERVAL)
                         || metricName.endsWith(METRIC_NAME_ERRORS_PER_INTERVAL))) {
 
-            metricType = MetricWriter.kPerIntervalCounter;
-            metricTypeSet = true;
+            return MetricWriter.kPerIntervalCounter;
 
         } else if (EpaUtils.getBooleanProperty(REPORT_LONG_AVERAGE, false)
             && (metricName.endsWith("Time (ms)")
                     || metricName.endsWith("Speed (kB/s)")
                     || metricName.endsWith("Size (kB)"))) {
 
-            metricType = MetricWriter.kLongAverage;
-            metricTypeSet = true;
+            return MetricWriter.kLongAverage;
         }
 
-        if (!metricTypeSet) {
         // determine type from metric value
-            if (metricValue.matches("^[+-]?[0-9]+$")) {
-                metricType = MetricWriter.kLongCounter;
-            } else if (metricValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
-                // float, cannot convert here
-                metricType = MetricWriter.kFloat;
-            } else {
-                metricType = MetricWriter.kStringEvent;
-            }
+        if (metricValue.matches("^[+-]?[0-9]+$")) {
+            metricType = MetricWriter.kLongCounter;
+        } else if (metricValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
+            // float, cannot convert here
+            metricType = MetricWriter.kFloat;
+        } else {
+            metricType = MetricWriter.kStringEvent;
         }
 
         return metricType;
