@@ -140,7 +140,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
         String name = jsonObject.optString(NAME_TAG, null);
         Monitor monitor = null;
         Module module = new Module(Thread.currentThread().getName());
-
+        int originalMapSize = metricMap.size();
+        
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "generateMetrics(" + metricTree + ", " 
                     + jsonString + ")");
@@ -319,6 +320,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
                     }
                     metricMap.put(metricTree + METRIC_NAME_SEPARATOR + STATUS_MESSAGE_VALUE,
                                   format.mapResponseToStatusCode(thisValue));
+                    // received data
+                    metricMap = setDataReceived(metricMap, metricTree);
                 }
 
                 // map metric key
@@ -346,6 +349,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 if (key.endsWith(STATUS_MESSAGE_VALUE)) {
                     metricMap.put(key,
                                   format.mapResponseToStatusCode(Integer.toString(result)));
+                    metricMap = setDataReceived(metricMap, metricTree);
                 } else {
                     metricMap.put(key, outputMap.get(key));
                 }
@@ -373,7 +377,8 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
 
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
-            EpaUtils.getFeedback().verbose(module, "BaseMonitor returning " + metricMap.size()
+            EpaUtils.getFeedback().verbose(module, "BaseMonitor returning "
+                                           + (metricMap.size() - originalMapSize)
                                            + " metrics for monitor " + getName()
                                            + " in metric tree " + metricTree);
         }
@@ -386,10 +391,6 @@ public class BaseMonitor implements Monitor, AsmProperties {
                 || UUID.fromString(currentUuid).compareTo(UUID.fromString(lastUuid)) > 0)) {
             metricMap.put(UUID_TAG, currentUuid);            
         }
-
-        // put "Data Received" metric
-        String key = metricTree + METRIC_NAME_SEPARATOR + METRIC_NAME_DATA_RECEIVED;
-        metricMap.put(key, "1");
 
         return metricMap;
     }
@@ -453,7 +454,9 @@ public class BaseMonitor implements Monitor, AsmProperties {
                                           String metricTree) {
         Module module = new Module(Thread.currentThread().getName());
 
-        if ((null != monitor) && (!SCRIPT_MONITOR.equals(monitor.getType()))) {
+        if (null != monitor) {
+            // removed && (!SCRIPT_MONITOR.equals(monitor.getType()))
+            // because we want the step also if we have an error!
             String stepMetricTree = metricTree + METRIC_PATH_SEPARATOR
                     + format.formatStep(1, EMPTY_STRING);
 
@@ -468,25 +471,31 @@ public class BaseMonitor implements Monitor, AsmProperties {
             for (Iterator<String> it = metricsToAddToStep.iterator(); it.hasNext(); ) {
                 String metricName = it.next();
                 String key = metricTree + METRIC_NAME_SEPARATOR + metricName;
-
+                String newKey = stepMetricTree + METRIC_NAME_SEPARATOR + metricName;
+                
                 if (metricMap.containsKey(key)) {
                     if (RESULT_CODE.equals(metricName)) {
-                        metricName = RESPONSE_CODE;
-                        if (metricMap.get(key).equals("0")) {
-                            metricMap.put(stepMetricTree + METRIC_NAME_SEPARATOR + metricName,
-                                          Integer.toString(RESULT_OK));
-                        } else {
-                            metricMap.put(stepMetricTree + METRIC_NAME_SEPARATOR + metricName,
-                                          metricMap.get(key));
+                        newKey = stepMetricTree + METRIC_NAME_SEPARATOR + RESPONSE_CODE;
+                        if (!metricMap.containsKey(newKey)) {
+                            if (metricMap.get(key).equals("0")) {
+                                metricMap.put(newKey, Integer.toString(RESULT_OK));
+                            } else {
+                                metricMap.put(newKey, metricMap.get(key));
+                            }
                         }
                     } else {
-                        metricMap.put(stepMetricTree + METRIC_NAME_SEPARATOR + metricName,
-                                      metricMap.get(key));
+                        if (!metricMap.containsKey(newKey)) {
+                            metricMap.put(newKey, metricMap.get(key));
+                        }
                     }
 
                     if (EpaUtils.getFeedback().isDebugEnabled(module)) {
                         EpaUtils.getFeedback().debug(module, "copied metric " + stepMetricTree
                                                      + METRIC_NAME_SEPARATOR + metricName);
+                    }
+
+                    if (key.endsWith(STATUS_MESSAGE_VALUE)) {
+                        metricMap = setDataReceived(metricMap, metricTree);
                     }
                 }
             }
@@ -518,6 +527,20 @@ public class BaseMonitor implements Monitor, AsmProperties {
         }
     }
 
+    /**
+     * Put "Data Received" metric.
+     * @param metricMap map to insert metrics into
+     * @param metricTree metric tree prefix
+     * @return map containing the metrics
+     */
+    protected Map<String, String> setDataReceived(Map<String, String> metricMap,
+                                                  String metricTree) {
+        String key = metricTree + METRIC_NAME_SEPARATOR + METRIC_NAME_DATA_RECEIVED;
+        metricMap.put(key, "1");
+        return metricMap;
+    }
+
+        
     public void setSuccessor(Handler successor) {
         this.successor = successor;
     }
