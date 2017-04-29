@@ -31,6 +31,7 @@
 			<groupId>com.ca.apm.agent.EPAgent</groupId>
 			<artifactId>EPAgent</artifactId>
 			<version>9.7.0.27</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -45,7 +46,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>com.ca.apm.extensions.epagent.${project.artifactId}-${project.version}</finalName>
+		<finalName>com.ca.apm.extensions.epagent.${project.artifactId}</finalName>
 		<defaultGoal>clean package</defaultGoal>
 
 		<extensions>
