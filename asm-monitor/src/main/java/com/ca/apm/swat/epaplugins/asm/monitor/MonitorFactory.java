@@ -38,11 +38,14 @@ public class MonitorFactory implements AsmProperties {
 
         Monitor monitor = null;
         // TODO make configurable
-        if (type.equalsIgnoreCase(SCRIPT_MONITOR)
-                /* don't handle here until we figured out what to do with har data
-                || type.equalsIgnoreCase(REAL_BROWSER_MONITOR)
-                || type.equalsIgnoreCase(FULL_PAGE_MONITOR)*/) {
+        if (type.equalsIgnoreCase(SCRIPT_MONITOR)) {
             monitor = new ScriptMonitor(name, folder, tags, url, active);
+        /*
+        } else if (type.equalsIgnoreCase(REAL_BROWSER_MONITOR)) {
+            monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
+        } else if (type.equalsIgnoreCase(FULL_PAGE_MONITOR)) {
+            monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
+        */
         } else {
             monitor = new BaseMonitor(name, type, folder, tags, url, active);
         }
