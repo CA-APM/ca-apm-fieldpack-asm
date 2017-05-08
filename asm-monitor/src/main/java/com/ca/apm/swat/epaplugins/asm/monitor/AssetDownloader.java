@@ -13,8 +13,14 @@ import java.net.URL;
 import java.util.Map;
 
 public class AssetDownloader implements Handler {
-
+    private final String path;
+    private final String key;
     protected Handler successor = null;  
+
+    public AssetDownloader(String path, String key) {
+        this.path = path;
+        this.key = key;
+    }
 
     public void setSuccessor(Handler successor) {
         this.successor = successor;
@@ -42,7 +48,7 @@ public class AssetDownloader implements Handler {
             
             try {
                 in = new BufferedReader(new InputStreamReader(new URL(
-                        new JSONObject(string).getJSONObject("jtl").getString("url")
+                        new JSONObject(string).getJSONObject(path).getString(key)
                     ).openStream()));
                 StringBuilder sb = new StringBuilder();
                 String str;

@@ -30,7 +30,7 @@ public class ScriptMonitor extends BaseMonitor {
         // build chain of responsibility
         Handler jmeterHandler = new JMeterScriptHandler();
         Handler decoder = new InflatingBase64Decoder();
-        Handler downloader = new AssetDownloader();
+        Handler downloader = new AssetDownloader("jtl", "url");
         decoder.setSuccessor(downloader);
         
         if (EpaUtils.getBooleanProperty(AsmProperties.FIX_AMPERSAND, true)) {
