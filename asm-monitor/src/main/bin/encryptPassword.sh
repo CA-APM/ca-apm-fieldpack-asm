@@ -43,7 +43,7 @@ HP-UX)
 esac
 
 # the command to start the EPAgent
-EpaCmd="java -cp lib/EPAgent.jar:lib/ca.apm.swat.asm-monitor.jar com.ca.apm.swat.epaplugins.utils.CryptoUtils $1"
+EpaCmd="java -cp lib/EPAgent.jar:lib/com.ca.apm.extensions.epagent.asm-monitor.jar:lib/commons-codec-1.10.jar com.ca.apm.swat.epaplugins.utils.CryptoUtils $1"
 # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
 
 cd "${WILYHOME}"
