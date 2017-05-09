@@ -95,6 +95,10 @@ public class JSONHar implements Har {
                     }
                     return parse(type, array.getJSONObject(i++));
                 }
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
             };
         }
     }
