@@ -135,6 +135,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
         if (null == jsonString) {
             return metricMap;
         }
+        
 
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
@@ -249,7 +250,13 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if ((null != thisValue) && (0 < thisValue.length())) {
-                                successor.generateMetrics(outputMap, thisValue, metricTree);
+                            	
+                            	if(monitor != null && monitor.getClass().getName().equals("JMeterScriptHandler")){
+									monitor.getSuccessor().generateMetrics(outputMap, thisValue, metricTree);
+                            	}
+								else{
+									successor.generateMetrics(outputMap, thisValue, metricTree);
+								}
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                                             AsmMessages.OUTPUT_EMPTY_WARN_705,
@@ -545,7 +552,7 @@ public class BaseMonitor implements Monitor, AsmProperties {
         this.successor = successor;
     }
 
-    protected Handler getSuccessor() {
+    public Handler getSuccessor() {
         return this.successor;
     }
 }

@@ -40,9 +40,9 @@ public class MonitorFactory implements AsmProperties {
         // TODO make configurable
         if (type.equalsIgnoreCase(SCRIPT_MONITOR)) {
             monitor = new ScriptMonitor(name, folder, tags, url, active);
-        /*
         } else if (type.equalsIgnoreCase(REAL_BROWSER_MONITOR)) {
             monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
+        /*
         } else if (type.equalsIgnoreCase(FULL_PAGE_MONITOR)) {
             monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
         */
