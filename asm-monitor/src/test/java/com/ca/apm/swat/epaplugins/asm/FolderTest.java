@@ -1,6 +1,7 @@
 package com.ca.apm.swat.epaplugins.asm;
 
 import java.util.Properties;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,7 +11,8 @@ import com.wily.introscope.epagent.EpaUtils;
 /**
  * Test class for testing the fldr_get API.
  *   Run with -DDEBUG=true for debug output.
- * 
+ *   
+ *   
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
@@ -160,4 +162,127 @@ public class FolderTest extends FileTest {
             Assert.fail(e.getMessage());
         }
     }
-}
+    
+    /**
+     * Test getFolders() with include property with wildcards.
+     */
+    @Test
+    public void getFoldersIncludeWildard() {
+
+        try {
+            // folderList should contain those entries
+            String[] matchList = {
+                "APM.*Sites",
+                "Cater*",
+                "Customer Sites",
+                "*ML",
+                "OPMS Testing",
+            };
+
+            String[] expectedFolders = {
+                "APM Vendor Sites",
+                "Caterpillar",
+                "Customer Sites",
+                "NML",
+                "OPMS Testing",
+            };
+            
+             String[] excludedFolders = {
+	            "Tests",
+                "Test folder name length"
+            };
+            // create include property
+            StringBuffer buf = new StringBuffer();
+            for (int i = 0; i < matchList.length; ++i) {
+                if (i > 0) {
+                    buf.append(',');
+                }
+                buf.append(matchList[i]);
+            }
+
+            // set properties
+            Properties props = EpaUtils.getProperties();
+            props.setProperty(INCLUDE_FOLDERS, buf.toString());
+            props.setProperty(EXCLUDE_FOLDERS, EMPTY_STRING);
+
+            // call API
+            String[] folderList = requestHelper.getFolders();
+
+            // check
+            checkMetrics(expectedFolders, folderList);
+            checkNotExistMetrics(excludedFolders, folderList);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+    /**
+     * Test getFolders() with exclude property.
+     */
+    @Test
+    public void getFoldersExcludeWildCard() {
+
+        try {
+            // folderList should contain those entries
+            String[] expectedFolders = {
+                "root_folder",
+                "APM Vendor Sites",
+                "Caterpillar",
+                "Customer Sites",
+                "NML",
+            };
+
+            String[] excludedFolders = {
+                "OPMS Testing",
+                "Tests",
+                "Test folder name length",
+                "Web Service tests"
+            };
+
+            String[] excludedMatches = {
+                "OPMS?Testing",
+                "Test*",
+                "Web S?rvice tests"
+            };
+            // create exclude property
+            StringBuffer buf = new StringBuffer();
+            for (int i = 0; i < excludedMatches.length; ++i) {
+                if (i > 0) {
+                    buf.append(',');
+                    for (int j = 0; j < i; ++j) {
+                        buf.append(' '); // append varying number of blanks
+                    }
+                }
+                buf.append(excludedMatches[i]);
+            }
+
+            // set properties
+            Properties props = EpaUtils.getProperties();
+            props.setProperty(INCLUDE_FOLDERS, EMPTY_STRING);
+            props.setProperty(EXCLUDE_FOLDERS, buf.toString());
+
+            // call API
+            String[] folderList = requestHelper.getFolders();
+
+            // check
+            checkMetrics(expectedFolders, folderList);
+            checkNotExistMetrics(excludedFolders, folderList);
+
+            if (DEBUG) {
+                buf = new StringBuffer();
+                for (int i = 0; i < folderList.length; ++i) {
+                    if (i > 0) {
+                        buf.append(',');
+                    }
+                    buf.append(folderList[i]);
+                }
+                System.out.println("folderList = " + buf.toString());             
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+ }
