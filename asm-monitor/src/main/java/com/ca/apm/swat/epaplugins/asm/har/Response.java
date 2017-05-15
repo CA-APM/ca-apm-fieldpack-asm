@@ -1,7 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm.har;
 
-import org.json.Cookie;
-
 public interface Response {
     public int getStatus();
     public String getStatusText();
