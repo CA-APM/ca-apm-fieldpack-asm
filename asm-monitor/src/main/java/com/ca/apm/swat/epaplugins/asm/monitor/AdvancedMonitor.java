@@ -9,8 +9,8 @@ public class AdvancedMonitor extends BaseMonitor {
      * @param name name of the monitor
      * @param folder folder of the monitor
      * @param tags tags of the monitor
-     * @param url
-     * @param active
+     * @param url URL (unused) url this monitor is following
+     * @param active activation state of this monitor
      */
     protected AdvancedMonitor(String type, String name,
                             String folder,

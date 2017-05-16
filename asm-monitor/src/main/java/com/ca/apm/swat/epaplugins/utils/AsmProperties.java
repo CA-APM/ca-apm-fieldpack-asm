@@ -1,5 +1,8 @@
 package com.ca.apm.swat.epaplugins.utils;
 
+import com.ca.apm.swat.epaplugins.asm.har.Entry;
+import com.wily.introscope.epagent.EpaUtils;
+
 /**
  * Contains all constants for CA App Synthetic Monitor EPA plugin.
  * @author Guenter Grossberger - CA APM SWAT Team
@@ -305,5 +308,18 @@ public interface AsmProperties {
     public static final String METRIC_NAME_ERRORS_PER_INTERVAL = "Errors Per Interval";
     public static final String METRIC_NAME_ALERTS_PER_INTERVAL = "Alerts Per Interval";
     public static final String METRIC_NAME_DATA_RECEIVED       = "Data Received";
+    
+    public static final String METRIC_NAME_LOAD_TIME            = "Load Time";
+    public static final String METRIC_NAME_CONTENT_LOAD_TIME    = "Content Load Time";
+    public static final String METRIC_NAME_TOTAL_TIME           = "Total Time";
+    public static final String METRIC_NAME_RESPONSE_HEADER_SIZE = "Response Header Size";
+    public static final String METRIC_NAME_RESPONSE_BODY_SIZE   = "Response Body Size";
+    public static final String METRIC_NAME_RECEIVE_TIME         = "Receive Time";
+    public static final String METRIC_NAME_SEND_TIME            = "Send Time";
+    public static final String METRIC_NAME_CONNECT_TIME         = "Connect Time";
+    public static final String METRIC_NAME_DNS_TIME             = "DNS Time";
+    public static final String METRIC_NAME_BLOCKED_TIME         = "Blocked Time";
+    public static final String METRIC_NAME_WAIT_TIME            = "Wait Time";
+        
 
 }

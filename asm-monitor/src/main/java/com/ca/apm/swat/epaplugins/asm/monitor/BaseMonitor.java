@@ -250,13 +250,18 @@ public class BaseMonitor implements Monitor, AsmProperties {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if ((null != thisValue) && (0 < thisValue.length())) {
-                            	
-                            	if(monitor != null && monitor.getClass().getName().equals("JMeterScriptHandler")){
-									monitor.getSuccessor().generateMetrics(outputMap, thisValue, metricTree);
-                            	}
-								else{
-									successor.generateMetrics(outputMap, thisValue, metricTree);
-								}
+                                // If we don't use the monitor's successor, then we wind up using
+                                // the root monitor's successor which doesn't necessarily use the 
+                                // same handlers
+                                if (monitor != null 
+                                        && monitor.getClass().getName().matches(
+                                                ".*AdvancedMonitor.*")
+                                    ) {
+                                    monitor.getSuccessor().generateMetrics(
+                                            outputMap, thisValue, metricTree);
+                                } else {
+                                    successor.generateMetrics(outputMap, thisValue, metricTree);
+                                }
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                                             AsmMessages.OUTPUT_EMPTY_WARN_705,
