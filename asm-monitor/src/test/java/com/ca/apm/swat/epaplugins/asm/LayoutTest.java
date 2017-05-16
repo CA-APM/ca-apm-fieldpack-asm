@@ -21,16 +21,20 @@ import java.util.Map;
 /**
  * Test class for testing the output formatting.
  *   Run with -DDEBUG=true for debug output.
- * 
+ *
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
 public class LayoutTest extends FileTest {
 
+
+
     @Override
     public void setup() {
-        super.setup();
 
+
+        super.setup();
+        System.out.println("DEBUG=" + DEBUG);
         // we need to load the the monitoring station map
         try {
             requestHelper.getMonitoringStations();
@@ -52,7 +56,7 @@ public class LayoutTest extends FileTest {
 
         try {
             // set properties
-            Properties props = EpaUtils.getProperties(); 
+            Properties props = EpaUtils.getProperties();
             props.setProperty(METRICS_LOGS, TRUE);
             props.setProperty(DISPLAY_STATIONS, TRUE);
             props.setProperty(PRINT_ASM_NODE, FALSE);
@@ -127,7 +131,7 @@ public class LayoutTest extends FileTest {
 
         try {
             // set properties
-            Properties props = EpaUtils.getProperties(); 
+            Properties props = EpaUtils.getProperties();
             props.setProperty(METRICS_LOGS, TRUE);
             props.setProperty(DISPLAY_STATIONS, TRUE);
             props.setProperty(IGNORE_METRICS, EMPTY_STRING);
@@ -169,7 +173,7 @@ public class LayoutTest extends FileTest {
             };
 
             Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
-            
+
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
                 for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
@@ -199,7 +203,7 @@ public class LayoutTest extends FileTest {
 
         try {
             // set properties
-            Properties props = EpaUtils.getProperties(); 
+            Properties props = EpaUtils.getProperties();
             props.setProperty(METRICS_LOGS, TRUE);
             props.setProperty(DISPLAY_STATIONS, TRUE);
             props.setProperty(IGNORE_METRICS, EMPTY_STRING);
@@ -241,7 +245,7 @@ public class LayoutTest extends FileTest {
             };
 
             Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
-            
+
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
                 for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
@@ -271,7 +275,7 @@ public class LayoutTest extends FileTest {
 
         try {
             // set properties
-            Properties props = EpaUtils.getProperties(); 
+            Properties props = EpaUtils.getProperties();
             props.setProperty(METRICS_LOGS, TRUE);
             props.setProperty(DISPLAY_STATIONS, TRUE);
             props.setProperty(IGNORE_METRICS, EMPTY_STRING);
@@ -313,7 +317,7 @@ public class LayoutTest extends FileTest {
             };
 
             Map<String, String> metricMap = runTest("target/test-classes/rule_log_script.json", props);
-            
+
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
                 for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
@@ -401,10 +405,10 @@ public class LayoutTest extends FileTest {
 
             for (int j = 0; j < lines.length; ++j) {
                 int begin = lines[j].indexOf(name) + name.length();
-                Assert.assertNotEquals("invalid output line: " + lines[j], -1, begin);                    
+                Assert.assertNotEquals("invalid output line: " + lines[j], -1, begin);
 
                 int end = lines[j].indexOf('"', begin);
-                Assert.assertNotEquals("invalid output line: " + lines[j], -1, end);                    
+                Assert.assertNotEquals("invalid output line: " + lines[j], -1, end);
 
                 actual[j] = lines[j].substring(begin, end);
             }
@@ -624,7 +628,7 @@ public class LayoutTest extends FileTest {
 //                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
             int numMonitors = 5;
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
+
             // load file
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_script.json");
 
@@ -637,7 +641,7 @@ public class LayoutTest extends FileTest {
             final String TORONTO    = "|america-north|Canada|Toronto";
             final String VANCOUVER  = "|america-north|Canada|Vancouver";
             final String PHOENIX    = "|america-north|United States|Phoenix";
-            
+
             String[] expectedMetrics = {
                 "Monitors|Tests:Agent Time Zone",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + ":Alerts Per Interval",
@@ -663,7 +667,7 @@ public class LayoutTest extends FileTest {
                     System.out.println(key + " = " + metricMap.get(key));
                 }
             }
-            
+
             // check
             checkMetrics(expectedMetrics, metricMap);
 

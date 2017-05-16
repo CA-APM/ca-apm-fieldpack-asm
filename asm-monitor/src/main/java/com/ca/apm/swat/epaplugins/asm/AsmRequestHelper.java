@@ -293,8 +293,21 @@ public class AsmRequestHelper implements AsmProperties {
      * @return reduced list matching <code>comparisonString</code>
      */
     private <T> List<T> matchList(List<T> masterList, String comparisonString) {
+        
         List<String> checkList = Arrays.asList(comparisonString.split(", *"));
-        masterList.retainAll(checkList);
+        List<T> matches = new ArrayList<T>();
+        
+        for (T dir: masterList) {
+            for (String matchStr: checkList) {
+                if (((String)dir).matches(
+                        "^" + matchStr.replaceAll("\\*", ".*").replaceAll("\\?", ".") + "$")) {
+                    matches.add(dir);
+                }
+            }
+        }
+        
+        masterList.retainAll(matches);
+        
         return masterList;
     }
 
@@ -307,7 +320,18 @@ public class AsmRequestHelper implements AsmProperties {
      */
     private List<String> removeList(List<String> masterList, String removeString) {
         List<String> checkList = Arrays.asList(removeString.split(", *"));
-        masterList.removeAll(checkList);
+        List<String> matches = new ArrayList<String>();
+        
+        for (String dir: masterList) {
+            for (String matchStr: checkList) {
+                if (((String)dir).matches(
+                        "^" + matchStr.replaceAll("\\*", ".*").replaceAll("\\?", ".") + "$")) {
+                    matches.add(dir);
+                }
+            }
+        }
+        
+        masterList.removeAll(matches);
         return masterList;
     }
 

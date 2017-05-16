@@ -8,8 +8,9 @@ package com.ca.apm.swat.epaplugins.asm.har;
 
 /**
  * HTTP Archive Viewer (HAR)
- *
+ * <p>
  * https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/HAR/Overview.html
+ * </p>
  */
 public interface Har {
     public Log getLog();

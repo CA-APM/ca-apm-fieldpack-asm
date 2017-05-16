@@ -5,16 +5,25 @@ import java.util.Calendar;
 public interface Entry {
     @OptionalItem
     public String getPageref();
+    
     public Calendar getStartedDateTime();
+    
     public Integer getTime();
+    
     public Request getRequest();
+    
     public Response getResponse();
+    
     public Cache getCache();
+    
     public Timings getTimings();
+    
     @OptionalItem
-    public String getServerIPAddress();
+    public String getServerIpAddress();
+    
     @OptionalItem
     public String getConnection();
+    
     @OptionalItem
     public String getComment();    
 }

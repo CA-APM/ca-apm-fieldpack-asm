@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Test class for testing the rule_log API and asm.alwaysReportTimeout property.
  *   Run with -DDEBUG=true for debug output.
- * 
+ *
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
@@ -25,7 +25,7 @@ public class TimeoutTest extends FileTest {
     @Override
     public void setup() {
         super.setup();
-        
+
         // we need to load the the monitoring station map
         try {
             requestHelper.getMonitoringStations();
@@ -49,7 +49,7 @@ public class TimeoutTest extends FileTest {
 
             String folder = "Tests";
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
+
             // load file
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_timeout.json");
             String logRequest = accessor.executeApi(LOGS_CMD, null);
@@ -127,7 +127,7 @@ public class TimeoutTest extends FileTest {
 
             String folder = "Tests";
             String metricPrefix = MONITOR_METRIC_PREFIX + folder;
-            
+
             // load file
             accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_timeout.json");
             String logRequest = accessor.executeApi(LOGS_CMD, null);
