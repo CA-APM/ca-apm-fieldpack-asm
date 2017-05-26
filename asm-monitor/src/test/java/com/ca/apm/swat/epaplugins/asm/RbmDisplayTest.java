@@ -55,7 +55,6 @@ public class RbmDisplayTest extends FileTest {
                             )
                         );	
             		
-            	System.out.println("Starting " );
             HarHandler handler = new HarHandler();
             String metricTree = "Monitors|CA|TestService";
             
