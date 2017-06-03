@@ -79,9 +79,9 @@ public class JSONHarTest extends FileTest {
 				assertThat(assertion.getName(), is("Assertion"));
 				assertTrue(assertion.getError() == false);
 				assertThat(assertion.getMessage(), is("Content check for pattern How did the idea for doodles"));
-				System.out.println("Assertion name=" + assertion.getName());
-				System.out.println("Assertion error=" + assertion.getError());
-				System.out.println("Assertion message=" + assertion.getMessage());
+//				System.out.println("Assertion name=" + assertion.getName());
+//				System.out.println("Assertion error=" + assertion.getError());
+//				System.out.println("Assertion message=" + assertion.getMessage());
 			}
 			
 	        
@@ -140,10 +140,10 @@ public class JSONHarTest extends FileTest {
 			
 			for(Assertion assertion: page.get_assertions() )
 			{
-				System.out.println("Assertion name=" + assertion.getName());
-				System.out.println("Assertion error=" + assertion.getError());
-				System.out.println("Assertion type=" + assertion.getType());
-				System.out.println("Assertion message=" + assertion.getMessage());
+//				System.out.println("Assertion name=" + assertion.getName());
+//				System.out.println("Assertion error=" + assertion.getError());
+//				System.out.println("Assertion type=" + assertion.getType());
+//				System.out.println("Assertion message=" + assertion.getMessage());
 			}
 			
 	        
