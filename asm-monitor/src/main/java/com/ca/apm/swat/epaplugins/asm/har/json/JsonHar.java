@@ -11,7 +11,6 @@ import com.ca.apm.swat.epaplugins.asm.har.OptionalItem;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Calendar;
 import java.util.NoSuchElementException;
 import javax.xml.bind.DatatypeConverter;
 

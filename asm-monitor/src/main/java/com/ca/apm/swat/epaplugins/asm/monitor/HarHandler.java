@@ -2,9 +2,11 @@ package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import com.ca.apm.swat.epaplugins.asm.har.Page;
 import com.ca.apm.swat.epaplugins.asm.har.json.JsonHar;
+import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
+import com.wily.util.StringUtils;
 import com.wily.util.feedback.Module;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -45,11 +47,8 @@ public class HarHandler implements Handler, AsmProperties {
         }
 
         if (!harString.startsWith("{\"log\":")) {
-            if (harString.startsWith(HAR_OR_LOG_TAG)) {
                 // Do nothing - already have seen it.
                 // and we don't need this log
-            }
-
             return metricMap;
         }
 
@@ -57,74 +56,26 @@ public class HarHandler implements Handler, AsmProperties {
 
             JsonHar har = new JsonHar(new JSONObject(harString));
 
-            int step = 0;
-            Formatter format = Formatter.getInstance();
+            int step = 1;
 
             for (Page page : har.getLog().getPages()) {
 
-                String metric;
-                String label;
-
+                String label = null;
+                
+//                if (EpaUtils.getBooleanProperty(REPORT_LABELS_IN_PATH, false)) {
+//                    label = METRIC_PATH_SEPARATOR + page.getTitle();
+//                }
+//                else {
                 label = page.getTitle();
+//                }
 
-                // report metrics
-                metric = EpaUtils.fixMetricName(
-                        metricTree + METRIC_PATH_SEPARATOR 
-                        + format.formatStep(++step, label) + METRIC_NAME_SEPARATOR);
-
-                if (EpaUtils.getFeedback().isDebugEnabled(module)) {
-                    EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
-                }
-
-                int assertionFailuresCount = 0;
-
-                for (Assertion assertion : page.get_assertions()) {
-                    if (assertion.getError()) {
-                        assertionFailuresCount++;
-                    }
-                }
-
-                addMetric(metricMap, metric 
-                        + ASSERTION_ERRORS, Integer.toString(assertionFailuresCount));
-                addMetric(metricMap, metric 
-                        + METRIC_NAME_LOAD_TIME, getPageMetric(page, METRIC_NAME_LOAD_TIME));
-                addMetric(metricMap, metric + METRIC_NAME_CONTENT_LOAD_TIME,
-                        getPageMetric(page, METRIC_NAME_CONTENT_LOAD_TIME));
-                addMetric(metricMap, metric 
-                        + ASSERTION_ERRORS, Integer.toString(assertionFailuresCount));
+                metricMap.putAll(reportPageMetrics(metricTree,page, step, label));
 
                 for (Entry entry : har.getLog().getEntries(page.getId())) {
-
-                    String entryMetric = EpaUtils
-                            .fixMetricName(metricTree 
-                                    + METRIC_PATH_SEPARATOR + format.formatStep(step, label)
-                                    + METRIC_PATH_SEPARATOR + entry.getRequest().getUrl() 
-                                    + METRIC_NAME_SEPARATOR);
-
-                    if (EpaUtils.getFeedback().isDebugEnabled(module)) {
-                        EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
-                    }
-
-                    addMetric(metricMap, entryMetric + METRIC_NAME_TOTAL_TIME,
-                            getEntryMetric(entry, METRIC_NAME_TOTAL_TIME));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_RESPONSE_HEADER_SIZE,
-                            getEntryMetric(entry, METRIC_NAME_RESPONSE_HEADER_SIZE));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_RESPONSE_BODY_SIZE,
-                            getEntryMetric(entry, METRIC_NAME_RESPONSE_BODY_SIZE));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_RECEIVE_TIME,
-                            getEntryMetric(entry, METRIC_NAME_RECEIVE_TIME));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_SEND_TIME,
-                            getEntryMetric(entry, METRIC_NAME_SEND_TIME));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_CONNECT_TIME,
-                            getEntryMetric(entry, METRIC_NAME_CONNECT_TIME));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_DNS_TIME,
-                            getEntryMetric(entry, METRIC_NAME_DNS_TIME));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_BLOCKED_TIME,
-                            getEntryMetric(entry, METRIC_NAME_BLOCKED_TIME));
-                    addMetric(metricMap, entryMetric + METRIC_NAME_WAIT_TIME,
-                            getEntryMetric(entry, METRIC_NAME_WAIT_TIME));
+                    metricMap.putAll(reportEntryMetrics(metricTree,entry, step, label));
                 }
 
+                ++step;
             }
 
             return metricMap;
@@ -135,7 +86,7 @@ public class HarHandler implements Handler, AsmProperties {
                             AsmMessages.JSON_PARSING_ERROR_713, this.getClass().getSimpleName()));
         } catch (Exception e) {
             e.printStackTrace();
-            EpaUtils.getFeedback().warn(module, "other exception");
+            EpaUtils.getFeedback().warn(module, "Caught exception:" + e.getMessage());
         }
 
         return metricMap;
@@ -187,8 +138,126 @@ public class HarHandler implements Handler, AsmProperties {
     }
 
     private void addMetric(Map<String, String> metricMap, String metricName, String value) {
+    
+	value = StringUtils.escapeHTMLSpecialCharacters(value);
+    
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module, "METRIC: " + metricName + ":" + value);
+        }
+        
         if (value != null) {
             metricMap.put(metricName, value);
         }
+        
+    }
+    
+    private Map<String, String> reportPageMetrics(
+            String metricTree, Page page, int step, String label) {
+
+        MetricMap metricMap = new MetricMap();
+        Formatter format = Formatter.getInstance();
+        // report metrics
+        String metric = EpaUtils.fixMetricName(
+                metricTree + METRIC_PATH_SEPARATOR 
+                + format.formatStep(step, label) + METRIC_NAME_SEPARATOR);
+
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
+        }
+                
+        int assertionFailuresCount = 0;
+        int assertionNum = 1;
+        
+        for (Assertion assertion : page.get_assertions()) {
+                                
+            if (assertion.getError()) {
+                assertionFailuresCount++;
+            }
+                                
+            metricMap.putAll(
+                   reportAssertionMetrics(metricTree,assertion, step, label, assertionNum));
+            
+            ++assertionNum;
+        }
+        
+        addMetric(metricMap, metric 
+                + ASSERTION_ERRORS, Integer.toString(assertionFailuresCount));
+        addMetric(metricMap, metric 
+                + METRIC_NAME_LOAD_TIME, getPageMetric(page, METRIC_NAME_LOAD_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_CONTENT_LOAD_TIME,
+                getPageMetric(page, METRIC_NAME_CONTENT_LOAD_TIME));
+        
+        return metricMap;
+    }
+    
+    private Map<String, String> reportAssertionMetrics(
+            String metricTree, Assertion assertion, int step, String label, int insertionNum) {
+        
+        MetricMap metricMap = new MetricMap();
+        Formatter format = Formatter.getInstance();
+        
+        String assertionName = assertion.getName();
+        String assertionError = (assertion.getError() ? "1" : "0" );
+        String assertionMessage = assertion.getMessage();
+        
+        if ( assertionName != null && ( assertionName.equals("Assertion") 
+                || assertionName.equals("Assertion Failure") ) ) {
+            assertionName = "Assertion " + insertionNum;
+        }
+    
+        String metric = EpaUtils.fixMetricName(metricTree 
+                   + METRIC_PATH_SEPARATOR + format.formatStep(step, label)
+                   + METRIC_PATH_SEPARATOR + assertionName
+                   + METRIC_NAME_SEPARATOR);
+       
+        addMetric(metricMap, metric + ASSERTION_ERRORS ,assertionError); 
+        addMetric(metricMap, metric + ASSERTION_MESSAGE ,assertionMessage);
+       
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module, "ASSERTION METRIC: " 
+                + metric + assertion.getMessage());
+        }
+        
+        return metricMap;
+    }
+ 
+    
+    private Map<String, String> reportEntryMetrics(
+            String metricTree, Entry entry, int step, String label) {
+
+        MetricMap metricMap = new MetricMap();
+        Formatter format = Formatter.getInstance();
+        
+        
+        String metric = EpaUtils
+                .fixMetricName(metricTree 
+                        + METRIC_PATH_SEPARATOR + format.formatStep(step, label)
+                        + METRIC_PATH_SEPARATOR + entry.getRequest().getUrl() 
+                        + METRIC_NAME_SEPARATOR);
+
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
+        }
+
+        addMetric(metricMap, metric + METRIC_NAME_TOTAL_TIME,
+                getEntryMetric(entry, METRIC_NAME_TOTAL_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_RESPONSE_HEADER_SIZE,
+                getEntryMetric(entry, METRIC_NAME_RESPONSE_HEADER_SIZE));
+        addMetric(metricMap, metric + METRIC_NAME_RESPONSE_BODY_SIZE,
+                getEntryMetric(entry, METRIC_NAME_RESPONSE_BODY_SIZE));
+        addMetric(metricMap, metric + METRIC_NAME_RECEIVE_TIME,
+                getEntryMetric(entry, METRIC_NAME_RECEIVE_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_SEND_TIME,
+                getEntryMetric(entry, METRIC_NAME_SEND_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_CONNECT_TIME,
+                getEntryMetric(entry, METRIC_NAME_CONNECT_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_DNS_TIME,
+                getEntryMetric(entry, METRIC_NAME_DNS_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_BLOCKED_TIME,
+                getEntryMetric(entry, METRIC_NAME_BLOCKED_TIME));
+        addMetric(metricMap, metric + METRIC_NAME_WAIT_TIME,
+                getEntryMetric(entry, METRIC_NAME_WAIT_TIME));
+        
+        return metricMap;
     }
 }
