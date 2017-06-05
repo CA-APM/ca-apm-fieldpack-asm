@@ -8,11 +8,6 @@
 package com.ca.apm.swat.epaplugins.asm.har.json;
 
 
-import com.ca.apm.swat.epaplugins.asm.har.PageTimings;
-import com.ca.apm.swat.epaplugins.asm.har.Assertion;
-
-import java.util.Calendar;
-
 import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.har.Timings;
