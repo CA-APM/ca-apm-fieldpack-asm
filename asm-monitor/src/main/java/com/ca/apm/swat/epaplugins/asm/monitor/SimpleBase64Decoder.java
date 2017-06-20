@@ -12,12 +12,10 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 import java.util.Map;
 
-public class SimpleBase64Decoder implements Handler {
+public class SimpleBase64Decoder extends AbstractHandler {
 
-    protected Handler successor = null;  
-
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
+    public SimpleBase64Decoder(Handler successor) {
+        super(successor);
     }
 
     /**
@@ -36,7 +34,7 @@ public class SimpleBase64Decoder implements Handler {
             throws AsmException {
 
         // doesn't make sense if nobody handles the result
-        if (null != successor) {
+        if (null != getSuccessor()) {
             if (EpaUtils.getFeedback().isDebugEnabled()) {
                 EpaUtils.getFeedback().debug(AsmMessages.getMessage(
                     AsmMessages.METHOD_FOR_FOLDER_306,
@@ -61,7 +59,7 @@ public class SimpleBase64Decoder implements Handler {
                 }
 
                 // call next handler in chain
-                return successor.generateMetrics(map, decodedString, metricTree);
+                return getSuccessor().generateMetrics(map, decodedString, metricTree);
             } else {
                 EpaUtils.getFeedback().warn(AsmMessages.getMessage(
                     AsmMessages.BYTES_DECODED_NULL_909,

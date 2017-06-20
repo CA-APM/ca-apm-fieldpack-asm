@@ -2,6 +2,14 @@ package com.ca.apm.swat.epaplugins.asm.monitor;
 
 
 public class AdvancedMonitor extends BaseMonitor {
+    private static final Handler DECODER;
+
+    static {
+        // build chain of responsibility
+        Handler harHandler = new HarHandler();
+        Handler downloader = new AssetDownloader(harHandler, "har", "uri");
+        DECODER = new InflatingBase64Decoder(downloader);
+    }
 
     /**
      * Create a new advanced monitor.
@@ -17,14 +25,6 @@ public class AdvancedMonitor extends BaseMonitor {
                             String[] tags,
                             String url,
                             boolean active) {
-        super(name, type, folder, tags, url, active);
-
-        // build chain of responsibility
-        Handler harHandler = new HarHandler();
-        Handler decoder = new InflatingBase64Decoder();
-        Handler downloader = new AssetDownloader("har", "uri");
-        decoder.setSuccessor(downloader);
-        downloader.setSuccessor(harHandler);
-        setSuccessor(decoder);
+        super(DECODER, name, type, folder, tags, url, active);
     }
 }

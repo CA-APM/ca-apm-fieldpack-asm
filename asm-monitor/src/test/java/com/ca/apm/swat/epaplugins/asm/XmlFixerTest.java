@@ -44,8 +44,7 @@ public class XmlFixerTest implements AsmProperties {
                              "no ampersand whatsoever"};
 
             Checker checker = this.new Checker();
-            Handler fixer = new XmlFixer();
-            fixer.setSuccessor(checker);
+            Handler fixer = new XmlFixer(checker);
             
             for (int i = 0; i < test.length; ++i) {
                 checker.setExpectedResult(expected[i]);
@@ -61,8 +60,6 @@ public class XmlFixerTest implements AsmProperties {
 
     private class Checker implements Handler {
         private String expected = null;
-
-        public void setSuccessor(Handler successor) {}
     
         public void setExpectedResult(String expectedResult) {
             expected = expectedResult;
@@ -74,6 +71,11 @@ public class XmlFixerTest implements AsmProperties {
             }
             Assert.assertEquals(xmlString, expected);
             return map;
+        }
+
+        @Override
+        public Handler getSuccessor() {
+            return null;
         }
     }
 

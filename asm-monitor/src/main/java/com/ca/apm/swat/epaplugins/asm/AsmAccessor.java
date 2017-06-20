@@ -94,7 +94,12 @@ public class AsmAccessor extends Accessor implements AsmProperties {
                                                     Long.toString(DEFAULT_REQUEST_RETRY_DELAY)));
             long delay = Math.round(rrDelay + rrDelay * (Math.random() - 0.5));
             boolean retry = false;
-            
+
+            String logsForUser = EpaUtils.getProperty(LOGS_FOR_USER, null);
+            if (!callType.startsWith("acct_") && (callType != "cp_list") && (logsForUser != null) && !logsForUser.isEmpty()) {
+                callParams += "&acct=" + URLEncoder.encode(logsForUser, EpaUtils.getEncoding());
+            }
+
             while (true) {
                 try {
                     URL apiUrl = new URL(this.properties.getProperty(URL) + "/" + callType);

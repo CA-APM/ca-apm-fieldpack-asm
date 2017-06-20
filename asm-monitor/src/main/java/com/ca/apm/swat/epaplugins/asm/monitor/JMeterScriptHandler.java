@@ -29,10 +29,6 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
     }
 
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
-    }
-
     /**
      * Generate metrics from API call result. 
      * @param metricMap map to insert metrics into
@@ -186,20 +182,25 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
                     .equals(JAVA_NET_URL)) {
                 String text = stepChild.getTextContent();
-                if (EpaUtils.getFeedback().isDebugEnabled(module)) {
-                    EpaUtils.getFeedback().debug(module, "replaced URL '" + url
-                        + "' with text '" + text + "'");
-                }
 
                 if ((null != text) && (0 < text.length())) {
+                    // lopal05: now normalize URL, we dont't want anything behing '?' as that may result in metric tree
+                    // explosion. Each new request creating new path / element.
+                    int indexOfChar = text.indexOf(";");
+                    if (indexOfChar > 0) {
+                        text = text.substring(0, indexOfChar);
+                    }
+                    indexOfChar = text.indexOf("?");
+                    if (indexOfChar > 0) {
+                        text = text.substring(0, indexOfChar);
+                    }
+                    
                     url = text;
+                    if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                        EpaUtils.getFeedback().debug(module, "replaced URL '" + url
+                            + "' with text '" + text + "'");
+                    }
                 }
-//            } else if (stepChild.getNodeType() == Node.ELEMENT_NODE && stepChild.getNodeName()
-//                    .equals(HTTP_SAMPLE)) {
-//                String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
-//                    + format.formatStep(step, url) + METRIC_NAME_SEPARATOR);
-//                metricMap.putAll(reportJMeterStep(metric, subStep, stepChild));
-//                ++subStep;
             }
         }
 
@@ -257,6 +258,11 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         }
 
         return metricMap;
+    }
+
+    @Override
+    public Handler getSuccessor() {
+        return null;
     }
 
 }

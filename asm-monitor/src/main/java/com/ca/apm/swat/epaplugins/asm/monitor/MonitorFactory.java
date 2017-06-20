@@ -16,7 +16,7 @@ public class MonitorFactory implements AsmProperties {
 
     private static Monitor ALL_MONITORS_MONITOR = null;
 
-    private static Map<String, Monitor> monitorMap = null;
+    private static final Map<String, Monitor> monitorMap = new HashMap<String, Monitor>();
 
     /**
      * Factory method returning a {@link Monitor} based on its type.
@@ -47,12 +47,9 @@ public class MonitorFactory implements AsmProperties {
             monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
         */
         } else {
-            monitor = new BaseMonitor(name, type, folder, tags, url, active);
+            monitor = new BaseMonitor(null, name, type, folder, tags, url, active);
         }
      
-        if (null == monitorMap) {
-            monitorMap = new HashMap<String, Monitor>();
-        }
         monitorMap.put(name, monitor);
         
         return monitor;
@@ -65,7 +62,7 @@ public class MonitorFactory implements AsmProperties {
     public static Monitor getAllMonitorsMonitor() {
         if (null == ALL_MONITORS_MONITOR) {
             ALL_MONITORS_MONITOR =
-                    new BaseMonitor(ALL_MONITORS,
+                    new BaseMonitor(null, ALL_MONITORS,
                         ALL_MONITORS,
                         EMPTY_STRING,
                         EMPTY_STRING_ARRAY,

@@ -19,13 +19,16 @@ import com.wily.util.feedback.Module;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONException;
 
 /**
  * Base class for implementations of the {@link Monitor} interface.
  * @author Guenter Grossberger - CA APM SWAT Team
  *
  */
-public class BaseMonitor implements Monitor, AsmProperties {
+public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
     private String name = null;
     private String folder = null;
@@ -34,16 +37,15 @@ public class BaseMonitor implements Monitor, AsmProperties {
     private String url = null;
     private boolean active = false;
 
-    protected Handler successor = null;
-
     protected static Formatter format = Formatter.getInstance();
 
     // metrics to add to step
-    protected static Set<String> metricsToAddToStep = new HashSet<String>();
+    protected static final Set<String> metricsToAddToStep = new HashSet<String>();
 
 
     /**
      * Monitor base class.
+     * @param successor
      * @param name name of the monitor
      * @param type monitor type
      * @param folder folder of the monitor
@@ -51,12 +53,14 @@ public class BaseMonitor implements Monitor, AsmProperties {
      * @param url URL that is monitored
      * @param active if the monitor is active
      */
-    protected BaseMonitor(String name,
+    protected BaseMonitor(Handler successor,
+                          String name,
                           String type,
                           String folder,
                           String[] tags,
                           String url,
                           boolean active) {
+        super(successor);
         this.name = name;
         this.folder = folder;
         this.tags = tags;
@@ -135,7 +139,6 @@ public class BaseMonitor implements Monitor, AsmProperties {
         if (null == jsonString) {
             return metricMap;
         }
-        
 
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
@@ -220,10 +223,22 @@ public class BaseMonitor implements Monitor, AsmProperties {
                                                          + "' with result value "
                                                          + arrayElement.optInt(RESULT_TAG));
                         } else {
-                            // recursively generate metrics for these tags
-                            generateMetrics(
-                                            metricMap,
-                                            innerJsonArray.getJSONObject(i).toString(), metricTree);
+                            JSONObject resultObj = innerJsonArray.getJSONObject(i);
+                            try {
+                                // find the monitor
+                                Monitor m = MonitorFactory.findMonitor(resultObj.getString("name"));
+                                if(m != null) {
+                                    // hand over parsing to a monitor-specific handler chain
+                                    m.generateMetrics(metricMap, resultObj.toString(), metricTree);
+                                } else {
+                                    // recursively generate metrics for these tags
+                                    generateMetrics(metricMap, resultObj.toString(), metricTree);
+                                }
+                            } catch(JSONException e) {
+                                EpaUtils.getFeedback().debug(module, "Missing name key for log record.");
+                            } catch (AsmException e) {
+                                handleException(e, metricTree, metricMap, module);
+                            }
                         }
                     } else if (thisKey.equals(MONITORS_TAG)
                             || thisKey.equals(STATS_TAG)) {
@@ -245,23 +260,12 @@ public class BaseMonitor implements Monitor, AsmProperties {
                         || format.ignoreTagForMonitor(thisKey)) {
                     continue;
                 } else if (thisKey.equalsIgnoreCase(OUTPUT_TAG)) {
-                    if (null != successor) {
+                    if (null != getSuccessor()) {
                         try {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if ((null != thisValue) && (0 < thisValue.length())) {
-                                // If we don't use the monitor's successor, then we wind up using
-                                // the root monitor's successor which doesn't necessarily use the 
-                                // same handlers
-                                if (monitor != null 
-                                        && monitor.getClass().getName().matches(
-                                                ".*AdvancedMonitor.*")
-                                    ) {
-                                    monitor.getSuccessor().generateMetrics(
-                                            outputMap, thisValue, metricTree);
-                                } else {
-                                    successor.generateMetrics(outputMap, thisValue, metricTree);
-                                }
+                                getSuccessor().generateMetrics(outputMap, thisValue, metricTree);
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                                             AsmMessages.OUTPUT_EMPTY_WARN_705,
@@ -552,12 +556,4 @@ public class BaseMonitor implements Monitor, AsmProperties {
         return metricMap;
     }
 
-        
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
-    }
-
-    public Handler getSuccessor() {
-        return this.successor;
-    }
 }

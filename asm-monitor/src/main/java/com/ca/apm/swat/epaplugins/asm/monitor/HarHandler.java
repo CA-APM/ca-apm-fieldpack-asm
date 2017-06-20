@@ -20,12 +20,6 @@ import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 public class HarHandler implements Handler, AsmProperties {
 
     private static final Module module = new Module("Asm.monitor.HarHandler");
-    protected Handler successor = null;
-
-    @Override
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
-    }
 
     /**
      * Generate metrics from API call result.
@@ -45,16 +39,13 @@ public class HarHandler implements Handler, AsmProperties {
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "HarHandler - harString = " + harString);
         }
-
-        if (!harString.startsWith("{\"log\":")) {
-                // Do nothing - already have seen it.
-                // and we don't need this log
-            return metricMap;
-        }
-
+        
         try {
 
-            JsonHar har = new JsonHar(new JSONObject(harString));
+            JSONObject h1 = new JSONObject(harString);
+            JSONObject h2 = h1.optJSONObject("har");
+
+            JsonHar har = new JsonHar(h2 != null? h2 : h1);
 
             int step = 1;
 
@@ -227,12 +218,33 @@ public class HarHandler implements Handler, AsmProperties {
 
         MetricMap metricMap = new MetricMap();
         Formatter format = Formatter.getInstance();
-        
+
+        String url = entry.getRequest().getUrl();
+        String text = url;
+
+        if ((null != text) && (0 < text.length())) {
+            // lopal05: now normalize URL, we dont't want anything behing '?' as that may result in metric tree
+            // explosion. Each new request creating new path / element.
+            int indexOfChar = text.indexOf(";");
+            if (indexOfChar > 0) {
+                text = text.substring(0, indexOfChar);
+            }
+            indexOfChar = text.indexOf("?");
+            if (indexOfChar > 0) {
+                text = text.substring(0, indexOfChar);
+            }
+
+            url = text;
+            if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                EpaUtils.getFeedback().debug(module, "replaced URL '" + url
+                        + "' with text '" + text + "'");
+            }
+        }
         
         String metric = EpaUtils
                 .fixMetricName(metricTree 
                         + METRIC_PATH_SEPARATOR + format.formatStep(step, label)
-                        + METRIC_PATH_SEPARATOR + entry.getRequest().getUrl() 
+                        + METRIC_PATH_SEPARATOR + text
                         + METRIC_NAME_SEPARATOR);
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
@@ -259,5 +271,10 @@ public class HarHandler implements Handler, AsmProperties {
                 getEntryMetric(entry, METRIC_NAME_WAIT_TIME));
         
         return metricMap;
+    }
+
+    @Override
+    public Handler getSuccessor() {
+        return null;
     }
 }
