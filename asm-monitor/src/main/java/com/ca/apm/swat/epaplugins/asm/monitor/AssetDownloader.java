@@ -12,18 +12,14 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Map;
 
-public class AssetDownloader implements Handler {
+public class AssetDownloader extends AbstractHandler {
     private final String path;
     private final String key;
-    protected Handler successor = null;  
 
-    public AssetDownloader(String path, String key) {
+    public AssetDownloader(Handler successor, String path, String key) {
+        super(successor);
         this.path = path;
-        this.key = key;
-    }
-
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
+        this.key = key;        
     }
 
     /**
@@ -42,7 +38,7 @@ public class AssetDownloader implements Handler {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
-        if (null != successor) {
+        if (null != getSuccessor()) {
             
             BufferedReader in = null;
             
@@ -75,7 +71,7 @@ public class AssetDownloader implements Handler {
                 }
             }
 
-            return successor.generateMetrics(map, string, metricTree);
+            return getSuccessor().generateMetrics(map, string, metricTree);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(

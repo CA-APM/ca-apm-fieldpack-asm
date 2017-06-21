@@ -1,7 +1,5 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
-import com.ca.apm.swat.epaplugins.asm.monitor.Handler;
-
 
 /**
  * Interface for all monitors.
@@ -48,12 +46,4 @@ public interface Monitor extends Handler {
      * @return url of the monitor
      */
     public String getUrl();
-
-    /**
-     * Returns the successor of the monitor.
-     * @return successor of the monitor
-     */
-    public Handler getSuccessor();
-    
-    
 }

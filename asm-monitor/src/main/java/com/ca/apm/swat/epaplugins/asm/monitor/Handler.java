@@ -13,10 +13,9 @@ import java.util.Map;
 public interface Handler {
     
     /**
-     * Add a Handler to the chain of responsibility.
-     * @param successor next Handler in chain
+     * @return next Handler in chain
      */
-    public void setSuccessor(Handler successor);
+    public Handler getSuccessor();
     
     /**
      * Generate metrics from API call result

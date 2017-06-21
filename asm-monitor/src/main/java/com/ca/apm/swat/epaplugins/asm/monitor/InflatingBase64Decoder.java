@@ -13,12 +13,10 @@ import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
 import java.util.Map;
 
-public class InflatingBase64Decoder implements Handler {
+public class InflatingBase64Decoder extends AbstractHandler {
 
-    protected Handler successor = null;  
-
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
+    public InflatingBase64Decoder(Handler successor) {
+        super(successor);
     }
 
     /**
@@ -39,7 +37,7 @@ public class InflatingBase64Decoder implements Handler {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
-        if (null != successor) {
+        if (null != getSuccessor()) {
             if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                 EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
                     AsmMessages.METHOD_FOR_FOLDER_306,
@@ -68,7 +66,7 @@ public class InflatingBase64Decoder implements Handler {
                     }
 
                     // call next handler in chain
-                    return successor.generateMetrics(map, decodedString, metricTree);
+                    return getSuccessor().generateMetrics(map, decodedString, metricTree);
                 } else {
                     throw new AsmException(AsmMessages.getMessage(
                         AsmMessages.DECOMPRESS_ERROR_711,

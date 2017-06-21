@@ -7,12 +7,10 @@ import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
 import java.util.Map;
 
-public class XmlFixer implements Handler {
+public class XmlFixer extends AbstractHandler {
 
-    protected Handler successor = null;  
-
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
+    public XmlFixer(Handler successor) {
+        super(successor);
     }
 
     /**
@@ -31,7 +29,7 @@ public class XmlFixer implements Handler {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
-        if (null != successor) {
+        if (null != getSuccessor()) {
             if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                 EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
                     AsmMessages.METHOD_FOR_FOLDER_306,
@@ -39,7 +37,7 @@ public class XmlFixer implements Handler {
                     metricTree));
             }
             // replace all occu
-            return successor.generateMetrics(map, xmlString.replaceAll("&", "&amp;"), metricTree);
+            return getSuccessor().generateMetrics(map, xmlString.replaceAll("&", "&amp;"), metricTree);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(

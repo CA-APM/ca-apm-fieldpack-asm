@@ -9,12 +9,10 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 import java.util.Map;
 
-public class Inflater implements Handler {
+public class Inflater extends AbstractHandler {
 
-    protected Handler successor = null;  
-
-    public void setSuccessor(Handler successor) {
-        this.successor = successor;
+    public Inflater(Handler successor) {
+        super(successor);
     }
 
     /**
@@ -33,7 +31,7 @@ public class Inflater implements Handler {
             throws AsmException {
 
         // doesn't make sense if nobody handles the result
-        if (null != successor) {
+        if (null != getSuccessor()) {
             byte[] bytesDecompressed = null;
             try {
                 bytesDecompressed = decompress(compressedString.getBytes(EpaUtils.getEncoding()));
@@ -41,7 +39,7 @@ public class Inflater implements Handler {
                     String decompressedString;
                     decompressedString = new String(bytesDecompressed, 0,
                         bytesDecompressed.length, EpaUtils.getEncoding());
-                    return successor.generateMetrics(map, decompressedString, metricTree);
+                    return getSuccessor().generateMetrics(map, decompressedString, metricTree);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                         AsmMessages.BYTES_DECODED_NULL_909,
