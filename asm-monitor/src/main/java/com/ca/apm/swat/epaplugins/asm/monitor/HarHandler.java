@@ -61,11 +61,11 @@ public class HarHandler implements Handler, AsmProperties {
 //                }
 
                 metricMap.putAll(reportPageMetrics(metricTree,page, step, label));
-
+                /*
                 for (Entry entry : har.getLog().getEntries(page.getId())) {
                     metricMap.putAll(reportEntryMetrics(metricTree,entry, step, label));
                 }
-
+                */
                 ++step;
             }
 
