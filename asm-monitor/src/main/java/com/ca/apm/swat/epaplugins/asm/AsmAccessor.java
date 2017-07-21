@@ -96,7 +96,10 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             boolean retry = false;
 
             String logsForUser = EpaUtils.getProperty(LOGS_FOR_USER, null);
-            if (!callType.startsWith("acct_") && (callType != "cp_list") && (logsForUser != null) && !logsForUser.isEmpty()) {
+            if (!callType.startsWith("acct_")
+                    && (callType != "cp_list")
+                    && (logsForUser != null)
+                    && !logsForUser.isEmpty()) {
                 callParams += "&acct=" + URLEncoder.encode(logsForUser, EpaUtils.getEncoding());
             }
 

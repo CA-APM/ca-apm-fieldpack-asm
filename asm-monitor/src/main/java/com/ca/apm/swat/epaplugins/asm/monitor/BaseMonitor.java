@@ -2,9 +2,12 @@ package com.ca.apm.swat.epaplugins.asm.monitor;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.ca.apm.swat.epaplugins.asm.AsmRequestHelper;
@@ -16,12 +19,6 @@ import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.ca.apm.swat.epaplugins.utils.AsmPropertiesImpl;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONException;
 
 /**
  * Base class for implementations of the {@link Monitor} interface.
@@ -45,7 +42,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
     /**
      * Monitor base class.
-     * @param successor
+     * @param successor successor in chain
      * @param name name of the monitor
      * @param type monitor type
      * @param folder folder of the monitor
@@ -226,16 +223,20 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                             JSONObject resultObj = innerJsonArray.getJSONObject(i);
                             try {
                                 // find the monitor
-                                Monitor m = MonitorFactory.findMonitor(resultObj.getString("name"));
-                                if(m != null) {
+                                Monitor mon =
+                                        MonitorFactory.findMonitor(resultObj.getString("name"));
+                                if (mon != null) {
                                     // hand over parsing to a monitor-specific handler chain
-                                    m.generateMetrics(metricMap, resultObj.toString(), metricTree);
+                                    mon.generateMetrics(metricMap,
+                                                        resultObj.toString(),
+                                                        metricTree);
                                 } else {
                                     // recursively generate metrics for these tags
                                     generateMetrics(metricMap, resultObj.toString(), metricTree);
                                 }
-                            } catch(JSONException e) {
-                                EpaUtils.getFeedback().debug(module, "Missing name key for log record.");
+                            } catch (JSONException e) {
+                                EpaUtils.getFeedback().debug(module,
+                                                             "Missing name key for log record.");
                             } catch (AsmException e) {
                                 handleException(e, metricTree, metricMap, module);
                             }

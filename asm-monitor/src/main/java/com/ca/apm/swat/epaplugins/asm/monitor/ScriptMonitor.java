@@ -33,8 +33,8 @@ public class ScriptMonitor extends BaseMonitor {
      * @param name name of the monitor
      * @param folder folder of the monitor
      * @param tags tags of the monitor
-     * @param url
-     * @param active
+     * @param url URL
+     * @param active is active?
      */
     protected ScriptMonitor(String name,
                             String folder,

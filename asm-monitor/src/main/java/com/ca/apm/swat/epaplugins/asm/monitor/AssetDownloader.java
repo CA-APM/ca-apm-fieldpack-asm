@@ -16,6 +16,12 @@ public class AssetDownloader extends AbstractHandler {
     private final String path;
     private final String key;
 
+    /**
+     * AssetDownloader constructor.
+     * @param successor successor
+     * @param path download path
+     * @param key key top extract
+     */
     public AssetDownloader(Handler successor, String path, String key) {
         super(successor);
         this.path = path;

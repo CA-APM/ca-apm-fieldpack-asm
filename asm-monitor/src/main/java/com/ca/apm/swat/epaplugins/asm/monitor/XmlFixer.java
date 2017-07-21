@@ -37,7 +37,9 @@ public class XmlFixer extends AbstractHandler {
                     metricTree));
             }
             // replace all occu
-            return getSuccessor().generateMetrics(map, xmlString.replaceAll("&", "&amp;"), metricTree);
+            return getSuccessor().generateMetrics(map,
+                                                  xmlString.replaceAll("&", "&amp;"),
+                                                  metricTree);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(

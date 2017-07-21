@@ -45,7 +45,7 @@ public class HarHandler implements Handler, AsmProperties {
             JSONObject h1 = new JSONObject(harString);
             JSONObject h2 = h1.optJSONObject("har");
 
-            JsonHar har = new JsonHar(h2 != null? h2 : h1);
+            JsonHar har = new JsonHar(h2 != null ? h2 : h1);
 
             int step = 1;
 
@@ -130,7 +130,7 @@ public class HarHandler implements Handler, AsmProperties {
 
     private void addMetric(Map<String, String> metricMap, String metricName, String value) {
     
-	value = StringUtils.escapeHTMLSpecialCharacters(value);
+        value = StringUtils.escapeHTMLSpecialCharacters(value);
     
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "METRIC: " + metricName + ":" + value);
@@ -223,8 +223,8 @@ public class HarHandler implements Handler, AsmProperties {
         String text = url;
 
         if ((null != text) && (0 < text.length())) {
-            // lopal05: now normalize URL, we dont't want anything behing '?' as that may result in metric tree
-            // explosion. Each new request creating new path / element.
+            // lopal05: now normalize URL, we dont't want anything behind '?' as that may result
+            // in metric tree explosion. Each new request creating new path / element.
             int indexOfChar = text.indexOf(";");
             if (indexOfChar > 0) {
                 text = text.substring(0, indexOfChar);

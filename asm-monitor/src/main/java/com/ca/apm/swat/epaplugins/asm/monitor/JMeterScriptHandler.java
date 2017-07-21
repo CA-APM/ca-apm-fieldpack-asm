@@ -184,8 +184,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                 String text = stepChild.getTextContent();
 
                 if ((null != text) && (0 < text.length())) {
-                    // lopal05: now normalize URL, we dont't want anything behing '?' as that may result in metric tree
-                    // explosion. Each new request creating new path / element.
+                    // lopal05: now normalize URL, we dont't want anything behind '?' as that
+                    // may result in metric tree explosion. Each new request creating new
+                    // path / element.
                     int indexOfChar = text.indexOf(";");
                     if (indexOfChar > 0) {
                         text = text.substring(0, indexOfChar);

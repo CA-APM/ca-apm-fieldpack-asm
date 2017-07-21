@@ -13,7 +13,7 @@ import java.util.Map;
 public interface Handler {
     
     /**
-     * @return next Handler in chain
+     * @return next Handler in chain.
      */
     public Handler getSuccessor();
     
