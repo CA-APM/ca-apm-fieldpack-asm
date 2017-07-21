@@ -68,7 +68,7 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
             // convert to integer
             if (MetricWriter.kFloat.equals(thisMetricType)) {
                 metricValue = convertToInteger(metricValue);
-                thisMetricType = MetricWriter.kIntCounter;
+                thisMetricType = MetricWriter.kLongCounter;
             } else if (metricValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
                 metricValue = convertToInteger(metricValue);
             }
