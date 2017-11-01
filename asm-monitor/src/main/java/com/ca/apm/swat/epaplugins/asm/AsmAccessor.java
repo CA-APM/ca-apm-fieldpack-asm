@@ -197,6 +197,7 @@ public class AsmAccessor extends Accessor implements AsmProperties {
      */
     public String login() throws LoginError, Exception {
         String user = this.properties.getProperty(USER);
+        String account = EpaUtils.getProperty(ACCOUNT);
         String password = null;
         if (EpaUtils.getBooleanProperty(PASSWORD_ENCRYPTED, false)) {
             password = AsmAccessor.crypto.decrypt(
@@ -208,9 +209,15 @@ public class AsmAccessor extends Accessor implements AsmProperties {
             password = this.properties.getProperty(PASSWORD);
         }
 
+
         String loginStr = "user=" + user
                 + "&password=" + URLEncoder.encode(password, EpaUtils.getEncoding())
                 + "&callback=" + DO_CALLBACK;
+        
+        if (null != account) {
+            loginStr = loginStr + ACCOUNT_PARAM + account;
+        }
+
         String loginRequest = executeApi(LOGIN_CMD, loginStr, false);
         JSONObject entireJsonObject = new JSONObject(loginRequest);
 

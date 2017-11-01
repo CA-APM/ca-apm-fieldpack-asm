@@ -74,6 +74,7 @@ public interface AsmProperties {
     public static final String USER                     = "asm.userEmail";
     public static final String PASSWORD                 = "asm.APIPassword";
     public static final String PASSWORD_ENCRYPTED       = "asm.APIPasswordEncrypted";
+    public static final String ACCOUNT                  = "asm.account";
     public static final String LOGS_FOR_USER            = "asm.logsForUser";
     public static final String INCLUDE_FOLDERS          = "asm.includeFolders";
     public static final String EXCLUDE_FOLDERS          = "asm.excludeFolders";

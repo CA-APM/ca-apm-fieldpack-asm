@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ca.apm.extensions</groupId>
 	<artifactId>asm-monitor</artifactId>
-	<version>1.5.2</version>
+	<version>1.5.3-SNAPSHOT</version>
 	<name>ASMMonitor</name>
 	<description>Extension to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
 
@@ -107,7 +107,8 @@
 				<configuration>
 					<excludes>
 						<exclude>com/ca/apm/swat/epaplugins/asm/reporting/*.java</exclude>
-					</excludes>
+                   		<!-- exclude>com/ca/apm/swat/epaplugins/asm/AsmLoginTest.java</exclude -->
+                </excludes>
 				</configuration>
 			</plugin>
 
