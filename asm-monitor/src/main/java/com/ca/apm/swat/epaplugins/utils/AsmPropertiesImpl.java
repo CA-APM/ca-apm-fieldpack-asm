@@ -62,6 +62,8 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("secscan", "Vulnerability Scan Credits Available");
         ASM_METRICS.put("sla_poor", "SLA Violation Poor (%)");
         ASM_METRICS.put("sla_warn", "SLA Violation Warning (%)");
+        ASM_METRICS.put("slapoor", "SLA Violation Poor (%)");
+        ASM_METRICS.put("slawarn", "SLA Violation Warning (%)");
         ASM_METRICS.put("sms", "SMS Credits Available");
         ASM_METRICS.put("spi", "Site Performance Index");
         ASM_METRICS.put("start", "Check Start Time");

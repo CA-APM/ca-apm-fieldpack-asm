@@ -185,6 +185,8 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
             return MetricTypes.kLongIntervalCounter;
         } else if (thisMetric.equals(MetricWriter.kIntAverage)) {
             return MetricTypes.kIntegerDuration;
+        } else if (thisMetric.equals(MetricWriter.kLongAverage)) {
+            return MetricTypes.kLongDuration;
         } else if (thisMetric.equals(MetricWriter.kStringEvent)) {
             return MetricTypes.kStringIndividualEvents;
         } else if (thisMetric.equals(MetricWriter.kFloat)) {
