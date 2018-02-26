@@ -172,9 +172,15 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     if (assertionResultEntry.getNodeName().equals(FAILURE_TAG)) {
                         assertionFailure = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());
+                        if (assertionFailure) {
+                            assertionFailures++;
+                        }
                     } else if (assertionResultEntry.getNodeName().equals(ERROR_TAG)) {
                         assertionError = Boolean.parseBoolean(
                             assertionResultEntry.getFirstChild().getNodeValue());
+                        if (assertionError) {
+                            assertionErrors++;
+                        }
                     } else if (assertionResultEntry.getNodeName().equals(FAILURE__MESSAGE_TAG)) {
                         failureMessage = assertionResultEntry.getFirstChild().getNodeValue();
                     }
@@ -214,12 +220,10 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             if (assertionFailure) {
                 statusMessage = failureMessage /* monitor + ASSERTION_FAILURE */;
                 statusCode = STATUS_CODE_ASSERTION_ERROR;
-                assertionFailures++;
             }
             if (assertionError) {
                 statusMessage = failureMessage /* monitor + ASSERTION_ERROR */;
                 statusCode = STATUS_CODE_ASSERTION_ERROR;
-                assertionErrors++;
             }
 
             // set status code for assertion failure 
