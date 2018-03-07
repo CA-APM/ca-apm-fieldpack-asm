@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
+import com.wily.introscope.epagent.EpaUtils;
 
 /**
  * Factory for creating {@link Monitor}s with type dependent behaviour.
@@ -41,11 +42,9 @@ public class MonitorFactory implements AsmProperties {
         if (type.equalsIgnoreCase(SCRIPT_MONITOR)) {
             monitor = new ScriptMonitor(name, folder, tags, url, active);
         } else if (type.equalsIgnoreCase(REAL_BROWSER_MONITOR)) {
-            monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
-        /*
-        } else if (type.equalsIgnoreCase(FULL_PAGE_MONITOR)) {
-            monitor = new AdvancedMonitor(type, name, folder, tags, url, active);
-        */
+            monitor = new AdvancedMonitor(type, name, folder, tags, url, active);        
+        } else if (type.equalsIgnoreCase(FULL_PAGE_MONITOR) && EpaUtils.getBooleanProperty(METRICS_HAR_FPM, false)) {
+            monitor = new AdvancedMonitor(type, name, folder, tags, url, active);        
         } else {
             monitor = new BaseMonitor(null, name, type, folder, tags, url, active);
         }

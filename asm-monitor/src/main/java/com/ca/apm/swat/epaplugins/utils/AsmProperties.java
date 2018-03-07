@@ -55,6 +55,7 @@ public interface AsmProperties {
     public static final String REPORT_LABELS_IN_PATH    = "asm.metrics.labelInPath";
     public static final String METRICS_DOWNLOAD_FULL    = "asm.metrics.download.full";
     public static final String METRICS_HAR_REQUESTS     = "asm.metrics.har.requests";
+    public static final String METRICS_HAR_FPM          = "asm.metrics.har.fpm";
 
     
     public static final String USE_PROXY                = "asm.useProxy";
