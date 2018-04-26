@@ -61,19 +61,32 @@ public class XmlMetricWriter implements MetricWriter {
         }
     }
 
+    /**
+     * Write generic metric value.
+     * @param name metric name
+     * @param metric metric value
+     */
     public void writeMetric(String type, String name, String metric) {
-        printStream.println(" <metric type=\"" + type + "\" name=\""
-                + name + "\" value=\"" + metric + "\" />");
+        String str = " <metric type=\"" + type + "\" name=\""
+                + name + "\" value=\"" + metric + "\" />\r\n";
+        try {
+            printStream.write(str.getBytes("UTF-8"));
+        } catch (Exception e) {
+            EpaUtils.getFeedback().error(AsmMessages.getMessage(
+                AsmMessages.METRIC_WRITE_ERROR_913,
+                this.getClass().getSimpleName(),
+                name,
+                metric,
+                e.getMessage()));
+        }
     }
-
+    
     public void writeMetric(String type, String name, int metric) {
-        printStream.println(" <metric type=\"" + type + "\" name=\""
-                + name + "\" value=\"" + metric + "\" />");
+        writeMetric(type, name, Integer.toString(metric));
     }
 
     public void writeMetric(String type, String name, long metric) {
-        printStream.println(" <metric type=\"" + type + "\" name=\""
-                + name + "\" value=\"" + metric + "\" />");
+        writeMetric(type, name, Long.toString(metric));
     }
 
     /**
@@ -82,8 +95,7 @@ public class XmlMetricWriter implements MetricWriter {
      * @param metric metric value
      */
     public void writeMetric(String type, String name, float metric) {
-        printStream.println(" <metric type=\"" + type + "\" name=\"" + name + "\" value=\""
-                + new Integer(Math.round(metric)).toString() + "\" />");
+        writeMetric(type, name, Math.round(metric));
     }
 
     public void writeErrorMessage(String message) {

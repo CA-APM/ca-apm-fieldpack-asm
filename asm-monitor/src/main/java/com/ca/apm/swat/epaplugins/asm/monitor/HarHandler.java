@@ -121,6 +121,8 @@ public class HarHandler implements Handler, AsmProperties {
                 return Integer.toString(entry.getTimings().getBlocked());
             } else if (metricName == METRIC_NAME_WAIT_TIME) {
                 return Integer.toString(entry.getTimings().getWait());
+            } else if (metricName == RESPONSE_CODE) {
+                return Integer.toString(entry.getResponse().getStatus());
             }
         } catch (NoSuchElementException e) {
             EpaUtils.getFeedback().debug(module, "Har doesn't contain Entry metric " + metricName);
@@ -271,6 +273,8 @@ public class HarHandler implements Handler, AsmProperties {
                 getEntryMetric(entry, METRIC_NAME_BLOCKED_TIME));
         addMetric(metricMap, metric + METRIC_NAME_WAIT_TIME,
                 getEntryMetric(entry, METRIC_NAME_WAIT_TIME));
+        addMetric(metricMap, metric + RESPONSE_CODE,
+                getEntryMetric(entry, RESPONSE_CODE));
         
         return metricMap;
     }
