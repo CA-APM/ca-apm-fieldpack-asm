@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ca.apm.extensions</groupId>
 	<artifactId>asm-monitor</artifactId>
-	<version>1.5.5-SNAPSHOT</version>
+	<version>1.5.5</version>
 	<name>ASMMonitor</name>
 	<description>Extension to integrate App Synthetic Monitor (fka Cloud Monitor, WatchMouse) into CA APM.</description>
 
@@ -147,7 +147,6 @@
 		 <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-compiler-plugin</artifactId>
-		  <version>2.3.2</version>
 		  <configuration>
 		   <source>1.7</source>
 		   <target>1.7</target>
