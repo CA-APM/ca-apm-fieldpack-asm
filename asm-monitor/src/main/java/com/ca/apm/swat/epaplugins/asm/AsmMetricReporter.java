@@ -151,7 +151,7 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
             return MetricWriter.kPerIntervalCounter;
 
         } else if (EpaUtils.getBooleanProperty(REPORT_LONG_AVERAGE, false)
-            && (metricName.endsWith("Time (ms)")
+            && (metricName.endsWith("(ms)")
                     || metricName.endsWith("Speed (kB/s)")
                     || metricName.endsWith("Size (kB)"))) {
 
