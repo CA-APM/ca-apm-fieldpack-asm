@@ -208,48 +208,54 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
                         // if result of first object was "No checkpoint available"
                         // and there is a next element skip it
-                        JSONObject arrayElement = innerJsonArray.getJSONObject(i);
-                        if (skipNoCheckpointAvailable
-                                && arrayElement.has(RESULT_TAG) 
-                                && (RESULT_NO_CHECKPOINT_AVAILABLE
-                                        == arrayElement.optInt(RESULT_TAG))
-                                        && ((i + 1) < innerJsonArray.length())) {
+                        JSONObject arrayElement = innerJsonArray.optJSONObject(i);
 
-                            EpaUtils.getFeedback().debug(module,
-                                                         "skipping node '" + thisKey
-                                                         + "' with result value "
-                                                         + arrayElement.optInt(RESULT_TAG));
-                        } else {
-                            JSONObject resultObj = innerJsonArray.getJSONObject(i);
-                            try {
-                                // find the monitor
-                                Monitor mon =
-                                        MonitorFactory.findMonitor(resultObj.getString("name"));
-                                if (mon != null) {
-                                    // hand over parsing to a monitor-specific handler chain
-                                    mon.generateMetrics(metricMap,
-                                                        resultObj.toString(),
-                                                        metricTree);
-                                } else {
-                                    // recursively generate metrics for these tags
-                                    generateMetrics(metricMap, resultObj.toString(), metricTree);
-                                }
-                            } catch (JSONException e) {
+                        // skip empty? json array
+                        if (null != arrayElement) {
+                            if (skipNoCheckpointAvailable
+                                    && arrayElement.has(RESULT_TAG)
+                                    && (RESULT_NO_CHECKPOINT_AVAILABLE
+                                    == arrayElement.optInt(RESULT_TAG))
+                                    && ((i + 1) < innerJsonArray.length())) {
+
                                 EpaUtils.getFeedback().debug(module,
-                                                             "Missing name key for log record.");
-                            } catch (AsmException e) {
-                                handleException(e, metricTree, metricMap, module);
+                                        "skipping node '" + thisKey
+                                                + "' with result value "
+                                                + arrayElement.optInt(RESULT_TAG));
+                            } else {
+                                JSONObject resultObj = innerJsonArray.getJSONObject(i);
+                                try {
+                                    // find the monitor
+                                    Monitor mon =
+                                            MonitorFactory.findMonitor(resultObj.getString("name"));
+                                    if (mon != null) {
+                                        // hand over parsing to a monitor-specific handler chain
+                                        mon.generateMetrics(metricMap,
+                                                resultObj.toString(),
+                                                metricTree);
+                                    } else {
+                                        // recursively generate metrics for these tags
+                                        generateMetrics(metricMap,
+                                                resultObj.toString(),
+                                                metricTree);
+                                    }
+                                } catch (JSONException e) {
+                                    EpaUtils.getFeedback().debug(module,
+                                            "Missing name key for log record.");
+                                } catch (AsmException e) {
+                                    handleException(e, metricTree, metricMap, module);
+                                }
                             }
                         }
                     } else if (thisKey.equals(MONITORS_TAG)
                             || thisKey.equals(STATS_TAG)) {
                         // recursively generate metrics for these tags
                         generateMetrics(metricMap,
-                                        innerJsonArray.getJSONObject(i).toString(), metricTree);
+                                innerJsonArray.getJSONObject(i).toString(), metricTree);
                     } else {
                         generateMetrics(metricMap,
-                                        innerJsonArray.getJSONObject(i).toString(),
-                                        metricTree + METRIC_PATH_SEPARATOR + thisKey);
+                                innerJsonArray.getJSONObject(i).toString(),
+                                metricTree + METRIC_PATH_SEPARATOR + thisKey);
                     }
                 }
             } else {
