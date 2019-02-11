@@ -26,7 +26,6 @@ import com.wily.util.feedback.Module;
  *
  */
 public class BaseMonitor extends AbstractMonitor implements AsmProperties {
-
     private String name = null;
     private String folder = null;
     private String[] tags = null;
@@ -139,7 +138,6 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
         JSONObject jsonObject = new JSONObject(jsonString);
         String name = jsonObject.optString(NAME_TAG, null);
-        Monitor monitor = null;
         Module module = new Module(Thread.currentThread().getName());
         int originalMapSize = metricMap.size();
         
@@ -153,7 +151,14 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
             return metricMap;
         }
 
+        // return if this monitor is in maintenance and REPORT_MAINTENANCE=false
+        if (!(EpaUtils.getBooleanProperty(REPORT_MAINTENANCE, true))
+            && (3 == jsonObject.optInt(TYPE_TAG, 0))) {
+            return metricMap;
+        }
+
         // if we find a name append it to metric tree
+        Monitor monitor = null;
         if (name != null) {
             metricTree = metricTree + METRIC_PATH_SEPARATOR + name;
 

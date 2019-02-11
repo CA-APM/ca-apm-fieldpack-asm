@@ -244,6 +244,149 @@ public class LogTest extends FileTest {
     }
 
     /**
+     * Test getLog() for a monitor in maintenance.
+     */
+    @Test
+    public void getLogMaintenance() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            EpaUtils.getProperties().setProperty(REPORT_MAINTENANCE, FALSE);
+
+            String folder = "Tests";
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_maintenance.json");
+
+            // call API
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
+
+            // metricMap should contain those entries
+
+            String[] expectedMetrics = {
+                    "Monitors|Tests:Agent Time Zone",
+                    "Monitors|Tests|Simple HTTP validation test:Alerts Per Interval",
+                    "Monitors|Tests|Simple HTTP validation test:Check End Time",
+                    "Monitors|Tests|Simple HTTP validation test:Check Start Time",
+                    "Monitors|Tests|Simple HTTP validation test:Connect Time (ms)",
+                    "Monitors|Tests|Simple HTTP validation test:Download Size (kB)",
+                    "Monitors|Tests|Simple HTTP validation test:Download Time (ms)",
+                    "Monitors|Tests|Simple HTTP validation test:IP Address",
+                    "Monitors|Tests|Simple HTTP validation test:Location Code",
+                    "Monitors|Tests|Simple HTTP validation test:Processing Time (ms)",
+                    "Monitors|Tests|Simple HTTP validation test:Repeat",
+                    "Monitors|Tests|Simple HTTP validation test:Resolve Time (ms)",
+                    "Monitors|Tests|Simple HTTP validation test:Result Code",
+                    "Monitors|Tests|Simple HTTP validation test:Monitor ID",
+                    "Monitors|Tests|Simple HTTP validation test:Monitor Name",
+                    "Monitors|Tests|Simple HTTP validation test:Total Time (ms)",
+                    "Monitors|Tests|Simple HTTP validation test:Type",
+                    "Monitors|Tests|Simple HTTP validation test:Monitor ID",
+                    "Monitors|Tests|DNS test:Alerts Per Interval",
+                    "Monitors|Tests|DNS test:Check End Time",
+                    "Monitors|Tests|DNS test:Check Start Time",
+                    "Monitors|Tests|DNS test:Download Size (kB)",
+                    "Monitors|Tests|DNS test:Download Time (ms)",
+/* monitor "FTP test" is in maintenance (type=3) and shoudl not be reported
+
+                    "Monitors|Tests|FTP test:IP Address",
+                    "Monitors|Tests|FTP test:Location Code",
+                    "Monitors|Tests|FTP test:Processing Time (ms)",
+                    "Monitors|Tests|FTP test:Repeat",
+                    "Monitors|Tests|FTP test:Result Code",
+                    "Monitors|Tests|FTP test:Monitor ID",
+                    "Monitors|Tests|FTP test:Monitor Name",
+ */
+                    "Monitors|Tests|Custom page ping:Total Time (ms)",
+                    "Monitors|Tests|Custom page ping:Type",
+                    "Monitors|Tests|Custom page ping:Monitor ID",
+                    "Monitors|Tests|Custom page ping:Connect Time (ms)",
+            };
+
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+
+            // check
+            checkMetrics(expectedMetrics, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Test getLog() for a monitor in maintenance.
+     */
+    @Test
+    public void getLogMaintenance2() {
+
+        try {
+            // set properties
+            EpaUtils.getProperties().setProperty(METRICS_LOGS, TRUE);
+            EpaUtils.getProperties().setProperty(DISPLAY_STATIONS, FALSE);
+            // EpaUtils.getProperties().setProperty(REPORT_MAINTENANCE, FALSE); default is true
+
+            String folder = "Tests";
+//            Monitor monitor = MonitorFactory.getMonitor("Simple JMeter recording",
+//                SCRIPT_MONITOR, folder, EMPTY_STRING_ARRAY);
+            int numMonitors = 5;
+            String metricPrefix = MONITOR_METRIC_PREFIX + folder;
+
+            // load file
+            accessor.loadFile(LOGS_CMD, "target/test-classes/rule_log_maintenance.json");
+
+            // call API
+            Map<String, String> metricMap =
+                    requestHelper.getLogs(folder, numMonitors, metricPrefix, null).getMap();
+
+            // metricMap should contain those entries
+            // monitor "FTP test" is in maintenance (type=3) but will be reported nonetheless
+
+            String[] expectedMetrics = {
+                    "Monitors|Tests:Agent Time Zone",
+                    "Monitors|Tests|Simple HTTP validation test:Alerts Per Interval",
+                    "Monitors|Tests|DNS test:Check End Time",
+                    "Monitors|Tests|FTP test:IP Address",
+                    "Monitors|Tests|FTP test:Location Code",
+                    "Monitors|Tests|FTP test:Processing Time (ms)",
+                    "Monitors|Tests|FTP test:Repeat",
+                    "Monitors|Tests|FTP test:Result Code",
+                    "Monitors|Tests|FTP test:Monitor ID",
+                    "Monitors|Tests|FTP test:Monitor Name",
+                    "Monitors|Tests|Custom page ping:Type",
+            };
+
+            if (DEBUG) {
+                TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
+                for (Iterator<String> it = sortedSet.iterator(); it.hasNext(); ) {
+                    String key = it.next();
+                    System.out.println(key + " = " + metricMap.get(key));
+                }
+            }
+
+            // check
+            checkMetrics(expectedMetrics, metricMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
      * Test getLog() for a http monitor.
      */
     @Test

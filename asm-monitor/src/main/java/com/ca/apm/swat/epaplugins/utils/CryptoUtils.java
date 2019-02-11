@@ -25,6 +25,7 @@ public class CryptoUtils implements AsmProperties {
     private AlgorithmParameterSpec paramSpec;
     
     public static final String UTF8 = "UTF8";
+    
     /**
      * Create new helper class for encryption.
      * @param passPhrase pass phrase

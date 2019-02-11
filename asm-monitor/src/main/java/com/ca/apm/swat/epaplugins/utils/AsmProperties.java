@@ -102,6 +102,7 @@ public interface AsmProperties {
     public static final String SKIP_NO_CHECKPOINT_AVAILABLE = "asm.skipNoCheckpointAvailable";
     public static final String REPORT_PER_INTERVAL_COUNTER  = "asm.report.perIntervalCounter";
     public static final String REPORT_LONG_AVERAGE      = "asm.report.longAverage";
+    public static final String REPORT_MAINTENANCE       = "asm.report.maintenance";
 
     // folder and other constants in properties
     public static final String ROOT_FOLDER              = "root_folder";

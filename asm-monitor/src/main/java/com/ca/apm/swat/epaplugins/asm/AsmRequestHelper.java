@@ -132,6 +132,11 @@ public class AsmRequestHelper implements AsmProperties {
                 resetValues = true;
             }
 
+            // don't reset counters if just started
+            if (0 == lastPrintApiTimestamp) {
+                lastPrintApiTimestamp = now.getTime();
+            }
+
             long timeElapsed = now.getTime() - lastPrintApiTimestamp;
             if (PRINT_API_INTERVAL < timeElapsed) {
                 lastPrintApiTimestamp = now.getTime();
@@ -158,7 +163,7 @@ public class AsmRequestHelper implements AsmProperties {
                     count = 0;
                     for (Iterator<String> mit = map.keySet().iterator(); mit.hasNext(); ) {
                         String cmd = mit.next();
-                        buf.append(map.get(cmd)).append(' ').append(cmd).append(',');
+                        buf.append(map.get(cmd)).append(' ').append(cmd).append(", ");
                         count += map.get(cmd);
                         if (resetValues) {
                             map.put(cmd, Long.valueOf(0));

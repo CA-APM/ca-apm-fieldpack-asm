@@ -27,6 +27,7 @@ public class EpaUtils {
      */
     private EpaUtils() {
     }
+    
     /**
      * Get the logging component.
      * @return the logging component

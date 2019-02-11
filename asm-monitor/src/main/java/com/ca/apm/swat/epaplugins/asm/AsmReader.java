@@ -231,7 +231,6 @@ public class AsmReader implements AsmProperties {
      * Connects to ASM API and gets all folder, monitor and monitoring station information.
      * Then starts a thread per folder to collect the monitor metrics.
      * @param epaWaitTime sleep time in main loop
-     * @param properties properties read from config file
      * @param metricWriter interface to EPAgent, write metrics here
      */
     private void work(int epaWaitTime, MetricWriter metricWriter) {
@@ -496,7 +495,7 @@ public class AsmReader implements AsmProperties {
                     "cancelling task for folder " + futureMap.get(future));
 
                 if (future.cancel(true)) {
-                    log(SeverityLevel.VERBOSE,
+                    log(SeverityLevel.WARN,
                         "folder " + futureMap.get(future) + " could not be cancelled");
                 }
             }
