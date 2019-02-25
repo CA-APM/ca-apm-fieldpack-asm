@@ -1,5 +1,6 @@
 package com.ca.apm.swat.epaplugins.asm;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class AsmRequestHelper implements AsmProperties {
     private static HashMap<String, String> stationMap;
     private static HashMap<String, Long> apiCallMap = null;
     private static HashMap<String, HashMap<String, Long>> objectApiCallMap = null;
+    private static HashMap<String, String> monitorMap;
+    private static int activeMonitorCount = 0;
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
     private static final long DEFAULT_MAX_LOG_LIMIT = 2000; // 2s
@@ -429,19 +432,16 @@ public class AsmRequestHelper implements AsmProperties {
         List<Monitor> monitors = new ArrayList<Monitor>();
 
         try {
-            String folderStr = EMPTY_STRING;
-            if (folder.equals(ROOT_FOLDER)) {
-                folder = EMPTY_STRING; // for later comparison
-            } else {
-                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-            }
-
             String monitorRequest = accessor.executeApi(MONITOR_GET_CMD,
-                getCommandString() + folderStr);
+                getCommandString() + getFolderString(folder));
             countApiCall(MONITOR_GET_CMD, folder);
+            if (folder.equals(ROOT_FOLDER)) {
+                folder = EMPTY_STRING;
+            }
 
             JSONArray monitorJsonArray = extractJsonArray(monitorRequest, RULES_TAG);
             Module module = new Module(Thread.currentThread().getName());
+            int activeMonitors = 0;
 
             for (int i = 0; i < monitorJsonArray.length(); i++) {
                 try {
@@ -459,8 +459,10 @@ public class AsmRequestHelper implements AsmProperties {
                                     monitorJsonObject.getString(FOLDER_TAG))));
                     }
 
+                    boolean active = YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO));
+
                     if ((EpaUtils.getBooleanProperty(SKIP_INACTIVE_MONITORS, false))
-                            && (!YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO)))) {
+                            && (!active)) {
                         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                             EpaUtils.getFeedback().verbose(module, AsmMessages.getMessage(
                                 AsmMessages.SKIP_MONITOR_308,
@@ -469,6 +471,10 @@ public class AsmRequestHelper implements AsmProperties {
                         }
                         // do not skip the inactive monitors, we need that information later!
                         // continue;
+                    }
+
+                    if (active) {
+                        ++activeMonitors;
                     }
 
                     String url = "";
@@ -489,12 +495,18 @@ public class AsmRequestHelper implements AsmProperties {
                                 monitorJsonObject.getString(TAGS_TAG).split(","),
                                 url,
                                 YES.equals(monitorJsonObject.optString(ACTIVE_TAG, NO))));
+
+                    // add to monitor map
+                    monitorMap.put(monitorJsonObject.getString(NAME_TAG), folder);
                 } catch (JSONException e) {
                     EpaUtils.getFeedback().warn(module,
                         AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
                             "getMonitors", e.getMessage()));
                 }
             }
+
+            activeMonitorCount = activeMonitors;
+
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
                 AsmMessages.getMessage(AsmMessages.JSON_PARSING_ERROR_713,
@@ -517,6 +529,7 @@ public class AsmRequestHelper implements AsmProperties {
      */
     public HashMap<String, List<Monitor>> getMonitors(String[] folders) throws Exception {
         HashMap<String, List<Monitor>> foldersAndMonitors = new HashMap<String, List<Monitor>>();
+        monitorMap = new HashMap<String, String>();
 
         try {
             for (int i = 0; i < folders.length; i++) {
@@ -558,13 +571,6 @@ public class AsmRequestHelper implements AsmProperties {
 
         try {
             String aggregateStr = NOT_AGGREGATE_PARAM;
-            String folderStr = EMPTY_STRING;
-
-            if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-            } else {
-                folder = ROOT_FOLDER;
-            }
 
             Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
             countApiCall(STATS_CMD, folder);
@@ -574,7 +580,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
-                    + folderStr + aggregateStr + START_DATE_PARAM
+                    + getFolderString(folder) + aggregateStr + START_DATE_PARAM
                     + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
             String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
@@ -607,18 +613,11 @@ public class AsmRequestHelper implements AsmProperties {
 
         try {
             String pspRequest = EMPTY_STRING;
-            String folderStr = EMPTY_STRING;
             String monitorStr = EMPTY_STRING;
-
-            if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-            } else {
-                folder = ROOT_FOLDER;
-            }
 
             countApiCall(PSP_CMD, folder);
             pspRequest = accessor.executeApi(PSP_CMD, getCommandString()
-                + folderStr + monitorStr);
+                + getFolderString(folder) + monitorStr);
 
             Module module = new Module(Thread.currentThread().getName());
             if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
@@ -668,19 +667,9 @@ public class AsmRequestHelper implements AsmProperties {
         String metricPrefix, String lastId) throws Exception {
 
         try {
-            String folderStr = EMPTY_STRING;
-
-            if ((folder.length() != 0) && (!folder.equals(ROOT_FOLDER))) {
-                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
-            } else {
-                folder = ROOT_FOLDER;
-                //TODO: check this again
-                //monitor = MonitorFactory.getAllMonitorsMonitor();
-            }
-
             countApiCall(LOGS_CMD, folder);
 
-            String logStr = NKEY_PARAM + this.nkey + folderStr
+            String logStr = NKEY_PARAM + this.nkey + getFolderString(folder)
                     + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
 
             // only download full data if configured
@@ -730,11 +719,11 @@ public class AsmRequestHelper implements AsmProperties {
 
             Monitor monitor =
                     MonitorFactory.createMonitor("dummy",
-                        monitorType,
-                        folderStr,
-                        null,
-                        EMPTY_STRING,
-                        false);
+                            monitorType,
+                            folder,
+                            null,
+                            EMPTY_STRING,
+                            false);
             monitor.generateMetrics(metrics, logResponse, metricPrefix);
             return new LogResult(metrics, metrics.remove(UUID_TAG));
 
@@ -756,5 +745,62 @@ public class AsmRequestHelper implements AsmProperties {
         final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         Calendar calendar = Calendar.getInstance();
         return dateFormat.format(calendar.getTime());
+    }
+
+    /**
+     * Get the folder for a monitor.
+     * @param monitor the monitor
+     * @return the folder
+     */
+    public static String getFolder(String monitor) {
+        if (null == monitorMap) {
+            return null;
+        }
+
+        return monitorMap.get(monitor);
+    }
+
+    /**
+     * Get the number of monitors.
+     * @return the number of monitors
+     */
+    public static int getMonitorCount() {
+        if (null == monitorMap) {
+            return 0;
+        }
+
+        return monitorMap.size();
+    }
+
+    /**
+     * Get the number of active monitors.
+     * @return the number of active monitors
+     */
+    public static int getActiveMonitorCount() {
+        return activeMonitorCount;
+    }
+
+    /**
+     * Get the folder string.
+     * @param folder the folder name
+     * @return the folder string
+     */
+    protected String getFolderString(String folder) throws UnsupportedEncodingException {
+        // missing parameter = all folders
+        String folderStr = EMPTY_STRING;
+
+        if ((null != folder)
+                && (folder.length() != 0)
+                && (!folder.equals(ALL_FOLDERS))) {
+
+            if (folder.equals(ROOT_FOLDER)) {
+                // empty parameter
+                folderStr = FOLDER_PARAM;
+            } else{
+                folderStr = FOLDER_PARAM + URLEncoder.encode(folder, EpaUtils.getEncoding());
+            }
+        }
+
+        return folderStr;
     }
 }

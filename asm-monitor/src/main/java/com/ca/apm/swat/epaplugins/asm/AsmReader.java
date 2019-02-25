@@ -385,20 +385,35 @@ public class AsmReader implements AsmProperties {
 
         futureMap = new HashMap<ScheduledFuture<?>, String>();
 
-        for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
-            String folder = it.next();
+        if (EpaUtils.getBooleanProperty(QUERY_BY_FOLDERS, false)) {
+            for (Iterator<String> it = folderMap.keySet().iterator(); it.hasNext(); ) {
+                String folder = it.next();
+                AsmReaderThread rt = new AsmReaderThread(
+                        folder,
+                        requestHelper,
+                        folderMap,
+                        metricWriter,
+                        reporterService);
+                ScheduledFuture<?> future = folderService.scheduleAtFixedRate(rt,
+                        delay,
+                        epaWaitTime,
+                        TimeUnit.MILLISECONDS);
+                futureMap.put(future, folder);
+                delay += stagger;
+            }
+        } else {
+            // query all folders in one call
             AsmReaderThread rt = new AsmReaderThread(
-                                                     folder,
-                                                     requestHelper,
-                                                     folderMap,
-                                                     metricWriter,
-                                                     reporterService);
+                    AsmProperties.ALL_FOLDERS,
+                    requestHelper,
+                    folderMap,
+                    metricWriter,
+                    reporterService);
             ScheduledFuture<?> future = folderService.scheduleAtFixedRate(rt,
-                                                                          delay,
-                                                                          epaWaitTime,
-                                                                          TimeUnit.MILLISECONDS);
-            futureMap.put(future, folder);
-            delay += stagger;
+                    0,
+                    epaWaitTime,
+                    TimeUnit.MILLISECONDS);
+            futureMap.put(future, null);
         }
 
         stopped = false;
@@ -751,5 +766,13 @@ public class AsmReader implements AsmProperties {
 
     private static void error(String message, Throwable throwable) {
         EpaUtils.getFeedback().error(module, message, throwable);
+    }
+
+    /**
+     * Trigger reload of the configuration at the next possible time (async).
+     */
+    public void reloadConfiguration() {
+        lastConfigUpdateTimestamp = 0;
+        log(SeverityLevel.VERBOSE, "triggered async reload of configuration");
     }
 }

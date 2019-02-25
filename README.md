@@ -46,3 +46,5 @@ Version | Author | Comment
 1.2.1 | Guenter Grossberger | added asm.skipNoCheckpointAvailable property and changed artifact and file names
 1.3 | Guenter Grossberger | changed some metric types for better/correct aggregation - this may lead to error messages after restart with the new version
 1.4 | Martin Macura | Prevent gaps in metrics on ASM API timeouts.
+1.5 | Martin Macura, Roderick Olliver | Added HAR parser. Various bugfixes and improvements.
+1.6 | Guenter Grossberger | Use one API call for all folders.

@@ -80,6 +80,7 @@ public interface AsmProperties {
     public static final String LOGS_FOR_USER            = "asm.logsForUser";
     public static final String INCLUDE_FOLDERS          = "asm.includeFolders";
     public static final String EXCLUDE_FOLDERS          = "asm.excludeFolders";
+    public static final String QUERY_BY_FOLDERS         = "asm.queryByFolders";
     public static final String FOLDER_THREADS           = "asm.folderThreads";
     public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
     public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
@@ -207,7 +208,7 @@ public interface AsmProperties {
     public static final String NOT_AGGREGATE_PARAM      = "&aggregate=n";
     public static final String AGGREGATE_PARAM          = "&aggregate=y";
     public static final String NUM_PARAM                = "&num=";
-    public static final String UUID_PARAM                = "&uuid=";
+    public static final String UUID_PARAM               = "&uuid=";
     public static final String START_DATE_PARAM         = "&start_date=";
     public static final String ACCOUNT_PARAM            = "&acct=";
     public static final String FULL_PARAM               = "&full=";

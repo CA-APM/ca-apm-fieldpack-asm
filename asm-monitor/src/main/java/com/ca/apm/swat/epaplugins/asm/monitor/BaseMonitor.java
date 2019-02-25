@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -137,7 +138,6 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
         }
 
         JSONObject jsonObject = new JSONObject(jsonString);
-        String name = jsonObject.optString(NAME_TAG, null);
         Module module = new Module(Thread.currentThread().getName());
         int originalMapSize = metricMap.size();
         
@@ -158,8 +158,24 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
         }
 
         // if we find a name append it to metric tree
+        String name = jsonObject.optString(NAME_TAG, null);
         Monitor monitor = null;
         if (name != null) {
+            if (null == metricTree) {
+                folder = AsmRequestHelper.getFolder(name);
+                if (null != folder) {
+                    metricTree = MONITOR_METRIC_PREFIX + folder;
+                } else {
+                    // we don't know the folder, probably a configuration change
+                    // e.g. monitor added/activated
+                    if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                        EpaUtils.getFeedback().verbose(module,
+                                "did not find a folder for monitor " + name + ", skipping it");
+                    }
+                    return metricMap;
+                }
+            }
+
             metricTree = metricTree + METRIC_PATH_SEPARATOR + name;
 
             // find the monitor
@@ -300,6 +316,11 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     continue;
                 }
 
+                // set metric tree if there is no name (we are at the json root)
+                if (null == metricTree) {
+                    metricTree = MONITOR_METRIC_PREFIX.substring(0, MONITOR_METRIC_PREFIX.length() - 1);
+                }
+
                 // automatically converts to string if an integer
                 String thisValue = jsonObject.optString(thisKey);
 
@@ -307,6 +328,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                 if ((null == thisValue)
                         || thisValue.length() == 0) {
                     return metricMap;
+                    // TODO: continue instead?
                 }
 
                 if (thisKey.equals(COLOR_TAG)) {
