@@ -1,5 +1,10 @@
 package com.ca.apm.swat.epaplugins.asm.monitor;
 
+/*import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileReader;*/
 import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,6 +22,7 @@ import com.ca.apm.swat.epaplugins.utils.AsmMessages;
 import com.ca.apm.swat.epaplugins.utils.AsmProperties;
 import com.wily.introscope.epagent.EpaUtils;
 import com.wily.util.feedback.Module;
+import java.util.Date;
 import java.util.Map;
 
 public class JMeterScriptHandler implements Handler, AsmProperties {
@@ -39,7 +45,33 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
     public Map<String, String> generateMetrics(Map<String, String> metricMap,
                                                String xmlString,
                                                String metricTree) {
+        // For local testing
+        /*if (xmlString.equals("{\"jtl\":null}")) {
+            BufferedReader br = null;
+            String metric = metricTree.substring(metricTree.lastIndexOf("|") + 1);
+            try {
+                br = new BufferedReader(new FileReader(new File(
+                    "C:\\Users\\reksi01\\OneDrive - CA Technologies\\Downloads\\" + metric.toLowerCase() + ".jtl")));
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            xmlString = new String();
+            String line;
+            StringBuilder sb = new StringBuilder();
 
+            try {
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            xmlString = sb.toString();
+            metricTree = "Monitors|Scripts|" + metric;
+        }*/
+        
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module,
                 "JMeterScriptHandler - xmlString = " + xmlString);
@@ -79,7 +111,11 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
                     Node stepNode = stepNodes.item(i);
                     if (stepNode.getNodeType() == Node.ELEMENT_NODE) {
-                        metricMap.putAll(reportJMeterStep(metricTree, step, stepNode));
+                        if (EpaUtils.getBooleanProperty(REPORT_JTL_SUBTREE, true)) {
+                            metricMap.putAll(reportJMeterStepSubTree(metricTree, step, stepNode));
+                        } else {
+                            metricMap.putAll(reportJMeterStep(metricTree, step, stepNode));
+                        }
                         ++step;
                     }
                 }
@@ -268,6 +304,187 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
     @Override
     public Handler getSuccessor() {
         return null;
+    }
+    
+    /**
+     * Report JMeter steps as individual metrics in subtree. 
+     * @param metricTree metric tree prefix
+     * @param step step number
+     * @param stepNode step node
+     * @return metricMap map containing the metrics
+     */
+    private MetricMap reportJMeterStepSubTree(String metricTree,
+                                       int step,
+                                       Node stepNode) {
+
+        Formatter format = Formatter.getInstance();
+        MetricMap metricMap = new MetricMap();
+
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module,
+                "reportJMeterStep " + step + ": " + stepNode.toString());
+        }
+
+        //First the attributes
+        NamedNodeMap attributes = stepNode.getAttributes();
+
+        int responseCode = RESULT_OK; // HTTP OK
+        try {
+            responseCode = Integer.parseInt(
+                attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue());
+        } catch (NumberFormatException e) {
+            String responseCodeText = attributes.getNamedItem(RESPONSE_CODE_TAG).getNodeValue();
+            if (responseCodeText.contains(RESPONSE_CODE_EXCEPTION)
+                    || responseCodeText.contains(RESPONSE_CODE_NON_HTTP)) {
+                responseCode = RESULT_NOT_FOUND; // HTTP not found indicating an error
+            }
+        }
+
+        // return if we should suppress this response code
+        if (format.suppressResponseCode(responseCode)) {
+            return metricMap;
+        }
+
+        String responseMessage = attributes.getNamedItem(RESPONSE_MESSAGE_TAG).getNodeValue();
+        if (responseMessage.contains(RESPONSE_MESSAGE_TIMEOUT)) {
+            // timeout
+            responseCode = RESULT_OPERATION_TIMEOUT;
+        } else if (responseMessage.contains(RESPONSE_MESSAGE_NON_HTTP)) {
+            // other error
+            responseCode = RESULT_NOT_FOUND; // HTTP not found indicating an error
+        }
+
+        //String successFlag = attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue();
+        final int errorCount = Integer.parseInt(attributes.getNamedItem(ERROR_COUNT_TAG)
+            .getNodeValue());
+        String url = attributes.getNamedItem(TEST_URL_TAG).getNodeValue();
+        String urlForMetric = new String(url);
+
+        String label = null;
+        if (EpaUtils.getBooleanProperty(REPORT_LABELS_IN_PATH, false)) {
+            label = "|" + url;
+        }
+
+        // report metrics
+        String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
+                + format.formatStep(step, (label == null ? url : label)) + METRIC_NAME_SEPARATOR);
+        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+            EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
+        }
+        
+        NodeList stepChildren = stepNode.getChildNodes();
+
+        int innerStep = 1;
+        int assertionStep = 1;
+        
+        //Walk through the elements of one step
+        for (int j = 0; j < stepChildren.getLength(); j++) {
+            Node stepChild = stepChildren.item(j);
+            if (stepChild.getNodeType() == Node.ELEMENT_NODE && (stepChild.getNodeName()
+                .equals(HTTP_SAMPLE) || stepChild.getNodeName().equals(SAMPLE))) {
+                metricMap.putAll(reportJMeterStepSubTree(metric.substring(0, metric.length() - 1), innerStep, stepChild));
+                ++innerStep;
+            } else if (stepChild.getNodeType() == Node.ELEMENT_NODE
+                && stepChild.getNodeName().equals(ASSERTION_RESULT)) {
+                NodeList assertionResultEntries = stepChild.getChildNodes();
+                
+                String failureMessage = UNDEFINED_ASSERTION;
+                boolean assertionFailure = false;
+                boolean assertionError = false;
+                String assertionName = "Response Assertion";
+                
+                for (int l = 0; l < assertionResultEntries.getLength(); l++) {
+                    Node assertionResultEntry = assertionResultEntries.item(l);
+                    
+                    if (assertionResultEntry.getNodeName().equals(NAME_TAG)) {
+                        assertionName = assertionResultEntry.getFirstChild().getNodeValue();
+                    } else if (assertionResultEntry.getNodeName().equals(FAILURE_TAG)) {
+                        assertionFailure = Boolean
+                            .parseBoolean(assertionResultEntry.getFirstChild().getNodeValue());
+                    } else if (assertionResultEntry.getNodeName().equals(ERROR_TAG)) {
+                        assertionError = Boolean
+                            .parseBoolean(assertionResultEntry.getFirstChild().getNodeValue());
+                    } else if (assertionResultEntry.getNodeName().equals(FAILURE__MESSAGE_TAG)) {
+                        failureMessage = assertionResultEntry.getFirstChild().getNodeValue();
+                    }
+                }
+                
+                // report metrics
+                String metricAssert = EpaUtils.fixMetricName(metric.substring(0, metric.length() - 1) + METRIC_PATH_SEPARATOR
+                        + format.formatStep(assertionStep, (label == null ? assertionName : label)) + METRIC_NAME_SEPARATOR);
+                
+                metricMap.put(metricAssert + ASSERTION_NAME,            assertionName);
+                metricMap.put(metricAssert + ASSERTION_FAILURE,         Boolean.toString(assertionFailure));
+                metricMap.put(metricAssert + ASSERTION_ERROR,           Boolean.toString(assertionError));
+                
+                if (!failureMessage.equals(UNDEFINED_ASSERTION)) {
+                    metricMap.put(metricAssert + ASSERTION_FAILURE_MSG, failureMessage);
+                }
+                ++assertionStep;
+            } else if (stepChild.getNodeType() == Node.ELEMENT_NODE
+                && stepChild.getNodeName().equals(JAVA_NET_URL)) {
+                String text = stepChild.getTextContent();
+
+                if ((null != text) && (0 < text.length())) {
+                    // lopal05: now normalize URL, we dont't want anything behind '?' as that
+                    // may result in metric tree explosion. Each new request creating new
+                    // path / element.
+                    int indexOfChar = text.indexOf(";");
+                    if (indexOfChar > 0) {
+                        text = text.substring(0, indexOfChar);
+                    }
+                    indexOfChar = text.indexOf("?");
+                    if (indexOfChar > 0) {
+                        text = text.substring(0, indexOfChar);
+                    }
+
+                    urlForMetric = text;
+                    if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                        EpaUtils.getFeedback().debug(module,
+                            "replaced URL '" + urlForMetric + "' with text '" + text + "'");
+                    }
+                }
+            }
+        }
+
+        // first map responseCode
+        int statusCode = format.mapResponseToStatusCode(responseCode);
+        //String statusMessage = responseCode + " - " + responseMessage;
+
+        Date timeStamp = new java.util.Date(Long.parseLong(attributes.getNamedItem(TIMESTAMP_TAG).getNodeValue()));
+        Long totalTime = Long.parseLong(attributes.getNamedItem(TOTAL_TIME_TAG).getNodeValue());
+        Long resolveTime = Long.parseLong(attributes.getNamedItem(RESOLVE_TIME_TAG).getNodeValue());
+        Long processingTime = Long.parseLong(attributes.getNamedItem(PROCESSING_TIME_TAG).getNodeValue());
+        Long sizeInBytes = Long.parseLong(attributes.getNamedItem(SIZE_IN_BYTES_TAG).getNodeValue());
+        Long sentBytes = Long.parseLong(attributes.getNamedItem(SENT_BYTES_TAG).getNodeValue());
+        Boolean success = Boolean.parseBoolean(attributes.getNamedItem(SUCCESS_FLAG_TAG).getNodeValue());
+        Integer sampleCount = Integer.parseInt(attributes.getNamedItem(SAMPLE_COUNT_TAG).getNodeValue());
+        
+        metricMap.put(metric + RESPONSE_MESSAGE,        responseMessage);
+        metricMap.put(metric + RESPONSE_CODE,           Integer.toString(statusCode));
+        metricMap.put(metric + SUCCESS,                 Boolean.toString(success));
+        metricMap.put(metric + SAMPLE_COUNT,            Integer.toString(sampleCount));
+        metricMap.put(metric + ERROR_COUNT,             Integer.toString(errorCount));
+        metricMap.put(metric + TIMESTAMP,               timeStamp.toString());
+        metricMap.put(metric + TOTAL_TIME,              Long.toString(totalTime));
+        metricMap.put(metric + RESOLVE_TIME,            Long.toString(resolveTime));
+        metricMap.put(metric + PROCESSING_TIME,         Long.toString(processingTime));
+        metricMap.put(metric + SIZE_IN_BYTES,           Long.toString(sizeInBytes));
+        metricMap.put(metric + SENT_BYTES,              Long.toString(sentBytes));
+        metricMap.put(metric + TEST_URL,                urlForMetric);
+        
+        /*metricMap.put(metric + STATUS_MESSAGE_VALUE,    Integer.toString(statusCode));
+        metricMap.put(metric + RESPONSE_CODE,           Integer.toString(responseCode));
+        metricMap.put(metric + ERROR_COUNT,             Integer.toString(errorCount));
+        metricMap.put(metric + ASSERTION_FAILURES,      Integer.toString(assertionFailures));
+        metricMap.put(metric + ASSERTION_ERRORS,        Integer.toString(assertionErrors));
+        metricMap.put(metric + TEST_URL,                urlForMetric);
+         
+        if (EpaUtils.getBooleanProperty(REPORT_STRING_RESULTS, true)) {
+            metricMap.put(metric + STATUS_MESSAGE, statusMessage);
+        }*/
+
+        return metricMap;
     }
 
 }
