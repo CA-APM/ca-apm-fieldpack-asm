@@ -94,6 +94,7 @@ public interface AsmProperties {
     public static final String REPORT_STRING_RESULTS    = "asm.reportStringResults";
     public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
     public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
+    public static final String REPORT_JTL_SUBTREE       = "asm.reportJTLSubtree";
     public static final String PRINT_ASM_NODE           = "asm.printAsmNode";
     public static final String STEP_FORMAT_DIGITS       = "asm.stepFormatDigits";
     public static final String STEP_FORMAT_URL          = "asm.stepFormatURL";
@@ -268,20 +269,28 @@ public interface AsmProperties {
 
     // JMeter log result tags
     public static final String TEST_RESULTS             = "testResults";
+    public static final String TIMESTAMP_TAG            = "ts";
+    public static final String TOTAL_TIME_TAG           = "t";
+    public static final String RESOLVE_TIME_TAG         = "rt";
+    public static final String PROCESSING_TIME_TAG      = "pt";
+    public static final String SIZE_IN_BYTES_TAG        = "by";
+    public static final String SENT_BYTES_TAG           = "sby";
     public static final String RESPONSE_CODE_TAG        = "rc";
     public static final String RESPONSE_MESSAGE_TAG     = "rm";
     public static final String SUCCESS_FLAG_TAG         = "s";
     public static final String ERROR_COUNT_TAG          = "ec";
+    public static final String SAMPLE_COUNT_TAG         = "sc";
     public static final String TEST_URL_TAG             = "lb";
     public static final String UNDEFINED_ASSERTION      = "Undefined Assertion";
     public static final String ASSERTION_RESULT         = "assertionResult";
     public static final String HTTP_SAMPLE              = "httpSample";
+    public static final String SAMPLE                   = "sample";
     public static final String JAVA_NET_URL             = "java.net.URL";
     public static final String FAILURE_TAG              = "failure";
     public static final String FAILURE__MESSAGE_TAG     = "failureMessage";
     public static final String STEP                     = "Step ";
-    public static final String ASSERTION_FAILURE        = " - Assertion Failure";
-    public static final String ASSERTION_ERROR          = " - Assertion Error";
+    public static final String ASSERTION_FAILURE        = "Assertion Failure";
+    public static final String ASSERTION_ERROR          = "Assertion Error";
     public static final String RESPONSE_CODE_NON_HTTP   = "Non HTTP response code";
     public static final String RESPONSE_CODE_EXCEPTION  = "Exception";
     public static final String RESPONSE_MESSAGE_NON_HTTP    = "Non HTTP response message";
@@ -292,11 +301,22 @@ public interface AsmProperties {
     public static final String STATUS_MESSAGE_VALUE     = "Status Message Value";
     public static final String RESPONSE_CODE            = "Response Code";
     public static final String RESULT_CODE              = "Result Code";
-    public static final String ERROR_COUNT              = "Errors Per Interval";
+    public static final String RESPONSE_MESSAGE         = "Response Message";
+    public static final String SUCCESS                  = "Success";
+    public static final String ERROR_COUNT              = "Error Count";
+    public static final String SAMPLE_COUNT             = "Sample Count";
+    public static final String TIMESTAMP                = "Timestamp";
+    public static final String TOTAL_TIME               = "Total Time (ms)";
+    public static final String RESOLVE_TIME             = "Resolve Time (ms)";
+    public static final String PROCESSING_TIME          = "Processing Time (ms)";
+    public static final String SIZE_IN_BYTES            = "Size In Bytes (B)";
+    public static final String SENT_BYTES               = "Sent Bytes (B)";
     public static final String ASSERTION_FAILURES       = "Assertion Failures";
     public static final String ASSERTION_ERRORS         = "Assertion Errors";
     public static final String TEST_URL                 = "URL";
     public static final String TEST_LABEL               = "Label";
+    public static final String ASSERTION_NAME           = "Assertion Name";
+    public static final String ASSERTION_FAILURE_MSG    = "Assertion Failure Message";
     
     // RBM Assertion metrics
     public static final String ASSERTION_MESSAGE         = "Assertion Message";
