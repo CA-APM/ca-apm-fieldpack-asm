@@ -48,3 +48,4 @@ Version | Author | Comment
 1.4 | Martin Macura | Prevent gaps in metrics on ASM API timeouts.
 1.5 | Martin Macura, Roderick Olliver | Added HAR parser. Various bugfixes and improvements.
 1.6 | Guenter Grossberger | Use one API call for all folders.
+1.7 | Sidrit Reka | Report JMeter child samples
