@@ -114,7 +114,8 @@ public class EpaUtils {
                 .replace(";", "-")
                 .replace("&", "_")
                 .replace(":", "_")
-                .replace("\"", "'");
+                .replace("\"", "'")
+                .replace("\n", " ");
     }
 
     /**
