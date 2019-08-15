@@ -168,7 +168,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                         metricTree = MONITOR_METRIC_PREFIX.substring(0,
                             MONITOR_METRIC_PREFIX.length() - 1);
                     } else {
-                        metricTree = MONITOR_METRIC_PREFIX + folder;
+                        metricTree = MONITOR_METRIC_PREFIX + folder.replace("|", "");
                     }
                 } else {
                     // we don't know the folder, probably a configuration change
@@ -181,7 +181,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                 }
             }
 
-            metricTree = metricTree + METRIC_PATH_SEPARATOR + name;
+            metricTree = metricTree + METRIC_PATH_SEPARATOR + name.replace("|", "");
 
             // find the monitor
             monitor = MonitorFactory.findMonitor(name);
@@ -203,8 +203,8 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                                       jsonObject.getString(LOCATION_TAG));
                 if (null == location) {
                     location = OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR
-                            + jsonObject.getString(LOCATION_TAG);
-                }
+                            + jsonObject.getString(LOCATION_TAG).replace("|", "");
+                } 
                 metricTree = metricTree + METRIC_PATH_SEPARATOR + location;
             }
         }
@@ -281,7 +281,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     } else {
                         generateMetrics(metricMap,
                                 innerJsonArray.getJSONObject(i).toString(),
-                                metricTree + METRIC_PATH_SEPARATOR + thisKey);
+                                metricTree + METRIC_PATH_SEPARATOR + thisKey.replace("|", ""));
                     }
                 }
             } else {

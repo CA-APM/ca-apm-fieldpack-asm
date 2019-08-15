@@ -154,7 +154,7 @@ public class HarHandler implements Handler, AsmProperties {
         // report metrics
         String metric = EpaUtils.fixMetricName(
                 metricTree + METRIC_PATH_SEPARATOR 
-                + format.formatStep(step, label) + METRIC_NAME_SEPARATOR);
+                + format.formatStep(step, label.replace("|", "")) + METRIC_NAME_SEPARATOR);
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
@@ -201,8 +201,8 @@ public class HarHandler implements Handler, AsmProperties {
         }
     
         String metric = EpaUtils.fixMetricName(metricTree 
-                   + METRIC_PATH_SEPARATOR + format.formatStep(step, label)
-                   + METRIC_PATH_SEPARATOR + assertionName
+                   + METRIC_PATH_SEPARATOR + format.formatStep(step, label.replace("|", ""))
+                   + METRIC_PATH_SEPARATOR + assertionName.replace("|", "")
                    + METRIC_NAME_SEPARATOR);
        
         addMetric(metricMap, metric + ASSERTION_ERRORS ,assertionError); 
@@ -247,8 +247,8 @@ public class HarHandler implements Handler, AsmProperties {
         
         String metric = EpaUtils
                 .fixMetricName(metricTree 
-                        + METRIC_PATH_SEPARATOR + format.formatStep(step, label)
-                        + METRIC_PATH_SEPARATOR + text
+                        + METRIC_PATH_SEPARATOR + format.formatStep(step, label.replace("|", ""))
+                        + METRIC_PATH_SEPARATOR + text.replace("|", "")
                         + METRIC_NAME_SEPARATOR);
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
