@@ -164,7 +164,12 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
             if (null == metricTree) {
                 folder = AsmRequestHelper.getFolder(name);
                 if (null != folder) {
-                    metricTree = MONITOR_METRIC_PREFIX + folder;
+                    if (folder.equals(EMPTY_STRING)) {
+                        metricTree = MONITOR_METRIC_PREFIX.substring(0,
+                            MONITOR_METRIC_PREFIX.length() - 1);
+                    } else {
+                        metricTree = MONITOR_METRIC_PREFIX + folder;
+                    }
                 } else {
                     // we don't know the folder, probably a configuration change
                     // e.g. monitor added/activated
