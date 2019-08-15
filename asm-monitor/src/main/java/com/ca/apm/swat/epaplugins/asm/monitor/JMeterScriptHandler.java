@@ -147,12 +147,12 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         
         String label = null;
         if (EpaUtils.getBooleanProperty(REPORT_LABELS_IN_PATH, false)) {
-            label = "|" + url;
+            label = "|" + url;//this pipe char is removed below, I am not sure why it was added
         }
         
         // report metrics
         String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
-                + format.formatStep(step, (label == null ? url : label)) + METRIC_NAME_SEPARATOR);
+                + format.formatStep(step, (label == null ? url.replace("|", "") : label.replace("|", ""))) + METRIC_NAME_SEPARATOR);
         
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
@@ -201,7 +201,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     
                     // report metrics
                     String metricAssert = EpaUtils.fixMetricName(metric.substring(0, metric.length() - 1) + METRIC_PATH_SEPARATOR
-                            + format.formatStep(assertionStep, (label == null ? assertionName : label)) + METRIC_NAME_SEPARATOR);
+                            + format.formatStep(assertionStep, (label == null ? assertionName.replace("|", "") : label.replace("|", ""))) + METRIC_NAME_SEPARATOR);
                     
                     metricMap.put(metricAssert + ASSERTION_NAME,            assertionName);
                     metricMap.put(metricAssert + ASSERTION_FAILURE,         Boolean.toString(assertionFailure));

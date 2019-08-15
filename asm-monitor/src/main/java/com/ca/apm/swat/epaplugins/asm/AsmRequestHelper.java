@@ -399,15 +399,15 @@ public class AsmRequestHelper implements AsmProperties {
                 if (cpJsonObject.get(AREA_TAG).toString().contains(DEFAULT_DELIMITER)) {
                     stationMap.put(
                         cpJsonObject.get(LOCATION_TAG).toString(),
-                        cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1]
-                                + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
-                                + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
+                        cpJsonObject.get(AREA_TAG).toString().split(DEFAULT_DELIMITER)[1].replace("|", "")
+                                + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG).toString().replace("|", "")
+                                + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG).toString().replace("|", ""));
                 } else {
                     stationMap.put(
                         cpJsonObject.get(LOCATION_TAG).toString(),
-                        cpJsonObject.get(AREA_TAG)
-                        + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG)
-                        + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG));
+                        cpJsonObject.get(AREA_TAG).toString().replace("|", "")
+                        + METRIC_PATH_SEPARATOR + cpJsonObject.get(COUNTRY_TAG).toString().replace("|", "")
+                        + METRIC_PATH_SEPARATOR + cpJsonObject.get(CITY_TAG).toString().replace("|", ""));
                 }
             }
         } catch (JSONException e) {
