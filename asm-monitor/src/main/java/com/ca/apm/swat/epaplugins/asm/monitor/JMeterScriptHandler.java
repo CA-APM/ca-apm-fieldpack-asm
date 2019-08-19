@@ -146,13 +146,17 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         String url = attributes.getNamedItem(TEST_URL_TAG).getNodeValue();
         
         String label = null;
+        String normalizedURL = null;
         if (EpaUtils.getBooleanProperty(REPORT_LABELS_IN_PATH, false)) {
             label = "|" + url;//this pipe char is removed below, I am not sure why it was added
+            label = normalizeURL(label);
+        } else {
+            normalizedURL = normalizeURL(url);
         }
         
         // report metrics
         String metric = EpaUtils.fixMetricName(metricTree + METRIC_PATH_SEPARATOR
-                + format.formatStep(step, (label == null ? url.replace("|", "") : label.replace("|", ""))) + METRIC_NAME_SEPARATOR);
+                + format.formatStep(step, (label == null ? normalizedURL.replace("|", "") : label.replace("|", ""))) + METRIC_NAME_SEPARATOR);
         
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "METRIC: " + metric);
@@ -201,7 +205,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     
                     // report metrics
                     String metricAssert = EpaUtils.fixMetricName(metric.substring(0, metric.length() - 1) + METRIC_PATH_SEPARATOR
-                            + format.formatStep(assertionStep, (label == null ? assertionName.replace("|", "") : label.replace("|", ""))) + METRIC_NAME_SEPARATOR);
+                            + format.formatStep(assertionStep, assertionName.replace("|", "")) + METRIC_NAME_SEPARATOR);
                     
                     metricMap.put(metricAssert + ASSERTION_NAME,            assertionName);
                     metricMap.put(metricAssert + ASSERTION_FAILURE,         Boolean.toString(assertionFailure));
@@ -215,25 +219,9 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     && stepChild.getNodeName().equals(JAVA_NET_URL)) {
                     String text = stepChild.getTextContent();
 
-                    if ((null != text) && (0 < text.length())) {
-                        // lopal05: now normalize URL, we dont't want anything behind '?' as that
-                        // may result in metric tree explosion. Each new request creating new
-                        // path / element.
-                        int indexOfChar = text.indexOf(";");
-                        if (indexOfChar > 0) {
-                            text = text.substring(0, indexOfChar);
-                        }
-                        indexOfChar = text.indexOf("?");
-                        if (indexOfChar > 0) {
-                            text = text.substring(0, indexOfChar);
-                        }
+                    //do not normalize here, since it is the metric value (original URL)
+                    urlForMetric = text;
 
-                        urlForMetric = text;
-                        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
-                            EpaUtils.getFeedback().debug(module,
-                                "replaced URL '" + urlForMetric + "' with text '" + text + "'");
-                        }
-                    }
                 }
             }
 
@@ -308,25 +296,7 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
                     && stepChild.getNodeName().equals(JAVA_NET_URL)) {
                     String text = stepChild.getTextContent();
 
-                    if ((null != text) && (0 < text.length())) {
-                        // lopal05: now normalize URL, we dont't want anything behind '?' as that
-                        // may result in metric tree explosion. Each new request creating new
-                        // path / element.
-                        int indexOfChar = text.indexOf(";");
-                        if (indexOfChar > 0) {
-                            text = text.substring(0, indexOfChar);
-                        }
-                        indexOfChar = text.indexOf("?");
-                        if (indexOfChar > 0) {
-                            text = text.substring(0, indexOfChar);
-                        }
-
-                        url = text;
-                        if (EpaUtils.getFeedback().isDebugEnabled(module)) {
-                            EpaUtils.getFeedback().debug(module,
-                                "replaced URL '" + url + "' with text '" + text + "'");
-                        }
-                    }
+                    url = normalizeURL(text);
                 }
             }
 
@@ -376,6 +346,31 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
             return metricMap;
         }
+    }
+    
+    private String normalizeURL(String url) {
+        if ((null != url) && (0 < url.length())) {
+            // lopal05: now normalize URL, we dont't want anything behind '?' as that
+            // may result in metric tree explosion. Each new request creating new
+            // path / element.
+            int indexOfChar = url.indexOf(";");
+            if (indexOfChar > 0) {
+                url = url.substring(0, indexOfChar);
+            }
+            indexOfChar = url.indexOf("?");
+            if (indexOfChar > 0) {
+                url = url.substring(0, indexOfChar);
+            }
+
+            String normalizedURL = url;
+            if (EpaUtils.getFeedback().isDebugEnabled(module)) {
+                EpaUtils.getFeedback().debug(module,
+                    "replaced URL '" + url + "' with text '" + normalizedURL + "'");
+            }
+            return normalizedURL;
+        }
+        
+        return url;
     }
 
     @Override
