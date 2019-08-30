@@ -49,9 +49,8 @@ public class AssetDownloader extends AbstractHandler {
             BufferedReader in = null;
             
             try {
-                in = new BufferedReader(new InputStreamReader(new URL(
-                        new JSONObject(string).getJSONObject(path).getString(key)
-                    ).openStream()));
+                String url = new JSONObject(string).getJSONObject(path).getString(key); 
+                in = new BufferedReader(new InputStreamReader(new URL(url).openStream()));
                 StringBuilder sb = new StringBuilder();
                 String str;
                 while ((str = in.readLine()) != null) {
