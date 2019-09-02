@@ -21,9 +21,9 @@ public class ScriptMonitor extends BaseMonitor {
         Handler fixer = new XmlFixer(jmeterHandler);
         Handler downloader;
         if (EpaUtils.getBooleanProperty(AsmProperties.FIX_AMPERSAND, true)) {
-            downloader = new AssetDownloader(fixer, "jtl", "url");
+            downloader = new AssetDownloader(fixer, "jtl", "uri");
         } else {
-            downloader = new AssetDownloader(jmeterHandler, "jtl", "url");
+            downloader = new AssetDownloader(jmeterHandler, "jtl", "uri");
         }                
         DECODER = new InflatingBase64Decoder(downloader);
     }
