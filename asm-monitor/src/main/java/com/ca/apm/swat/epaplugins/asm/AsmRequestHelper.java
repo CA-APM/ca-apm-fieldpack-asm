@@ -579,9 +579,9 @@ public class AsmRequestHelper implements AsmProperties {
                 aggregateStr = AGGREGATE_PARAM;
             }
 
-            String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
-                    + getFolderString(folder) + aggregateStr + START_DATE_PARAM
-                    + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
+            String statsStr = NKEY_PARAM + this.nkey + CALLBACK_PARAM + DO_CALLBACK 
+                    + ACCOUNT_PARAM + this.user + getFolderString(folder) 
+                    + aggregateStr + START_DATE_PARAM + getTodaysDate();
             String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
             Module module = new Module(Thread.currentThread().getName());
@@ -669,8 +669,8 @@ public class AsmRequestHelper implements AsmProperties {
         try {
             countApiCall(LOGS_CMD, folder);
 
-            String logStr = NKEY_PARAM + this.nkey + getFolderString(folder)
-                    + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
+            String logStr = NKEY_PARAM + this.nkey + CALLBACK_PARAM + DO_CALLBACK 
+                    + getFolderString(folder) + FULL_PARAM;
 
             // only download full data if configured
             if (EpaUtils.getBooleanProperty(METRICS_DOWNLOAD_FULL, false)) {

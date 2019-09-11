@@ -83,7 +83,18 @@ public class RestClient {
                 if (-1 < end) {
                     params2 = params2.substring(0, index + 9) + "*******" + params2.substring(end);
                 } else {
-                    params2 = params2.substring(0, index + 9) + "*******";
+                    params2 = params2.substring(0, index + 9) + "*******" + params2.substring(params2.indexOf("&", index));
+                }
+            } else {
+                //mask nkey
+                index = params2.indexOf("nkey");
+                if (-1 < index) {
+                    int end = params2.indexOf("&callback", index);
+                    if (-1 < end) {
+                        params2 = params2.substring(0, index + 5) + "*******" + params2.substring(end);
+                    } else {
+                        params2 = params2.substring(0, index + 5) + "*******" + params2.substring(params2.indexOf("&", index));
+                    }
                 }
             }
 
