@@ -687,11 +687,8 @@ public class AsmRequestHelper implements AsmProperties {
             Map<String, String> metrics;
 
             if (lastId == null) {
-                // get n latest records on the first run
+                // get only 1 record on the first run (just to get uuid)
                 int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
-                if (numMonitors > 0) {
-                    numLogs =  numLogs * numMonitors;
-                }
                 logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
                 metrics = new MetricMap();
             } else {
