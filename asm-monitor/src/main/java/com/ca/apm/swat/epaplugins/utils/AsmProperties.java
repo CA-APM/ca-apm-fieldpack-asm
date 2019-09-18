@@ -18,7 +18,7 @@ public interface AsmProperties {
     public static final String YES                      = "y";
     public static final String NO                       = "n";
     public static final String NO_TYPE                  = "no type";
-    public static final String DATE_FORMAT              = "yyyy-MM-dd";
+    public static final String DATE_FORMAT              = "yyyy-MM-dd hh:mm:ss";
     public static final String DEFAULT_DELIMITER        = ",";
     public static final String BLANK                    = " ";
     public static final String TRUE                     = "true";
@@ -95,6 +95,7 @@ public interface AsmProperties {
     public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
     public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
     public static final String REPORT_JTL_SUBTREE       = "asm.reportJTLSubtree";
+    public static final String METRICS_STATS_WDW_SIZE   = "asm.metrics.stats.windowSize";
     public static final String PRINT_ASM_NODE           = "asm.printAsmNode";
     public static final String STEP_FORMAT_DIGITS       = "asm.stepFormatDigits";
     public static final String STEP_FORMAT_URL          = "asm.stepFormatURL";
@@ -211,6 +212,7 @@ public interface AsmProperties {
     public static final String NUM_PARAM                = "&num=";
     public static final String UUID_PARAM               = "&uuid=";
     public static final String START_DATE_PARAM         = "&start_date=";
+    public static final String END_DATE_PARAM           = "&end_date=";
     public static final String ACCOUNT_PARAM            = "&acct=";
     public static final String FULL_PARAM               = "&full=";
     public static final String NEW_OUTPUT_PARAM         = "&legacy_output=n";

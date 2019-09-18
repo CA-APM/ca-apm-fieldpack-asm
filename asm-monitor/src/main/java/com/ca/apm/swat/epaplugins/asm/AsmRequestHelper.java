@@ -581,7 +581,9 @@ public class AsmRequestHelper implements AsmProperties {
 
             String statsStr = NKEY_PARAM + this.nkey + CALLBACK_PARAM + DO_CALLBACK 
                     + ACCOUNT_PARAM + this.user + getFolderString(folder) 
-                    + aggregateStr + START_DATE_PARAM + getTodaysDate();
+                    + aggregateStr 
+                    + START_DATE_PARAM + getDateTime(EpaUtils.getProperty(METRICS_STATS_WDW_SIZE, "3600000"))
+                    + END_DATE_PARAM + getDateTime("0");
             String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
             Module module = new Module(Thread.currentThread().getName());
@@ -734,14 +736,15 @@ public class AsmRequestHelper implements AsmProperties {
     }
 
     /**
-     * Get today's date.
-     * @return today's date
+     * Get urlEncoded value of current datetime - windowSize
      * @throws Exception errors
      */
-    private static String getTodaysDate() throws Exception {
+    private static String getDateTime(String windowSize) throws Exception {
+        long wdwSize = Long.parseLong(windowSize);
         final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         Calendar calendar = Calendar.getInstance();
-        return dateFormat.format(calendar.getTime());
+        calendar.setTimeInMillis(calendar.getTimeInMillis() - wdwSize);
+        return URLEncoder.encode(dateFormat.format(calendar.getTime()), EpaUtils.getEncoding());
     }
 
     /**
