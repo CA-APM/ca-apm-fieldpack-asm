@@ -192,10 +192,17 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                                                                  monitorCount,
                                                                  folderPrefix,
                                                                  lastId);
+                    String oldLastId = lastId;
+                    
                     if (result.getLastId() != null) {
                         lastId = result.getLastId();
                     }
-                    resultMetricMap.putAll(result.getMap());
+                    
+                    //do not send the metrics of the first call
+                    //since it is supposed only to get the uuid
+                    if (oldLastId != null) { 
+                        resultMetricMap.putAll(result.getMap());
+                    }
                 }
             } catch (Exception e) {
                 log.warn(module, AsmMessages.getMessage(AsmMessages.METRIC_READ_WARN_704,

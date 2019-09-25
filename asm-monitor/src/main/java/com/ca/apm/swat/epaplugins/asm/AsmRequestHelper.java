@@ -724,7 +724,21 @@ public class AsmRequestHelper implements AsmProperties {
                             EMPTY_STRING,
                             false);
             monitor.generateMetrics(metrics, logResponse, metricPrefix);
-            return new LogResult(metrics, metrics.remove(UUID_TAG));
+            
+            JSONObject ruleLogJsonResponse;
+            String lastUuid = null;
+            
+            try {
+                ruleLogJsonResponse = new JSONObject(logResponse);
+                lastUuid = ruleLogJsonResponse.getString("uuid");
+            } catch (JSONException e) {
+                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                    EpaUtils.getFeedback().verbose(module,
+                            "Unable to read uuid from response: " + e.getMessage());
+                }
+            }
+            
+            return new LogResult(metrics, lastUuid);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),

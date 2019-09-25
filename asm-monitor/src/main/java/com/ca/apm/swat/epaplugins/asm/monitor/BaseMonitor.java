@@ -425,15 +425,6 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                                            + " in metric tree " + metricTree);
         }
 
-        // save the most recent UUID
-        String lastUuid = metricMap.get(UUID_TAG);
-        String currentUuid = jsonObject.optString(UUID_TAG, null);
-        if (currentUuid != null
-                && (lastUuid == null 
-                || UUID.fromString(currentUuid).compareTo(UUID.fromString(lastUuid)) > 0)) {
-            metricMap.put(UUID_TAG, currentUuid);            
-        }
-
         return metricMap;
     }
 
