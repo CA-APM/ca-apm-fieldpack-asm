@@ -288,7 +288,8 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                 // ignore these tags
                 if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
                         || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
-                        || (thisKey.equals(ACTIVE_TAG))
+                        || (thisKey.equals(ACTIVE_TAG)) || (thisKey.equals(CURSOR_TAG))
+                        || (thisKey.equals(UUID_TAG))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)
                         || format.ignoreTagForMonitor(thisKey)) {
                     continue;

@@ -251,6 +251,7 @@ public interface AsmProperties {
     public static final String PORT_TAG                 = "port";
     public static final String PATH_TAG                 = "path";
     public static final String VERSION_TAG              = "version";
+    public static final String CURSOR_TAG               = "cursor";
     public static final String OUTPUT_TAG               = "output";
     public static final String TAGS_TAG                 = "tags";
     public static final String IPADDRESS_TAG            = "ipaddr";
