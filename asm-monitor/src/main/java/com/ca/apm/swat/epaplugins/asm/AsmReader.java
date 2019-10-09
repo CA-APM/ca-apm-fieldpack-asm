@@ -267,7 +267,7 @@ public class AsmReader implements AsmProperties {
                 // get credits
                 if (EpaUtils.getBooleanProperty(METRICS_CREDITS, false)) {
                     HashMap<String, String> creditsMap = requestHelper.getCredits();
-                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap, true));
+                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap));
                     creditsMap = null;
                 }
 

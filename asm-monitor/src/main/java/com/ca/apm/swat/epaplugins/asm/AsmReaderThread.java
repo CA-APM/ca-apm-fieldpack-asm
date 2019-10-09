@@ -26,7 +26,6 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     private MetricWriter metricWriter;
     private ExecutorService reporterService;
     private Module module;
-    private boolean firstRun;
     private String lastId;
 
 
@@ -50,7 +49,6 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         this.metricWriter = metricWriter;
         this.reporterService = reporterService;
         this.module = new Module("Asm.Folder." + folderName);
-        this.firstRun = true;
         this.lastId = null;
     }
 
@@ -72,9 +70,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             HashMap<String, String> metricMap = getFolderMetrics();
 
             // send the metrics to Enterprise Manager
-            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap, firstRun));
+            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap));
 
-            firstRun = false;
         } catch (InterruptedException e) {
             // We've been interrupted: exit
             return;
