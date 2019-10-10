@@ -26,8 +26,6 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     private MetricWriter metricWriter;
     private ExecutorService reporterService;
     private Module module;
-    private String lastId;
-
 
     /**
      * Worker thread for App Synthetic Monitor EPA plugin.
@@ -49,7 +47,6 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         this.metricWriter = metricWriter;
         this.reporterService = reporterService;
         this.module = new Module("Asm.Folder." + folderName);
-        this.lastId = null;
     }
 
 
@@ -188,18 +185,17 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                     LogResult result = requestHelper.getLogs(folder,
                                                                  monitorCount,
                                                                  folderPrefix,
-                                                                 lastId);
-                    String oldLastId = lastId;
-                    
-                    if (result.getLastId() != null) {
-                        lastId = result.getLastId();
-                    }
-                    
+                                                                 AsmReader.getLastUuidForFolder(folder));
                     //do not send the metrics of the first call
                     //since it is supposed only to get the uuid
-                    if (oldLastId != null) { 
+                    if (AsmReader.getLastUuidForFolder(folder) != null) { 
                         resultMetricMap.putAll(result.getMap());
                     }
+                    
+                    if (result.getLastId() != null) {
+                        AsmReader.updateLastUuidForFolder(folder, result.getLastId());
+                    }
+                    
                 }
             } catch (Exception e) {
                 log.warn(module, AsmMessages.getMessage(AsmMessages.METRIC_READ_WARN_704,
