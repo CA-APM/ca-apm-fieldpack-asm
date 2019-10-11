@@ -71,13 +71,12 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
             if (DEBUG) {
@@ -137,13 +136,12 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
             if (DEBUG) {
