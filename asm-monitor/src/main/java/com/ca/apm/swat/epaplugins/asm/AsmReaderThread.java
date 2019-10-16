@@ -157,9 +157,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         // don't get aggregate metrics for root folder
         if (!EMPTY_STRING.equals(folder)) {
             // get stats for all monitors of this folder
-            // Disabling this for the moment since these statistics are not very useful
-            // and they somehow overwrite the values coming from rule_log
-            /*try {
+            
+            try {
                 if (EpaUtils.getBooleanProperty(METRICS_STATS_MONITOR, false)) {
                     resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, false));
                 }
@@ -177,7 +176,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                                  + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
                                                           folder, resultMetricMap.size()));
                 return resultMetricMap;
-            }*/
+            }
 
             // get logs for all monitors of this folder
             try {
