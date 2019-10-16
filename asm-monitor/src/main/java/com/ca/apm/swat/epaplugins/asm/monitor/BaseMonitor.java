@@ -337,12 +337,25 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     // TODO: continue instead?
                 }
 
-                if (thisKey.equals(COLOR_TAG)) {
+                // store description as error
+                if (thisKey.equals(DESCR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
+                        + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
+                    metricMap.put(rawErrorMetric, ONE);
+
+                    // convert numeric to string value to avoid metric type errors
+                    if (thisValue.matches("^[+-]?[0-9]+$")
+                        || thisValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
+                        thisValue = "http error " + thisValue;
+                    }
+
+                    // convert color to status value
+                } else if (thisKey.equals(COLOR_TAG)) {
+                    String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                        + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
                     if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
                         metricMap.put(rawErrorMetric,
-                                      (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
+                            (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
                     } else {
                         metricMap.put(rawErrorMetric, ZERO);
                     }
