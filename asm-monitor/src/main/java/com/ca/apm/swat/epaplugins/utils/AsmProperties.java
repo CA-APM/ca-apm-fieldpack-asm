@@ -18,7 +18,7 @@ public interface AsmProperties {
     public static final String YES                      = "y";
     public static final String NO                       = "n";
     public static final String NO_TYPE                  = "no type";
-    public static final String DATE_FORMAT              = "yyyy-MM-dd hh:mm:ss";
+    public static final String DATE_FORMAT              = "yyyy-MM-dd HH:mm:ss";
     public static final String DEFAULT_DELIMITER        = ",";
     public static final String BLANK                    = " ";
     public static final String TRUE                     = "true";
