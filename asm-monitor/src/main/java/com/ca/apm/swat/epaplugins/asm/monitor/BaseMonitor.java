@@ -217,6 +217,9 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
         boolean skipNoCheckpointAvailable =
                 EpaUtils.getBooleanProperty(SKIP_NO_CHECKPOINT_AVAILABLE, false);
 
+        Integer resultFieldInProbe = null;
+        Integer typeFieldInProbe = null;
+        
         while (jsonObjectKeys.hasNext()) {
             String thisKey = jsonObjectKeys.next().toString();
 
@@ -337,16 +340,37 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     // TODO: continue instead?
                 }
 
-                // store description as error
-                if (thisKey.equals(DESCR_TAG)) {
-                    String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                        + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
-                    metricMap.put(rawErrorMetric, ONE);
-
-                    // convert numeric to string value to avoid metric type errors
-                    if (thisValue.matches("^[+-]?[0-9]+$")
-                        || thisValue.matches("^[+-]?[0-9]*\\.[0-9]+$")) {
-                        thisValue = "http error " + thisValue;
+                if (thisKey.equals(TYPE_TAG)) {
+                    if (resultFieldInProbe != null && typeFieldInProbe == null) {
+                        //calculate and push metric
+                        String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
+                        
+                        typeFieldInProbe = Integer.parseInt(thisValue);
+                        
+                        if (resultFieldInProbe != 0 && (typeFieldInProbe  == 0 || typeFieldInProbe == 2 || typeFieldInProbe == 4)) {
+                            metricMap.put(rawErrorMetric, ONE);
+                        } else {
+                            metricMap.put(rawErrorMetric, ZERO);
+                        }
+                    } else {
+                        typeFieldInProbe = Integer.parseInt(thisValue);
+                    }
+                } else if (thisKey.equals(RESULT_TAG)) {
+                    if (typeFieldInProbe != null && resultFieldInProbe == null) {
+                        //calculate and push metric
+                        String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
+                        
+                        resultFieldInProbe = Integer.parseInt(thisValue);
+                        
+                        if (resultFieldInProbe != 0 && (typeFieldInProbe  == 0 || typeFieldInProbe == 2 || typeFieldInProbe == 4)) {
+                            metricMap.put(rawErrorMetric, ONE);
+                        } else {
+                            metricMap.put(rawErrorMetric, ZERO);
+                        }
+                    } else {
+                        resultFieldInProbe = Integer.parseInt(thisValue);
                     }
 
                     // convert color to status value
