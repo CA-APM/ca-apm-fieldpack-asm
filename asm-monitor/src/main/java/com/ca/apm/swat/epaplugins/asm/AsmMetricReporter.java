@@ -131,6 +131,11 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
         if (metricName.endsWith(METRIC_NAME_DATA_RECEIVED)) {
             return MetricWriter.kPerIntervalCounter;
         }
+        
+        // for the moment return PerIntervalCounter for this kind of metric
+        if (metricName.endsWith(METRIC_NAME_ERRORS_PER_INTERVAL)) {
+            return MetricWriter.kPerIntervalCounter;
+        }
 
         // does mostly not make sense as we are sending metrics only every 5 minutes
         if (EpaUtils.getBooleanProperty(REPORT_PER_INTERVAL_COUNTER, false)

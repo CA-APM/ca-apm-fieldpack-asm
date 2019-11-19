@@ -344,7 +344,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     if (resultFieldInProbe != null && typeFieldInProbe == null) {
                         //calculate and push metric
                         String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
+                            + METRIC_NAME_ERRORS_PER_INTERVAL;
                         
                         typeFieldInProbe = new Integer(thisValue);
                         
@@ -360,7 +360,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     if (typeFieldInProbe != null && resultFieldInProbe == null) {
                         //calculate and push metric
                         String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
+                            + METRIC_NAME_ERRORS_PER_INTERVAL;
                         
                         resultFieldInProbe = new Integer(thisValue);
                         
