@@ -346,15 +346,15 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                         String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
                         
-                        typeFieldInProbe = Integer.parseInt(thisValue);
+                        typeFieldInProbe = new Integer(thisValue);
                         
-                        if (resultFieldInProbe != 0 && (typeFieldInProbe  == 0 || typeFieldInProbe == 2 || typeFieldInProbe == 4)) {
+                        if (resultFieldInProbe != PROBE_RESULT_OK && (typeFieldInProbe == PROBE_TYPE_NORMAL || typeFieldInProbe == PROBE_TYPE_SECOND_OPINION || typeFieldInProbe == PROBE_TYPE_FINAL)) {
                             metricMap.put(rawErrorMetric, ONE);
                         } else {
                             metricMap.put(rawErrorMetric, ZERO);
                         }
                     } else {
-                        typeFieldInProbe = Integer.parseInt(thisValue);
+                        typeFieldInProbe = new Integer(thisValue);
                     }
                 } else if (thisKey.equals(RESULT_TAG)) {
                     if (typeFieldInProbe != null && resultFieldInProbe == null) {
@@ -362,15 +362,15 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                         String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
                             + (String) AsmPropertiesImpl.ASM_METRICS.get(ERRORS_TAG);
                         
-                        resultFieldInProbe = Integer.parseInt(thisValue);
+                        resultFieldInProbe = new Integer(thisValue);
                         
-                        if (resultFieldInProbe != 0 && (typeFieldInProbe  == 0 || typeFieldInProbe == 2 || typeFieldInProbe == 4)) {
+                        if (resultFieldInProbe != PROBE_RESULT_OK && (typeFieldInProbe == PROBE_TYPE_NORMAL || typeFieldInProbe == PROBE_TYPE_SECOND_OPINION || typeFieldInProbe == PROBE_TYPE_FINAL)) {
                             metricMap.put(rawErrorMetric, ONE);
                         } else {
                             metricMap.put(rawErrorMetric, ZERO);
                         }
                     } else {
-                        resultFieldInProbe = Integer.parseInt(thisValue);
+                        resultFieldInProbe = new Integer(thisValue);
                     }
 
                     // convert color to status value

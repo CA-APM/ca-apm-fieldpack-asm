@@ -353,5 +353,15 @@ public interface AsmProperties {
     public static final String METRIC_NAME_BLOCKED_TIME         = "Blocked Time";
     public static final String METRIC_NAME_WAIT_TIME            = "Wait Time";
         
-
+    //types of probes in rule_log
+    public static final int PROBE_TYPE_NORMAL = 0;
+    public static final int PROBE_TYPE_EXTRA = 1;
+    public static final int PROBE_TYPE_SECOND_OPINION = 2;
+    public static final int PROBE_TYPE_MAINTENANCE = 3;
+    public static final int PROBE_TYPE_FINAL = 4;
+    public static final int PROBE_TYPE_INTERNAL_ERROR_OPMS = 5;
+    public static final int PROBE_TYPE_INTERNAL_ERROR_PUBLIC = 6;
+    
+    //results of probes in rule_log
+    public static final int PROBE_RESULT_OK = 0;
 }
