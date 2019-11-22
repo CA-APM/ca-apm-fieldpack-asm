@@ -85,7 +85,6 @@ public interface AsmProperties {
     public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
     public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String FOLDER_PREFIX            = "asm.folder.";
-    public static final String NUM_LOGS                 = "asm.numlogs";
     public static final String MAX_LOG_LIMIT            = "asm.maxLogLimit";
     public static final String LEGACY_OUTPUT_FORMAT     = "asm.legacyOutputFormat";
     public static final String IGNORE_TAGS              = "asm.ignoreTags";

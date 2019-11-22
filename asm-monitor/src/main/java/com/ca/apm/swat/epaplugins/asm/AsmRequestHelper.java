@@ -43,6 +43,7 @@ public class AsmRequestHelper implements AsmProperties {
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
     private static final long DEFAULT_MAX_LOG_LIMIT = 2000; // 2s
+    private static final long NUM_LOGS = 1; // get only 1 record on the first run (just to get uuid)
 
     /**
      * Create new CloudMonitorRequestHelper.
@@ -689,9 +690,7 @@ public class AsmRequestHelper implements AsmProperties {
             Map<String, String> metrics;
 
             if (lastId == null) {
-                // get only 1 record on the first run (just to get uuid)
-                int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
-                logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
+                logStr += REVERSE_PARAM + NUM_PARAM + NUM_LOGS;
                 metrics = new MetricMap();
             } else {
                 // get all records newer than last uuid
