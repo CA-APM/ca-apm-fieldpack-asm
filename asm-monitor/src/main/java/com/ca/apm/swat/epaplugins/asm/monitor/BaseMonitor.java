@@ -4,9 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
-import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -198,14 +196,13 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
         // append monitoring station to metric tree
         if (jsonObject.optString(LOCATION_TAG, null) != null) {
+            String location = getLocation(jsonObject);
             if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
-                String location = AsmRequestHelper.getMonitoringStationMap().get(
-                                      jsonObject.getString(LOCATION_TAG));
-                if (null == location) {
-                    location = OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR
-                            + jsonObject.getString(LOCATION_TAG).replace("|", "");
-                } 
                 metricTree = metricTree + METRIC_PATH_SEPARATOR + location;
+            } 
+            
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module, "Location: " + location);
             }
         }
 
@@ -302,6 +299,9 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if ((null != thisValue) && (0 < thisValue.length())) {
+                                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                                    EpaUtils.getFeedback().verbose(module, LOGS_CMD + " " + OUTPUT_TAG + ": " + thisValue);
+                                }
                                 getSuccessor().generateMetrics(outputMap, thisValue, metricTree);
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
@@ -464,6 +464,15 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
         }
 
         return metricMap;
+    }
+    
+    private String getLocation(JSONObject jsonObject) {
+        String location = AsmRequestHelper.getMonitoringStationMap().get(jsonObject.getString(LOCATION_TAG));
+        if (null == location) {
+            location = OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR
+                + jsonObject.getString(LOCATION_TAG).replace("|", "");
+        }
+        return location;
     }
 
     /**

@@ -10,7 +10,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
@@ -44,6 +43,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module,
                 "JMeterScriptHandler - xmlString = " + xmlString);
+        } else if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module, "Entering JMeterScriptHandler.generateMetrics");
         }
 
         if (!xmlString.startsWith(XML_PREFIX)) {
