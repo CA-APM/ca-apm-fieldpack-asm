@@ -349,9 +349,9 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                         typeFieldInProbe = new Integer(thisValue);
                         
                         if (resultFieldInProbe != PROBE_RESULT_OK && (typeFieldInProbe == PROBE_TYPE_NORMAL || typeFieldInProbe == PROBE_TYPE_SECOND_OPINION || typeFieldInProbe == PROBE_TYPE_FINAL)) {
-                            metricMap.put(rawErrorMetric, ONE);
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ONE);
                         } else {
-                            metricMap.put(rawErrorMetric, ZERO);
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ZERO);
                         }
                     } else {
                         typeFieldInProbe = new Integer(thisValue);
@@ -365,9 +365,9 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                         resultFieldInProbe = new Integer(thisValue);
                         
                         if (resultFieldInProbe != PROBE_RESULT_OK && (typeFieldInProbe == PROBE_TYPE_NORMAL || typeFieldInProbe == PROBE_TYPE_SECOND_OPINION || typeFieldInProbe == PROBE_TYPE_FINAL)) {
-                            metricMap.put(rawErrorMetric, ONE);
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ONE);
                         } else {
-                            metricMap.put(rawErrorMetric, ZERO);
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ZERO);
                         }
                     } else {
                         resultFieldInProbe = new Integer(thisValue);
@@ -464,6 +464,13 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
         }
 
         return metricMap;
+    }
+    
+    private void pushErrorsPerIntervalAndLastCheckStatus(Map<String, String> metricMap, String metricTree, String metric, String value) {
+        metricMap.put(metric, value);
+        String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+            + METRIC_NAME_LAST_CHECK_STATUS;
+        metricMap.put(rawErrorMetric, value);
     }
     
     private String getLocation(JSONObject jsonObject) {

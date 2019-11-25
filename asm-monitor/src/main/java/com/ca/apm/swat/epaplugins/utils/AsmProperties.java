@@ -337,6 +337,7 @@ public interface AsmProperties {
     public static final String METRIC_NAME_REPEAT       = "Repeat";
     public static final String METRIC_NAME_CONSECUTIVE_ERRORS  = "Consecutive Errors";
     public static final String METRIC_NAME_ERRORS_PER_INTERVAL = "Errors Per Interval";
+    public static final String METRIC_NAME_LAST_CHECK_STATUS   = "Last Check Status";
     public static final String METRIC_NAME_ALERTS_PER_INTERVAL = "Alerts Per Interval";
     public static final String METRIC_NAME_DATA_RECEIVED       = "Data Received";
     
