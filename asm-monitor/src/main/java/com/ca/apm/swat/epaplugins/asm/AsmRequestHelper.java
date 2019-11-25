@@ -594,7 +594,11 @@ public class AsmRequestHelper implements AsmProperties {
                     "getStats", folder, monitor.getName(), monitor.getType()));
             }
 
-            return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix);
+            if (aggregate) {
+                return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix, STATS_AGG_Y_ENDPOINT);
+            } else {
+                return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix, STATS_AGG_N_ENDPOINT);
+            }
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -630,7 +634,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
-            return monitor.generateMetrics(new MetricMap(), pspRequest, metricPrefix);
+            return monitor.generateMetrics(new MetricMap(), pspRequest, metricPrefix, PSP_ENDPOINT);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -722,7 +726,7 @@ public class AsmRequestHelper implements AsmProperties {
                             null,
                             EMPTY_STRING,
                             false);
-            monitor.generateMetrics(metrics, logResponse, metricPrefix);
+            monitor.generateMetrics(metrics, logResponse, metricPrefix, LOGS_ENDPOINT);
             
             JSONObject ruleLogJsonResponse;
             String lastUuid = null;

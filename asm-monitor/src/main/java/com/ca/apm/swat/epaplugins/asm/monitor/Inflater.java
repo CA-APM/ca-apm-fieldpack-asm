@@ -22,12 +22,14 @@ public class Inflater extends AbstractHandler {
      * @param map map to insert metrics into
      * @param compressedString compressedString
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
     public Map<String, String> generateMetrics(Map<String, String> map,
                                                String compressedString,
-                                               String metricTree)
+                                               String metricTree,
+                                               String endpoint)
             throws AsmException {
 
         // doesn't make sense if nobody handles the result
@@ -39,7 +41,7 @@ public class Inflater extends AbstractHandler {
                     String decompressedString;
                     decompressedString = new String(bytesDecompressed, 0,
                         bytesDecompressed.length, EpaUtils.getEncoding());
-                    return getSuccessor().generateMetrics(map, decompressedString, metricTree);
+                    return getSuccessor().generateMetrics(map, decompressedString, metricTree, endpoint);
                 } else {
                     EpaUtils.getFeedback().error(AsmMessages.getMessage(
                         AsmMessages.BYTES_DECODED_NULL_909,

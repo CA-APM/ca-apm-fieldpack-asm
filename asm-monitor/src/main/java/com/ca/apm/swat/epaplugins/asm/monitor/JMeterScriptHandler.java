@@ -34,11 +34,12 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * @param metricMap map to insert metrics into
      * @param xmlString JMeter script data
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return map containing the metrics
      */
     public Map<String, String> generateMetrics(Map<String, String> metricMap,
                                                String xmlString,
-                                               String metricTree) {
+                                               String metricTree, String endpoint) {
         
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module,

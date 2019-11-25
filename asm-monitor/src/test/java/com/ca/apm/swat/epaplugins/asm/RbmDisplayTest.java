@@ -58,7 +58,7 @@ public class RbmDisplayTest extends FileTest {
             HarHandler handler = new HarHandler();
             String metricTree = "Monitors|CA|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());

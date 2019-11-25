@@ -60,7 +60,7 @@ public class TimeoutTest extends FileTest {
 
             // call API
             Map<String, String> metricMap =
-                    monitor.generateMetrics(new MetricMap(), logRequest, metricPrefix);
+                    monitor.generateMetrics(new MetricMap(), logRequest, metricPrefix, LOGS_ENDPOINT);
 
             // print
             if (DEBUG) {
@@ -138,7 +138,7 @@ public class TimeoutTest extends FileTest {
 
             // call API
             Map<String, String> metricMap =
-                    monitor.generateMetrics(new MetricMap(), logRequest, metricPrefix);
+                    monitor.generateMetrics(new MetricMap(), logRequest, metricPrefix, LOGS_ENDPOINT);
 
             // print
             if (DEBUG) {

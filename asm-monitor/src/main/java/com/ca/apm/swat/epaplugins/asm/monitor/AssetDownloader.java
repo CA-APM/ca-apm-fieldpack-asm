@@ -35,12 +35,14 @@ public class AssetDownloader extends AbstractHandler {
      * @param map map to insert metrics into
      * @param string a string
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
     public Map<String, String> generateMetrics(Map<String, String> map,
                                                String string,
-                                               String metricTree) throws AsmException {
+                                               String metricTree,
+                                               String endpoint) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
@@ -76,7 +78,7 @@ public class AssetDownloader extends AbstractHandler {
                 }
             }
 
-            return getSuccessor().generateMetrics(map, string, metricTree);
+            return getSuccessor().generateMetrics(map, string, metricTree, endpoint);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(

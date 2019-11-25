@@ -198,6 +198,12 @@ public interface AsmProperties {
     public static final String PSP_CMD                  = "rule_psp";
     public static final String STATS_CMD                = "rule_stats";
     public static final String LOGS_CMD                 = "rule_log";
+    
+    // API Endpoints
+    public static final String PSP_ENDPOINT             = "rule_psp_endpoint";
+    public static final String STATS_AGG_Y_ENDPOINT     = "rule_stats_agg_y_endpoint";
+    public static final String STATS_AGG_N_ENDPOINT     = "rule_stats_agg_n_endpoint";
+    public static final String LOGS_ENDPOINT            = "rule_log_endpoint";
 
     // command parameters
     public static final String NKEY_PARAM               = "nkey=";

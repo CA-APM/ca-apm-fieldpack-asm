@@ -17,15 +17,17 @@ public class XmlFixer extends AbstractHandler {
      * Generate metrics from API call result.
      * XmlFixer replaces all '&' characters in xml string with "&amp;"
      * 
-     * @param map map to insert metrics into
+     * @param map to insert metrics into
      * @param xmlString xml string
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
     public Map<String, String> generateMetrics(Map<String, String> map,
                                                String xmlString,
-                                               String metricTree) throws AsmException {
+                                               String metricTree,
+                                               String endpoint) throws AsmException {
         Module module = new Module(Thread.currentThread().getName());
 
         // doesn't make sense if nobody handles the result
@@ -39,7 +41,7 @@ public class XmlFixer extends AbstractHandler {
             // replace all occu
             return getSuccessor().generateMetrics(map,
                                                   xmlString.replaceAll("&", "&amp;"),
-                                                  metricTree);
+                                                  metricTree, endpoint);
 
         } else {
             EpaUtils.getFeedback().error(module, AsmMessages.getMessage(

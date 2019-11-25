@@ -30,11 +30,12 @@ public class HarHandler implements Handler, AsmProperties {
      *            string representing har file
      * @param metricTree
      *            metric tree prefix
+     * @param API endpoint where the request came from           
      * @return map containing the metrics
      */
     @Override
     public Map<String, String> generateMetrics(
-            Map<String, String> metricMap, String harString, String metricTree) {
+            Map<String, String> metricMap, String harString, String metricTree, String endpoint) {
 
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module, "HarHandler - harString = " + harString);

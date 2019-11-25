@@ -123,13 +123,15 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
      * @param metricMap map to insert metrics into
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return metricMap map containing the metrics
      */
     @SuppressWarnings("rawtypes")
     public Map<String, String> generateMetrics(
                                                Map<String, String> metricMap,
                                                String jsonString,
-                                               String metricTree) {
+                                               String metricTree, 
+                                               String endpoint) {
 
         if (null == jsonString) {
             return metricMap;
@@ -223,7 +225,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
             // if this is another object do recursion
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
-                generateMetrics(metricMap, innerJsonObject.toString(), metricTree);
+                generateMetrics(metricMap, innerJsonObject.toString(), metricTree, endpoint);
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 // iterate over array
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
@@ -258,12 +260,12 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                                         // hand over parsing to a monitor-specific handler chain
                                         mon.generateMetrics(metricMap,
                                                 resultObj.toString(),
-                                                metricTree);
+                                                metricTree, endpoint);
                                     } else {
                                         // recursively generate metrics for these tags
                                         generateMetrics(metricMap,
                                                 resultObj.toString(),
-                                                metricTree);
+                                                metricTree, endpoint);
                                     }
                                 } catch (JSONException e) {
                                     EpaUtils.getFeedback().debug(module,
@@ -277,11 +279,11 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                             || thisKey.equals(STATS_TAG)) {
                         // recursively generate metrics for these tags
                         generateMetrics(metricMap,
-                                innerJsonArray.getJSONObject(i).toString(), metricTree);
+                                innerJsonArray.getJSONObject(i).toString(), metricTree, endpoint);
                     } else {
                         generateMetrics(metricMap,
                                 innerJsonArray.getJSONObject(i).toString(),
-                                metricTree + METRIC_PATH_SEPARATOR + thisKey.replace("|", ""));
+                                metricTree + METRIC_PATH_SEPARATOR + thisKey.replace("|", ""), endpoint);
                     }
                 }
             } else {
@@ -302,7 +304,7 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                                 if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
                                     EpaUtils.getFeedback().verbose(module, LOGS_CMD + " " + OUTPUT_TAG + ": " + thisValue);
                                 }
-                                getSuccessor().generateMetrics(outputMap, thisValue, metricTree);
+                                getSuccessor().generateMetrics(outputMap, thisValue, metricTree, endpoint);
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                                             AsmMessages.OUTPUT_EMPTY_WARN_705,
@@ -406,6 +408,12 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
                 // map metric key
                 if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
+                    // ignore these tags from rule_stats due to clashing of names with tags of rule_log and rule_psp
+                    if (endpoint.equals(STATS_AGG_N_ENDPOINT)) {
+                        if (AsmPropertiesImpl.ASM_RULE_STATS_TAGS_TO_IGNORE.contains(thisKey)) {
+                            continue;
+                        }
+                    }
                     thisKey = AsmPropertiesImpl.ASM_METRICS.get(thisKey);
                 }
 

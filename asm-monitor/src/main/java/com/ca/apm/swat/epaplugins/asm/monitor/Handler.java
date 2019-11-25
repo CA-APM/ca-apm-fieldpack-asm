@@ -22,11 +22,13 @@ public interface Handler {
      * @param map Map to be populated by metrics
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return map containing the metrics
      * @throws AsmException error during metrics generation
      */
     public Map<String, String> generateMetrics(Map<String,String> map,
                                                String jsonString,
-                                               String metricTree)
+                                               String metricTree,
+                                               String endpoint)
                                                        throws AsmException;
 }

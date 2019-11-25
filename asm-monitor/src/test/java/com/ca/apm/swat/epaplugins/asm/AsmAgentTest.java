@@ -48,7 +48,7 @@ public class AsmAgentTest extends FileTest {
             properties.setProperty(DISPLAY_STATIONS, FALSE);
 
             Map<String, String> map = MonitorFactory.getAllMonitorsMonitor()
-                    .generateMetrics(new MetricMap(), json, "Monitors|CA");
+                    .generateMetrics(new MetricMap(), json, "Monitors|CA", "");
 
             SortedSet<String> set = new TreeSet<String>();
             for (Iterator<String> it = map.keySet().iterator(); it.hasNext();) {

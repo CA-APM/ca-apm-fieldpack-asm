@@ -87,7 +87,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -161,7 +161,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -237,7 +237,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -313,7 +313,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -389,7 +389,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -465,7 +465,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -541,7 +541,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -617,7 +617,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
