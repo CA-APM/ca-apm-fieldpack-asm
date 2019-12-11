@@ -43,6 +43,7 @@ public class AsmRequestHelper implements AsmProperties {
     private long lastPrintApiTimestamp = 0;
     private static final long PRINT_API_INTERVAL = 900000; // 15 minutes
     private static final long DEFAULT_MAX_LOG_LIMIT = 2000; // 2s
+    private static final long NUM_LOGS = 1; // get only 1 record on the first run (just to get uuid)
 
     /**
      * Create new CloudMonitorRequestHelper.
@@ -579,9 +580,11 @@ public class AsmRequestHelper implements AsmProperties {
                 aggregateStr = AGGREGATE_PARAM;
             }
 
-            String statsStr = NKEY_PARAM + this.nkey + ACCOUNT_PARAM + this.user
-                    + getFolderString(folder) + aggregateStr + START_DATE_PARAM
-                    + getTodaysDate() + CALLBACK_PARAM + DO_CALLBACK;
+            String statsStr = NKEY_PARAM + this.nkey + CALLBACK_PARAM + DO_CALLBACK 
+                    + ACCOUNT_PARAM + this.user + getFolderString(folder) 
+                    + aggregateStr 
+                    + START_DATE_PARAM + getDateTime(EpaUtils.getProperty(METRICS_STATS_WDW_SIZE, "3600000"))
+                    + END_DATE_PARAM + getDateTime("0");
             String statsRequest = accessor.executeApi(STATS_CMD, statsStr);
 
             Module module = new Module(Thread.currentThread().getName());
@@ -591,7 +594,11 @@ public class AsmRequestHelper implements AsmProperties {
                     "getStats", folder, monitor.getName(), monitor.getType()));
             }
 
-            return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix);
+            if (aggregate) {
+                return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix, STATS_AGG_Y_ENDPOINT);
+            } else {
+                return monitor.generateMetrics(new MetricMap(), statsRequest, metricPrefix, STATS_AGG_N_ENDPOINT);
+            }
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -627,7 +634,7 @@ public class AsmRequestHelper implements AsmProperties {
             }
 
             Monitor monitor = MonitorFactory.getAllMonitorsMonitor();
-            return monitor.generateMetrics(new MetricMap(), pspRequest, metricPrefix);
+            return monitor.generateMetrics(new MetricMap(), pspRequest, metricPrefix, PSP_ENDPOINT);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -669,8 +676,8 @@ public class AsmRequestHelper implements AsmProperties {
         try {
             countApiCall(LOGS_CMD, folder);
 
-            String logStr = NKEY_PARAM + this.nkey + getFolderString(folder)
-                    + CALLBACK_PARAM + DO_CALLBACK + FULL_PARAM;
+            String logStr = NKEY_PARAM + this.nkey + CALLBACK_PARAM + DO_CALLBACK 
+                    + getFolderString(folder) + FULL_PARAM;
 
             // only download full data if configured
             if (EpaUtils.getBooleanProperty(METRICS_DOWNLOAD_FULL, false)) {
@@ -687,12 +694,7 @@ public class AsmRequestHelper implements AsmProperties {
             Map<String, String> metrics;
 
             if (lastId == null) {
-                // get n latest records on the first run
-                int numLogs = Integer.parseInt(EpaUtils.getProperty(NUM_LOGS));
-                if (numMonitors > 0) {
-                    numLogs =  numLogs * numMonitors;
-                }
-                logStr += REVERSE_PARAM + NUM_PARAM + numLogs;
+                logStr += REVERSE_PARAM + NUM_PARAM + NUM_LOGS;
                 metrics = new MetricMap();
             } else {
                 // get all records newer than last uuid
@@ -724,8 +726,22 @@ public class AsmRequestHelper implements AsmProperties {
                             null,
                             EMPTY_STRING,
                             false);
-            monitor.generateMetrics(metrics, logResponse, metricPrefix);
-            return new LogResult(metrics, metrics.remove(UUID_TAG));
+            monitor.generateMetrics(metrics, logResponse, metricPrefix, LOGS_ENDPOINT);
+            
+            JSONObject ruleLogJsonResponse;
+            String lastUuid = null;
+            
+            try {
+                ruleLogJsonResponse = new JSONObject(logResponse);
+                lastUuid = ruleLogJsonResponse.getString("uuid");
+            } catch (JSONException e) {
+                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                    EpaUtils.getFeedback().verbose(module,
+                            "Unable to read uuid from response: " + e.getMessage());
+                }
+            }
+            
+            return new LogResult(metrics, lastUuid);
 
         } catch (JSONException e) {
             EpaUtils.getFeedback().warn(new Module(Thread.currentThread().getName()),
@@ -737,14 +753,15 @@ public class AsmRequestHelper implements AsmProperties {
     }
 
     /**
-     * Get today's date.
-     * @return today's date
+     * Get urlEncoded value of current datetime - windowSize
      * @throws Exception errors
      */
-    private static String getTodaysDate() throws Exception {
+    private static String getDateTime(String windowSize) throws Exception {
+        long wdwSize = Long.parseLong(windowSize);
         final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         Calendar calendar = Calendar.getInstance();
-        return dateFormat.format(calendar.getTime());
+        calendar.setTimeInMillis(calendar.getTimeInMillis() - wdwSize);
+        return URLEncoder.encode(dateFormat.format(calendar.getTime()), EpaUtils.getEncoding());
     }
 
     /**

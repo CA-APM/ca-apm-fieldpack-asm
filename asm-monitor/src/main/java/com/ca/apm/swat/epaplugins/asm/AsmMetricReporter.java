@@ -26,7 +26,6 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
 
     private MetricWriter metricWriter;
     private Map<String, String> metricMap = null;
-    private boolean turnOn = false;
     private static Module module = null;
 
     protected static final String SEPARATOR = "\\.";
@@ -38,11 +37,9 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
      * @param turnOn turn metrics on
      */
     public AsmMetricReporter(MetricWriter metricWriter,
-                             Map<String, String> metricMap,
-                             boolean turnOn) {
+                             Map<String, String> metricMap) {
         this.metricWriter = metricWriter;
         this.metricMap = metricMap;
-        this.turnOn = turnOn;
         if (null == module) {
             module = new Module("Asm.AsmMetricReporter");
         }
@@ -88,23 +85,21 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
                         + thisMetricType + " '" + metricPath + "' = " + metricValue);
             }
 
-            // turn on metric
-            if (turnOn) {
-                try {
-                    MetricRecordingAdministrator admin =
-                            AgentShim.getAgent().IAgent_getMetricRecordingAdministrator();
-                    AgentMetric agentMetric =
-                            AgentMetric.getAgentMetric(metricPath, mapMetricType(thisMetricType));
-                    admin.turnMetricOn(agentMetric);
-                } catch (AgentNotAvailableException e) {
-                    EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-                        AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
-                } catch (BadlyFormedNameException e) {
-                    EpaUtils.getFeedback().error(module, AsmMessages.getMessage(
-                        AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
-                }
 
+            try {
+                MetricRecordingAdministrator admin
+                    = AgentShim.getAgent().IAgent_getMetricRecordingAdministrator();
+                AgentMetric agentMetric
+                    = AgentMetric.getAgentMetric(metricPath, mapMetricType(thisMetricType));
+                admin.turnMetricOn(agentMetric);
+            } catch (AgentNotAvailableException e) {
+                EpaUtils.getFeedback().error(module,
+                    AsmMessages.getMessage(AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
+            } catch (BadlyFormedNameException e) {
+                EpaUtils.getFeedback().error(module,
+                    AsmMessages.getMessage(AsmMessages.METRIC_TURN_ON_ERROR_923, metricPath), e);
             }
+            
 
             // write metric
             metricWriter.writeMetric(thisMetricType, metricPath, metricValue);
@@ -134,6 +129,11 @@ public class AsmMetricReporter implements AsmProperties, Runnable {
 
         // determine type from metric name
         if (metricName.endsWith(METRIC_NAME_DATA_RECEIVED)) {
+            return MetricWriter.kPerIntervalCounter;
+        }
+        
+        // for the moment return PerIntervalCounter for this kind of metric
+        if (metricName.endsWith(METRIC_NAME_ERRORS_PER_INTERVAL)) {
             return MetricWriter.kPerIntervalCounter;
         }
 

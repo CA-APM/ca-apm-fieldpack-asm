@@ -25,12 +25,14 @@ public class SimpleBase64Decoder extends AbstractHandler {
      * @param map map to insert metrics into
      * @param encodedString Base64 encoded string
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return metricMap map containing the metrics
      * @throws AsmException error during metrics generation
      */
     public Map<String, String> generateMetrics(Map<String, String> map,
                                                String encodedString,
-                                               String metricTree)
+                                               String metricTree,
+                                               String endpoint)
             throws AsmException {
 
         // doesn't make sense if nobody handles the result
@@ -59,7 +61,7 @@ public class SimpleBase64Decoder extends AbstractHandler {
                 }
 
                 // call next handler in chain
-                return getSuccessor().generateMetrics(map, decodedString, metricTree);
+                return getSuccessor().generateMetrics(map, decodedString, metricTree, endpoint);
             } else {
                 EpaUtils.getFeedback().warn(AsmMessages.getMessage(
                     AsmMessages.BYTES_DECODED_NULL_909,

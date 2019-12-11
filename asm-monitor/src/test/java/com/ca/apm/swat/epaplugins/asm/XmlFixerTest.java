@@ -49,7 +49,7 @@ public class XmlFixerTest implements AsmProperties {
             for (int i = 0; i < test.length; ++i) {
                 checker.setExpectedResult(expected[i]);
 
-                fixer.generateMetrics(new MetricMap(), test[i], null);
+                fixer.generateMetrics(new MetricMap(), test[i], null, "");
             }
             
         } catch (Exception e) {
@@ -65,7 +65,7 @@ public class XmlFixerTest implements AsmProperties {
             expected = expectedResult;
         }
     
-        public Map<String, String> generateMetrics(Map<String, String> map, String xmlString, String metricTree) {
+        public Map<String, String> generateMetrics(Map<String, String> map, String xmlString, String metricTree, String endpoint) {
             if (DEBUG) {
                 System.out.println(xmlString);
             }

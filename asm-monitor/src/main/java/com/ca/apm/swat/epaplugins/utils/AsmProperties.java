@@ -18,7 +18,7 @@ public interface AsmProperties {
     public static final String YES                      = "y";
     public static final String NO                       = "n";
     public static final String NO_TYPE                  = "no type";
-    public static final String DATE_FORMAT              = "yyyy-MM-dd";
+    public static final String DATE_FORMAT              = "yyyy-MM-dd HH:mm:ss";
     public static final String DEFAULT_DELIMITER        = ",";
     public static final String BLANK                    = " ";
     public static final String TRUE                     = "true";
@@ -85,7 +85,6 @@ public interface AsmProperties {
     public static final String SKIP_INACTIVE_FOLDERS    = "asm.skipInactiveFolders";
     public static final String SKIP_INACTIVE_MONITORS   = "asm.skipInactiveMonitors";
     public static final String FOLDER_PREFIX            = "asm.folder.";
-    public static final String NUM_LOGS                 = "asm.numlogs";
     public static final String MAX_LOG_LIMIT            = "asm.maxLogLimit";
     public static final String LEGACY_OUTPUT_FORMAT     = "asm.legacyOutputFormat";
     public static final String IGNORE_TAGS              = "asm.ignoreTags";
@@ -95,6 +94,7 @@ public interface AsmProperties {
     public static final String REPORT_ASSERTION_FAILURES_AS = "asm.reportAssertionFailureAs";
     public static final String REPORT_JMETER_STEPS      = "asm.reportJMeterSteps";
     public static final String REPORT_JTL_SUBTREE       = "asm.reportJTLSubtree";
+    public static final String METRICS_STATS_WDW_SIZE   = "asm.metrics.stats.windowSize";
     public static final String PRINT_ASM_NODE           = "asm.printAsmNode";
     public static final String STEP_FORMAT_DIGITS       = "asm.stepFormatDigits";
     public static final String STEP_FORMAT_URL          = "asm.stepFormatURL";
@@ -198,6 +198,12 @@ public interface AsmProperties {
     public static final String PSP_CMD                  = "rule_psp";
     public static final String STATS_CMD                = "rule_stats";
     public static final String LOGS_CMD                 = "rule_log";
+    
+    // API Endpoints
+    public static final String PSP_ENDPOINT             = "rule_psp_endpoint";
+    public static final String STATS_AGG_Y_ENDPOINT     = "rule_stats_agg_y_endpoint";
+    public static final String STATS_AGG_N_ENDPOINT     = "rule_stats_agg_n_endpoint";
+    public static final String LOGS_ENDPOINT            = "rule_log_endpoint";
 
     // command parameters
     public static final String NKEY_PARAM               = "nkey=";
@@ -211,6 +217,7 @@ public interface AsmProperties {
     public static final String NUM_PARAM                = "&num=";
     public static final String UUID_PARAM               = "&uuid=";
     public static final String START_DATE_PARAM         = "&start_date=";
+    public static final String END_DATE_PARAM           = "&end_date=";
     public static final String ACCOUNT_PARAM            = "&acct=";
     public static final String FULL_PARAM               = "&full=";
     public static final String NEW_OUTPUT_PARAM         = "&legacy_output=n";
@@ -249,6 +256,7 @@ public interface AsmProperties {
     public static final String PORT_TAG                 = "port";
     public static final String PATH_TAG                 = "path";
     public static final String VERSION_TAG              = "version";
+    public static final String CURSOR_TAG               = "cursor";
     public static final String OUTPUT_TAG               = "output";
     public static final String TAGS_TAG                 = "tags";
     public static final String IPADDRESS_TAG            = "ipaddr";
@@ -335,6 +343,7 @@ public interface AsmProperties {
     public static final String METRIC_NAME_REPEAT       = "Repeat";
     public static final String METRIC_NAME_CONSECUTIVE_ERRORS  = "Consecutive Errors";
     public static final String METRIC_NAME_ERRORS_PER_INTERVAL = "Errors Per Interval";
+    public static final String METRIC_NAME_LAST_CHECK_STATUS   = "Last Check Status";
     public static final String METRIC_NAME_ALERTS_PER_INTERVAL = "Alerts Per Interval";
     public static final String METRIC_NAME_DATA_RECEIVED       = "Data Received";
     
@@ -350,5 +359,15 @@ public interface AsmProperties {
     public static final String METRIC_NAME_BLOCKED_TIME         = "Blocked Time";
     public static final String METRIC_NAME_WAIT_TIME            = "Wait Time";
         
-
+    //types of probes in rule_log
+    public static final int PROBE_TYPE_NORMAL = 0;
+    public static final int PROBE_TYPE_EXTRA = 1;
+    public static final int PROBE_TYPE_SECOND_OPINION = 2;
+    public static final int PROBE_TYPE_MAINTENANCE = 3;
+    public static final int PROBE_TYPE_FINAL = 4;
+    public static final int PROBE_TYPE_INTERNAL_ERROR_OPMS = 5;
+    public static final int PROBE_TYPE_INTERNAL_ERROR_PUBLIC = 6;
+    
+    //results of probes in rule_log
+    public static final int PROBE_RESULT_OK = 0;
 }

@@ -71,6 +71,7 @@ public class AsmReader implements AsmProperties {
     private static String connectionRetryInterval = "60";
     private static String propertyFileName = PROPERTY_FILE_NAME;
     private static AsmReader instance;
+    private static HashMap<String, String> folderToLastUuidMapping = new HashMap<>();
 
     private boolean stopped = true;
     private Map<ScheduledFuture<?>, String> futureMap = null;
@@ -267,7 +268,7 @@ public class AsmReader implements AsmProperties {
                 // get credits
                 if (EpaUtils.getBooleanProperty(METRICS_CREDITS, false)) {
                     HashMap<String, String> creditsMap = requestHelper.getCredits();
-                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap, true));
+                    reporterService.execute(new AsmMetricReporter(metricWriter, creditsMap));
                     creditsMap = null;
                 }
 
@@ -774,5 +775,17 @@ public class AsmReader implements AsmProperties {
     public void reloadConfiguration() {
         lastConfigUpdateTimestamp = 0;
         log(SeverityLevel.VERBOSE, "triggered async reload of configuration");
+    }
+    
+    public static synchronized String getLastUuidForFolder(String folder) {
+        if (folderToLastUuidMapping.containsKey(folder)) {
+            return folderToLastUuidMapping.get(folder);
+        } else {
+            return null;
+        }
+    }
+    
+    public static synchronized void updateLastUuidForFolder(String folder, String lastUuid) {
+        folderToLastUuidMapping.put(folder, lastUuid);
     }
 }

@@ -76,20 +76,31 @@ public class RestClient {
 
         if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
             // mask password
-            String url2 = url.toString();
-            int index = url2.indexOf("password");
+            String params2 = params.toString();
+            int index = params2.indexOf("password");
             if (-1 < index) {
-                int end = url2.indexOf("&callback", index);
+                int end = params2.indexOf("&callback", index);
                 if (-1 < end) {
-                    url2 = url2.substring(0, index + 9) + "*******" + url2.substring(end);
+                    params2 = params2.substring(0, index + 9) + "*******" + params2.substring(end);
                 } else {
-                    url2 = url2.substring(0, index + 9) + "*******" + url2.substring(end);
+                    params2 = params2.substring(0, index + 9) + "*******" + params2.substring(params2.indexOf("&", index));
+                }
+            } else {
+                //mask nkey
+                index = params2.indexOf("nkey");
+                if (-1 < index) {
+                    int end = params2.indexOf("&callback", index);
+                    if (-1 < end) {
+                        params2 = params2.substring(0, index + 5) + "*******" + params2.substring(end);
+                    } else {
+                        params2 = params2.substring(0, index + 5) + "*******" + params2.substring(params2.indexOf("&", index));
+                    }
                 }
             }
 
             EpaUtils.getFeedback().verbose(module,
                                            AsmMessages.getMessage(AsmMessages.HTTP_REQUEST_310,
-                                                                  method, url2, params));
+                                                                  method, url, params2));
         }
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

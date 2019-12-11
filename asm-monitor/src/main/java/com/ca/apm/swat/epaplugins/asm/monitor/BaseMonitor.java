@@ -4,9 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
-import com.ca.apm.swat.epaplugins.asm.AsmReader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,13 +123,15 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
      * @param metricMap map to insert metrics into
      * @param jsonString API call result.
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return metricMap map containing the metrics
      */
     @SuppressWarnings("rawtypes")
     public Map<String, String> generateMetrics(
                                                Map<String, String> metricMap,
                                                String jsonString,
-                                               String metricTree) {
+                                               String metricTree, 
+                                               String endpoint) {
 
         if (null == jsonString) {
             return metricMap;
@@ -198,14 +198,13 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
         // append monitoring station to metric tree
         if (jsonObject.optString(LOCATION_TAG, null) != null) {
+            String location = getLocation(jsonObject);
             if (EpaUtils.getBooleanProperty(DISPLAY_STATIONS, true)) {
-                String location = AsmRequestHelper.getMonitoringStationMap().get(
-                                      jsonObject.getString(LOCATION_TAG));
-                if (null == location) {
-                    location = OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR
-                            + jsonObject.getString(LOCATION_TAG).replace("|", "");
-                } 
                 metricTree = metricTree + METRIC_PATH_SEPARATOR + location;
+            } 
+            
+            if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                EpaUtils.getFeedback().verbose(module, "Location: " + location);
             }
         }
 
@@ -217,13 +216,16 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
         boolean skipNoCheckpointAvailable =
                 EpaUtils.getBooleanProperty(SKIP_NO_CHECKPOINT_AVAILABLE, false);
 
+        Integer resultFieldInProbe = null;
+        Integer typeFieldInProbe = null;
+        
         while (jsonObjectKeys.hasNext()) {
             String thisKey = jsonObjectKeys.next().toString();
 
             // if this is another object do recursion
             if (jsonObject.optJSONObject(thisKey) != null) {
                 JSONObject innerJsonObject = jsonObject.getJSONObject(thisKey);
-                generateMetrics(metricMap, innerJsonObject.toString(), metricTree);
+                generateMetrics(metricMap, innerJsonObject.toString(), metricTree, endpoint);
             } else if (jsonObject.optJSONArray(thisKey) != null) {
                 // iterate over array
                 JSONArray innerJsonArray = jsonObject.optJSONArray(thisKey);
@@ -258,12 +260,12 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                                         // hand over parsing to a monitor-specific handler chain
                                         mon.generateMetrics(metricMap,
                                                 resultObj.toString(),
-                                                metricTree);
+                                                metricTree, endpoint);
                                     } else {
                                         // recursively generate metrics for these tags
                                         generateMetrics(metricMap,
                                                 resultObj.toString(),
-                                                metricTree);
+                                                metricTree, endpoint);
                                     }
                                 } catch (JSONException e) {
                                     EpaUtils.getFeedback().debug(module,
@@ -277,18 +279,19 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                             || thisKey.equals(STATS_TAG)) {
                         // recursively generate metrics for these tags
                         generateMetrics(metricMap,
-                                innerJsonArray.getJSONObject(i).toString(), metricTree);
+                                innerJsonArray.getJSONObject(i).toString(), metricTree, endpoint);
                     } else {
                         generateMetrics(metricMap,
                                 innerJsonArray.getJSONObject(i).toString(),
-                                metricTree + METRIC_PATH_SEPARATOR + thisKey.replace("|", ""));
+                                metricTree + METRIC_PATH_SEPARATOR + thisKey.replace("|", ""), endpoint);
                     }
                 }
             } else {
                 // ignore these tags
                 if ((thisKey.equals(CODE_TAG)) || (thisKey.equals(ELAPSED_TAG))
                         || (thisKey.equals(INFO_TAG)) || (thisKey.equals(VERSION_TAG))
-                        || (thisKey.equals(ACTIVE_TAG))
+                        || (thisKey.equals(ACTIVE_TAG)) || (thisKey.equals(CURSOR_TAG))
+                        || (thisKey.equals(UUID_TAG))
                         || (jsonObject.optString(thisKey, EMPTY_STRING).length() == 0)
                         || format.ignoreTagForMonitor(thisKey)) {
                     continue;
@@ -298,7 +301,10 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                             // let successors do the work
                             String thisValue = jsonObject.getString(thisKey);
                             if ((null != thisValue) && (0 < thisValue.length())) {
-                                getSuccessor().generateMetrics(outputMap, thisValue, metricTree);
+                                if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+                                    EpaUtils.getFeedback().verbose(module, LOGS_CMD + " " + OUTPUT_TAG + ": " + thisValue);
+                                }
+                                getSuccessor().generateMetrics(outputMap, thisValue, metricTree, endpoint);
                             } else {
                                 EpaUtils.getFeedback().warn(module, AsmMessages.getMessage(
                                                             AsmMessages.OUTPUT_EMPTY_WARN_705,
@@ -336,12 +342,46 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                     // TODO: continue instead?
                 }
 
-                if (thisKey.equals(COLOR_TAG)) {
+                if (thisKey.equals(TYPE_TAG)) {
+                    if (resultFieldInProbe != null && typeFieldInProbe == null) {
+                        //calculate and push metric
+                        String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + METRIC_NAME_ERRORS_PER_INTERVAL;
+                        
+                        typeFieldInProbe = new Integer(thisValue);
+                        
+                        if (resultFieldInProbe != PROBE_RESULT_OK && (typeFieldInProbe == PROBE_TYPE_NORMAL || typeFieldInProbe == PROBE_TYPE_SECOND_OPINION || typeFieldInProbe == PROBE_TYPE_FINAL)) {
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ONE);
+                        } else {
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ZERO);
+                        }
+                    } else {
+                        typeFieldInProbe = new Integer(thisValue);
+                    }
+                } else if (thisKey.equals(RESULT_TAG)) {
+                    if (typeFieldInProbe != null && resultFieldInProbe == null) {
+                        //calculate and push metric
+                        String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+                            + METRIC_NAME_ERRORS_PER_INTERVAL;
+                        
+                        resultFieldInProbe = new Integer(thisValue);
+                        
+                        if (resultFieldInProbe != PROBE_RESULT_OK && (typeFieldInProbe == PROBE_TYPE_NORMAL || typeFieldInProbe == PROBE_TYPE_SECOND_OPINION || typeFieldInProbe == PROBE_TYPE_FINAL)) {
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ONE);
+                        } else {
+                            pushErrorsPerIntervalAndLastCheckStatus(metricMap, metricTree, rawErrorMetric, ZERO);
+                        }
+                    } else {
+                        resultFieldInProbe = new Integer(thisValue);
+                    }
+
+                    // convert color to status value
+                } else if (thisKey.equals(COLOR_TAG)) {
                     String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
-                            + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
+                        + (String) AsmPropertiesImpl.ASM_METRICS.get(COLORS_TAG);
                     if (AsmPropertiesImpl.ASM_COLORS.containsKey(thisValue)) {
                         metricMap.put(rawErrorMetric,
-                                      (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
+                            (String) AsmPropertiesImpl.ASM_COLORS.get(thisValue));
                     } else {
                         metricMap.put(rawErrorMetric, ZERO);
                     }
@@ -368,6 +408,12 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
 
                 // map metric key
                 if (AsmPropertiesImpl.ASM_METRICS.containsKey(thisKey)) {
+                    // ignore these tags from rule_stats due to clashing of names with tags of rule_log and rule_psp
+                    if (endpoint.equals(STATS_AGG_N_ENDPOINT)) {
+                        if (AsmPropertiesImpl.ASM_RULE_STATS_TAGS_TO_IGNORE.contains(thisKey)) {
+                            continue;
+                        }
+                    }
                     thisKey = AsmPropertiesImpl.ASM_METRICS.get(thisKey);
                 }
 
@@ -425,16 +471,23 @@ public class BaseMonitor extends AbstractMonitor implements AsmProperties {
                                            + " in metric tree " + metricTree);
         }
 
-        // save the most recent UUID
-        String lastUuid = metricMap.get(UUID_TAG);
-        String currentUuid = jsonObject.optString(UUID_TAG, null);
-        if (currentUuid != null
-                && (lastUuid == null 
-                || UUID.fromString(currentUuid).compareTo(UUID.fromString(lastUuid)) > 0)) {
-            metricMap.put(UUID_TAG, currentUuid);            
-        }
-
         return metricMap;
+    }
+    
+    private void pushErrorsPerIntervalAndLastCheckStatus(Map<String, String> metricMap, String metricTree, String metric, String value) {
+        metricMap.put(metric, value);
+        String rawErrorMetric = metricTree + METRIC_NAME_SEPARATOR
+            + METRIC_NAME_LAST_CHECK_STATUS;
+        metricMap.put(rawErrorMetric, value);
+    }
+    
+    private String getLocation(JSONObject jsonObject) {
+        String location = AsmRequestHelper.getMonitoringStationMap().get(jsonObject.getString(LOCATION_TAG));
+        if (null == location) {
+            location = OPMS + METRIC_PATH_SEPARATOR + OPMS + METRIC_PATH_SEPARATOR
+                + jsonObject.getString(LOCATION_TAG).replace("|", "");
+        }
+        return location;
     }
 
     /**

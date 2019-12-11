@@ -71,13 +71,12 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
             if (DEBUG) {
@@ -137,13 +136,12 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + ":Result Code",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Check Start Time",
                 "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + ":Monitor ID",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Errors",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 http_//jmeter.apache.org/index.html:Assertion Failures",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Errors Per Interval",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 http_//jmeter.apache.org/usermanual/index.html:Response Code",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 http_//jmeter.apache.org/usermanual/build-test-plan.html:Status Message Value",
-                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 http_//www.apache.org/foundation/thanks.html:URL"
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|001 /index.html:Assertion Errors",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|001 /index.html:Assertion Failures",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? PHOENIX   : "") + "|002 /usermanual/index.html:Response Code",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? CALGARY   : "") + "|003 /usermanual/build-test-plan.html:Status Message",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? TORONTO   : "") + "|003 /usermanual/build-test-plan.html:Status Message Value",
+                "Monitors|Tests|Simple JMeter recording" + (stations ? VANCOUVER : "") + "|004 /foundation/thanks.html:URL"
             };
 
             if (DEBUG) {
@@ -632,6 +630,7 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Map Service_Restricted_Area:Alerts Per Interval",
                 "Monitors|Tests|Map Service_Restricted_Area:Check Start Time",
                 "Monitors|Tests|Map Service_Restricted_Area:Error Description",
+                "Monitors|Tests|Map Service_Restricted_Area:Errors Per Interval",
                 "Monitors|Tests|Map Service_Restricted_Area:Location Code",
                 "Monitors|Tests|Map Service_Restricted_Area:Monitor ID",
                 "Monitors|Tests|Map Service_Restricted_Area:Monitor Name",
@@ -646,6 +645,7 @@ public class LogTest extends FileTest {
                 "0",
                 "2016-11-02 00:02:28",
                 "Timeout of monitor sequence",
+                "1",
                 "ad",
                 "402423",
                 "Map Service_Restricted_Area",
@@ -701,6 +701,7 @@ public class LogTest extends FileTest {
                 "Monitors|Tests|Map Service_Restricted_Area:Alerts Per Interval",
                 "Monitors|Tests|Map Service_Restricted_Area:Check Start Time",
                 "Monitors|Tests|Map Service_Restricted_Area:Error Description",
+                "Monitors|Tests|Map Service_Restricted_Area:Errors Per Interval",
                 "Monitors|Tests|Map Service_Restricted_Area:Location Code",
                 "Monitors|Tests|Map Service_Restricted_Area:Monitor ID",
                 "Monitors|Tests|Map Service_Restricted_Area:Monitor Name",
@@ -714,7 +715,7 @@ public class LogTest extends FileTest {
                 "0",
                 "2016-11-02 00:03:10",
                 "No checkpoint available for check type script/IPvANY in namespace #195 and pool &apos;ad&apos;, excluding &apos;ad&apos;",
-                //"1",
+                "1",
                 "--",
                 "402423",
                 "Map Service_Restricted_Area",

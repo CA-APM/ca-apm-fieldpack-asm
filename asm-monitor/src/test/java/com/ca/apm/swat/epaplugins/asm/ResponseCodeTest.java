@@ -87,7 +87,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -98,9 +98,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 
@@ -161,7 +161,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -172,9 +172,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
             
@@ -237,7 +237,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
 
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -248,9 +248,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
             
@@ -313,7 +313,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -324,9 +324,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 
@@ -389,7 +389,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -400,9 +400,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 
@@ -465,7 +465,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -476,9 +476,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 
@@ -541,7 +541,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -552,9 +552,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 
@@ -617,7 +617,7 @@ public class ResponseCodeTest extends FileTest {
             JMeterScriptHandler handler = new JMeterScriptHandler();
             String metricTree = "Monitors|Test|TestService";
             
-            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree);
+            Map<String, String> metricMap = handler.generateMetrics(new MetricMap(), xmlString, metricTree, "");
             
             if (DEBUG) {
                 TreeSet<String> sortedSet = new TreeSet<String>(metricMap.keySet());
@@ -628,9 +628,9 @@ public class ResponseCodeTest extends FileTest {
             }
 
             String[] expectedMetrics = {
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Response Code",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message",
-                    metricTree + "|001 https_//test.ca.com/TestService/services/TestServicePort:Status Message Value"};
+                    metricTree + "|001 TestService:Response Code",
+                    metricTree + "|001 TestService:Status Message",
+                    metricTree + "|001 TestService:Status Message Value"};
 
             checkMetrics(expectedMetrics, metricMap);
 

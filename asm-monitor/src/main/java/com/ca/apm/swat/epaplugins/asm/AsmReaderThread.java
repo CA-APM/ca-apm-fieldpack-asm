@@ -26,9 +26,6 @@ public class AsmReaderThread implements AsmProperties, Runnable {
     private MetricWriter metricWriter;
     private ExecutorService reporterService;
     private Module module;
-    private boolean firstRun;
-    private String lastId;
-
 
     /**
      * Worker thread for App Synthetic Monitor EPA plugin.
@@ -50,8 +47,6 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         this.metricWriter = metricWriter;
         this.reporterService = reporterService;
         this.module = new Module("Asm.Folder." + folderName);
-        this.firstRun = true;
-        this.lastId = null;
     }
 
 
@@ -72,9 +67,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
             HashMap<String, String> metricMap = getFolderMetrics();
 
             // send the metrics to Enterprise Manager
-            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap, firstRun));
+            reporterService.execute(new AsmMetricReporter(metricWriter, metricMap));
 
-            firstRun = false;
         } catch (InterruptedException e) {
             // We've been interrupted: exit
             return;
@@ -163,9 +157,8 @@ public class AsmReaderThread implements AsmProperties, Runnable {
         // don't get aggregate metrics for root folder
         if (!EMPTY_STRING.equals(folder)) {
             // get stats for all monitors of this folder
-            // Disabling this for the moment since these statistics are not very useful
-            // and they somehow overwrite the values coming from rule_log
-            /*try {
+            
+            try {
                 if (EpaUtils.getBooleanProperty(METRICS_STATS_MONITOR, false)) {
                     resultMetricMap.putAll(requestHelper.getStats(folder, folderPrefix, false));
                 }
@@ -183,7 +176,7 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                                  + AsmMessages.getMessage(AsmMessages.GET_FOLDER_METRICS_304,
                                                           folder, resultMetricMap.size()));
                 return resultMetricMap;
-            }*/
+            }
 
             // get logs for all monitors of this folder
             try {
@@ -191,11 +184,17 @@ public class AsmReaderThread implements AsmProperties, Runnable {
                     LogResult result = requestHelper.getLogs(folder,
                                                                  monitorCount,
                                                                  folderPrefix,
-                                                                 lastId);
-                    if (result.getLastId() != null) {
-                        lastId = result.getLastId();
+                                                                 AsmReader.getLastUuidForFolder(folder));
+                    //do not send the metrics of the first call
+                    //since it is supposed only to get the uuid
+                    if (AsmReader.getLastUuidForFolder(folder) != null) { 
+                        resultMetricMap.putAll(result.getMap());
                     }
-                    resultMetricMap.putAll(result.getMap());
+                    
+                    if (result.getLastId() != null) {
+                        AsmReader.updateLastUuidForFolder(folder, result.getLastId());
+                    }
+                    
                 }
             } catch (Exception e) {
                 log.warn(module, AsmMessages.getMessage(AsmMessages.METRIC_READ_WARN_704,

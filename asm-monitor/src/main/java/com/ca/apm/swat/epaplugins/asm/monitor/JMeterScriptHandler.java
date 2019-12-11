@@ -10,7 +10,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
 import com.ca.apm.swat.epaplugins.asm.format.Formatter;
 import com.ca.apm.swat.epaplugins.asm.reporting.MetricMap;
 import com.ca.apm.swat.epaplugins.utils.AsmMessages;
@@ -35,15 +34,18 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
      * @param metricMap map to insert metrics into
      * @param xmlString JMeter script data
      * @param metricTree metric tree prefix
+     * @param API endpoint where the request came from
      * @return map containing the metrics
      */
     public Map<String, String> generateMetrics(Map<String, String> metricMap,
                                                String xmlString,
-                                               String metricTree) {
+                                               String metricTree, String endpoint) {
         
         if (EpaUtils.getFeedback().isDebugEnabled(module)) {
             EpaUtils.getFeedback().debug(module,
                 "JMeterScriptHandler - xmlString = " + xmlString);
+        } else if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module, "Entering JMeterScriptHandler.generateMetrics");
         }
 
         if (!xmlString.startsWith(XML_PREFIX)) {
@@ -55,6 +57,8 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             return metricMap;
         }
 
+        int step = 1; // start from 1, business not engineering
+        
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -63,7 +67,6 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
 
             NodeList testResults = document.getElementsByTagName(TEST_RESULTS);
 
-            int step = 1; // start from 1, business not engineering
             if (testResults.getLength() > 0) {
 
                 if (EpaUtils.getFeedback().isDebugEnabled(module)) {
@@ -90,6 +93,12 @@ public class JMeterScriptHandler implements Handler, AsmProperties {
             // don't throw, simply quit.
             // TODO In future we have to implement it for multiple different XML formats.
         }
+        
+        if (EpaUtils.getFeedback().isVerboseEnabled(module)) {
+            EpaUtils.getFeedback().verbose(module,
+                    "JMeterScriptHandler.generateMetrics for metricTree " + metricTree + " generated " + metricMap.size() + " metrics, steps created: " + (step-1));
+        }
+        
         return metricMap;
     }
 

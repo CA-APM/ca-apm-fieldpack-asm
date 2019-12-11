@@ -1,6 +1,7 @@
 package com.ca.apm.swat.epaplugins.utils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Contains constant maps for CA App Synthetic Monitor EPA plugin.
@@ -19,6 +20,11 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
      * Mapping table of status indicator colors.
      */
     public static final HashMap<String, String> ASM_COLORS = new HashMap<String, String>();
+    
+    /**
+     * Tags of rule_stats that need to be ignored (due to clashing of names with tags of rule_log and rule_psp)
+     */
+    public static final HashSet<String> ASM_RULE_STATS_TAGS_TO_IGNORE = new HashSet<String>();
 
     static {
         ASM_METRICS.put(ACTIVE_TAG, "Active");
@@ -43,7 +49,7 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_METRICS.put("dtime", "Download Time (ms)");
         ASM_METRICS.put("elapsed", "API Call Time (ms)");
         ASM_METRICS.put("end", "Check End Time");
-        ASM_METRICS.put(ERRORS_TAG, METRIC_NAME_ERRORS_PER_INTERVAL);
+        ASM_METRICS.put(ERRORS_TAG, "Consecutive Errors");
         ASM_METRICS.put("errorsince", "Error Since");
         ASM_METRICS.put(GMT_OFFSET_TAG, "Agent GMT Offset");
         ASM_METRICS.put("info", "Info");
@@ -82,5 +88,12 @@ public abstract class AsmPropertiesImpl implements AsmProperties {
         ASM_COLORS.put(YELLOW, "2");
         ASM_COLORS.put(ORANGE, "2");
         ASM_COLORS.put(RED, "3");
+        
+        ASM_RULE_STATS_TAGS_TO_IGNORE.add("ttime");
+        ASM_RULE_STATS_TAGS_TO_IGNORE.add("ctime");
+        ASM_RULE_STATS_TAGS_TO_IGNORE.add("ptime");
+        ASM_RULE_STATS_TAGS_TO_IGNORE.add("dtime");
+        ASM_RULE_STATS_TAGS_TO_IGNORE.add("dsize");
+        ASM_RULE_STATS_TAGS_TO_IGNORE.add("consecutive_errors");
     }
 }
